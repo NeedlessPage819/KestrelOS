@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Kestrel OS helper: one simple command for updates, rollback and status (DECISIONS.md D11).
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Kestrel OS – Hilfsbefehl
+
+  kestrel update     System und Apps aktualisieren (System-Update gilt ab dem nächsten Neustart)
+  kestrel rollback   Beim nächsten Neustart wieder die vorherige Systemversion starten
+  kestrel status     Aktuelle und vorherige Systemversion anzeigen
+  kestrel help       Diese Hilfe
+EOF
+}
+
+as_root() {
+    if (( EUID == 0 )); then "$@"; else sudo "$@"; fi
+}
+
+cmd_update() {
+    echo "==> System-Update wird heruntergeladen und vorbereitet …"
+    as_root bootc upgrade
+    echo "==> Apps (Flatpak) werden aktualisiert …"
+    flatpak update --system --noninteractive
+    flatpak update --user --noninteractive 2>/dev/null || true
+    echo
+    echo "Fertig. Das neue System ist ab dem nächsten Neustart aktiv."
+    echo "Falls danach etwas nicht stimmt: 'kestrel rollback' und neu starten."
+}
+
+cmd_rollback() {
+    as_root bootc rollback
+    echo
+    echo "Beim nächsten Neustart startet die vorherige Systemversion."
+}
+
+cmd_status() {
+    as_root bootc status
+}
+
+case "${1:-help}" in
+    update)   cmd_update ;;
+    rollback) cmd_rollback ;;
+    status)   cmd_status ;;
+    help|-h|--help) usage ;;
+    *) usage >&2; exit 2 ;;
+esac

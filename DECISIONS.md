@@ -157,3 +157,37 @@ Ein „Ausprobieren ohne Installation“ gibt es vorerst nicht.
 Windows-PC. Darin läuft eine **QEMU/KVM-VM** mit Secure Boot. Dein Windows bleibt unberührt.
 **Warum:** WSL2 ist von Microsoft, sauber getrennt und mit einem Befehl wieder entfernbar.
 Fedora in WSL hat genau die Werkzeuge, die auch das Zielsystem nutzt (podman, bootc).
+
+---
+
+## D11 – Ein einfacher Befehl für Updates: `kestrel`
+
+**Was:** Im Terminal gibt es den Befehl `kestrel`:
+- `kestrel update`: lädt das neue System und aktualisiert alle Apps. Das neue System gilt ab dem
+  nächsten Neustart. Das alte bleibt als Notfall-Version erhalten.
+- `kestrel rollback`: beim nächsten Start wieder die vorherige Version nehmen.
+- `kestrel status`: zeigt, welche Versionen installiert sind.
+
+Updates gehen auch per Mausklick in **Discover** (dem App-Store von KDE).
+
+**Warum:** Die eigentlichen Werkzeuge (`bootc`, `flatpak`) sind für Anfänger unübersichtlich.
+Ein Befehl mit deutschen Meldungen ist einfacher.
+
+**Offen:** Damit installierte Rechner Updates *finden*, muss das fertige System-Image im Internet
+liegen (z. B. kostenlos auf GitHub). Das ist eine Veröffentlichung nach außen, deshalb frage ich
+vorher nach. Bis dahin aktualisiert man durch Neuinstallation mit einem neuen ISO.
+
+---
+
+## D12 – Eigenes Design statt fremder Themes
+
+**Was:**
+- **Hintergrundbild:** eigene Vektorgrafik (Farbverlauf mit weichen Wellen), hell und dunkel.
+  Plasma wählt automatisch die passende Variante zum hellen oder dunklen Farbschema. Dasselbe Bild
+  erscheint auf dem Sperrbildschirm.
+- **Akzentfarbe:** ein ruhiges Blau-Violett (`#5B6CF0`), passend zum Hintergrund.
+- **Grundlage:** das Standard-Design „Breeze“ von KDE, nur angepasst.
+
+**Warum:** Fertige „macOS-Themes“ aus dem Internet kopieren oft Apple-Grafiken (rechtlich heikel)
+und gehen bei Plasma-Updates gerne kaputt. Breeze wird von KDE selbst gepflegt und bleibt bei
+Updates stabil. Wir passen nur Farben, Schrift und Anordnung an.

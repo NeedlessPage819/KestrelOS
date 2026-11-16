@@ -1,0 +1,8 @@
+{
+    "KPlugin": {
+        "Authors": [{ "Name": "Kestrel OS" }],
+        "Id": "Kestrel",
+        "License": "CC-BY-SA-4.0",
+        "Name": "Kestrel"
+    }
+}

@@ -6,11 +6,20 @@ ARG AKMODS_NVIDIA_IMAGE=ghcr.io/ublue-os/akmods-nvidia-open
 # Prebuilt, signed Nvidia kernel modules matching the base image kernel.
 FROM ${AKMODS_NVIDIA_IMAGE}:main-${FEDORA_VERSION} AS akmods-nvidia
 
+# Render the vector artwork to PNG, so the final image needs no SVG tooling.
+FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION} AS artwork
+RUN dnf5 -y install librsvg2-tools
+COPY artwork/ /src/
+RUN mkdir -p /out/images /out/images_dark && \
+    rsvg-convert -w 3840 -h 2160 -o /out/images/3840x2160.png /src/wallpaper-light.svg && \
+    rsvg-convert -w 3840 -h 2160 -o /out/images_dark/3840x2160.png /src/wallpaper-dark.svg
+
 FROM ${BASE_IMAGE}:${FEDORA_VERSION}
 ARG OS_NAME="Kestrel OS"
 ARG IMAGE_NAME=kestrel
 
 COPY system_files/ /
+COPY --from=artwork /out/ /usr/share/wallpapers/Kestrel/contents/
 COPY packages/ /tmp/build/packages/
 COPY build/ /tmp/build/
 
