@@ -135,8 +135,9 @@ System verlangen. Das haben wir dann schon.
 
 ## D8 – Alltags-Programme als Flatpak
 
-Firefox, LibreOffice und VLC kommen beim ersten Start mit Internet von Flathub.
-Dateimanager (Dolphin), Drucken (CUPS), WLAN, Bluetooth und Energieverwaltung sind fest im System.
+LibreOffice und VLC kommen beim ersten Start mit Internet von Flathub.
+Firefox, Dateimanager (Dolphin), Drucken (CUPS), WLAN, Bluetooth und Energieverwaltung sind fest
+im System. Flathub ist die einzige App-Quelle, damit Discover keine Apps doppelt anzeigt.
 **Warum:** Flatpaks bekommen Updates direkt vom Hersteller. Sie laufen getrennt vom System, damit
 können sie das Grundsystem nicht beschädigen.
 

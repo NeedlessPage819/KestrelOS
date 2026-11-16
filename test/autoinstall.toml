@@ -16,8 +16,8 @@ poweroff
 
 %post --erroronfail
 systemctl enable sshd.service
-mkdir -p /etc/sddm.conf.d
-cat > /etc/sddm.conf.d/zz-kestrel-test-autologin.conf <<'EOF'
+mkdir -p /etc/plasmalogin.conf.d
+cat > /etc/plasmalogin.conf.d/zz-kestrel-test-autologin.conf <<'EOF'
 [Autologin]
 User=tester
 Session=plasma

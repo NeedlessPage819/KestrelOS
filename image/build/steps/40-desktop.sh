@@ -9,9 +9,11 @@ ours=/usr/share/plasma/look-and-feel/org.kestrel.desktop/contents
 cp -rn "$breeze"/. "$ours"/
 
 # Spotlight: open KRunner with Meta+Space in addition to the Plasma defaults.
-krunner=/usr/share/applications/org.kde.krunner.desktop
+# Only the first entry is KRunner itself; later ones belong to its actions.
+krunner=/usr/share/kglobalaccel/org.kde.krunner.desktop
 grep -q '^X-KDE-Shortcuts=' "$krunner" || die "KRunner shortcut entry not found"
-sed -i '/^X-KDE-Shortcuts=/{/Meta+Space/!s/=/=Meta+Space,/}' "$krunner"
+sed -i '0,/^X-KDE-Shortcuts=/{/^X-KDE-Shortcuts=/{/Meta+Space/!s/=/=Meta+Space,/}}' "$krunner"
+grep -m1 '^X-KDE-Shortcuts=' "$krunner" | grep -q 'Meta+Space' || die "could not add Meta+Space to KRunner"
 
 # Branding. ID stays "fedora" so that tools checking for Fedora keep working.
 sed -i \
