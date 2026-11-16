@@ -1,0 +1,12 @@
+# Gaming stack (see DECISIONS.md D6). Heroic, Bottles, ProtonUp-Qt come as Flatpaks.
+steam
+wine
+winetricks
+lutris
+gamemode
+gamemode.i686
+mangohud
+mangohud.i686
+gamescope
+vulkan-tools
+mesa-vulkan-drivers.i686

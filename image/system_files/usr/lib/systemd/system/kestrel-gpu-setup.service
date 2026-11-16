@@ -1,0 +1,12 @@
+[Unit]
+Description=Kestrel OS: choose GPU driver for this hardware
+ConditionPathExists=!/var/lib/kestrel/gpu-setup.done
+After=systemd-udev-settle.service local-fs.target
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/kestrel/gpu-setup
+
+[Install]
+WantedBy=multi-user.target

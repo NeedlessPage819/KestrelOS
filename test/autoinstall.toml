@@ -1,0 +1,26 @@
+# bootc-image-builder config for the automated VM test ISO. NEVER use on real hardware:
+# it wipes the first disk without asking. Test-only account: tester / kestrel-test.
+[customizations.installer.kickstart]
+contents = """
+text --non-interactive
+lang de_DE.UTF-8
+keyboard de
+timezone Europe/Berlin --utc
+zerombr
+clearpart --all --initlabel --disklabel=gpt
+autopart --noswap --type=btrfs
+network --bootproto=dhcp --device=link --activate --onboot=on
+user --name=tester --groups=wheel --password=kestrel-test --plaintext
+rootpw --lock
+poweroff
+
+%post --erroronfail
+systemctl enable sshd.service
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/zz-kestrel-test-autologin.conf <<'EOF'
+[Autologin]
+User=tester
+Session=plasma
+EOF
+%end
+"""

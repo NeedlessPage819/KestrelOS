@@ -1,0 +1,159 @@
+# Entscheidungen
+
+Hier steht jede wichtige Entscheidung: **was**, **warum** und **was wir dafür in Kauf nehmen**.
+Neueste Einträge kommen ans Ende.
+
+---
+
+## D1 – Arbeitsname „Kestrel OS“
+
+**Was:** Das System heißt vorerst *Kestrel OS* (Kestrel = Turmfalke: klein, schnell).
+**Warum:** Wir brauchen einen Namen für Dateien und Menüs. Er steht nur an einer Stelle
+(`config.env`) und lässt sich jederzeit ändern.
+
+---
+
+## D2 – Basis: Fedora Kinoite (Atomic Desktop) über Universal Blue
+
+**Was:** Wir bauen auf **Fedora Kinoite** auf. Das ist das offizielle Fedora mit KDE Plasma,
+als „atomares“ System. Als Startpunkt nehmen wir das Image `kinoite-main` von
+**Universal Blue**. Das ist dasselbe Fedora, nur schon mit Multimedia-Codecs und
+fertig signierten Nvidia-Treibern. Darauf bauen auch Bazzite und Aurora auf.
+
+**Warum, einfach erklärt:**
+
+| Anforderung | Warum Fedora Atomic passt |
+|---|---|
+| Updates dürfen nichts kaputt machen | Ein Update wird komplett im Hintergrund vorbereitet und erst beim Neustart aktiv. Geht etwas schief, wählst du im Startmenü einfach die vorherige Version (**Rollback eingebaut**, ohne Extra-Werkzeug). |
+| Secure Boot / Anti-Cheat | Fedora startet mit einem von Microsoft signierten Bootloader. Secure Boot kann also **an** bleiben. Kernel und Bootvorgang bleiben Standard. |
+| Aktuelle Treiber | Fedora liefert neue Kernel und Mesa-Versionen (AMD/Intel-Grafik) innerhalb weniger Wochen. Debian/Ubuntu-LTS sind hier oft ein Jahr hinterher. |
+| Reproduzierbarer Build | Das ganze System wird wie ein Container aus einer Datei (`image/Containerfile`) gebaut. Gleiche Eingaben ergeben das gleiche System. |
+| Verbreitet und gepflegt | Fedora wird von Red Hat und einer großen Community gepflegt. Gaming-Distros wie Bazzite beweisen, dass genau dieser Stapel für Spiele funktioniert. |
+
+**Verworfene Alternativen:**
+- *Arch Linux + archiso:* Neueste Pakete, aber Secure Boot geht nicht direkt, und ein Rollback
+  müsste man selbst bauen (Btrfs + Snapper). Bei Rolling Release ist die Gefahr größer,
+  dass ein Update den Alltag stört.
+- *Ubuntu/Debian + live-build:* Stabil, aber Grafiktreiber und Mesa sind für Gaming oft zu alt.
+  Auch hier gibt es kein eingebautes Rollback.
+- *openSUSE Tumbleweed:* Hat Snapshots und Secure Boot, ist aber bei Gaming-Software und
+  Nvidia-Paketen weniger verbreitet.
+
+**Was wir dafür in Kauf nehmen:** Programme installiert man im Alltag als **Flatpak**
+(über „Discover“), nicht mit `dnf`. Für normale Nutzer ist das sogar einfacher.
+
+---
+
+## D3 – Fedora-Version: 44 (nicht das ganz neue 45)
+
+**Was:** Standard ist Fedora 44 (Einstellung `FEDORA_VERSION` in `config.env`).
+**Warum:** Fedora 45 ist gerade erst erschienen. Nach unserer Regel „Alltag geht vor“
+nehmen wir die seit Monaten bewährte Version. Fedora 44 bekommt noch bis etwa Mitte 2027
+Updates. Sobald 45 ein paar Wochen ohne große Fehler läuft, wechseln wir. Dafür ändert
+man nur eine Zahl.
+
+---
+
+## D4 – Desktop: KDE Plasma 6 im macOS-Stil
+
+**Was:** KDE Plasma 6 (Wayland) mit eigenem Layout:
+- **Top-Bar:** Startmenü-Knopf links, Programm-Menü (globales Menü), rechts Symbole und Uhr.
+- **Dock:** schwebend und zentriert unten. Weicht Fenstern aus und enthält Launchpad-Knopf,
+  Lieblings-Apps und Papierkorb.
+- **Blur** (Milchglas-Effekt) und weiche Animationen. Fenster minimieren sich mit dem
+  „Magic Lamp“-Effekt (wie der Genie-Effekt).
+- **Fensterknöpfe links** (Schließen, Minimieren, Maximieren), wie am Mac.
+- **Schrift:** *Inter* (sehr gut lesbar, ähnlich wie SF Pro) und *JetBrains Mono* für Code.
+- **Spotlight:** KRunner öffnet sich mit **Meta+Leertaste** (Meta = Windows-Taste, entspricht
+  Cmd am Mac). KRunner findet Apps, Dateien, rechnet und rechnet Einheiten um.
+- **Gesten:** Plasma hat Touchpad-Gesten eingebaut (Wischen mit 4 Fingern: Übersicht und
+  Arbeitsflächen wechseln). Tippen zum Klicken ist an.
+
+**Warum KDE und nicht GNOME:** GNOME braucht für Dock und Blur *Erweiterungen*. Die gehen bei
+GNOME-Updates oft kaputt, und das widerspricht „Updates dürfen nichts kaputt machen“.
+In Plasma sind Dock, Blur, globales Menü und Spotlight **fest eingebaut**.
+
+**Bewusst nicht gemacht:** Wir kopieren keine Apple-Grafiken, Logos oder Icons.
+Wir übernehmen das *Gefühl*, nicht das Markenzeichen.
+
+---
+
+## D5 – Grafiktreiber: automatisch nach Hardware
+
+**Was:**
+- **AMD und Intel:** Treiber stecken im Kernel und in Mesa und laufen sofort. Es gibt nichts
+  einzurichten. Das gilt auch für deinen Acer (AMD Radeon).
+- **Nvidia (GTX 16xx / RTX 20xx und neuer):** Der offizielle Nvidia-Treiber („nvidia-open“) ist
+  im System enthalten, aber zunächst *ausgeschaltet*. Beim ersten Start prüft der Dienst
+  `kestrel-gpu-setup`, ob eine passende Nvidia-Karte da ist. Nur dann schaltet er den Treiber ein
+  und startet einmal neu.
+- **Ältere Nvidia-Karten (GTX 10xx und älter):** Sie behalten den freien Treiber „nouveau“.
+  Der neue Nvidia-Treiber unterstützt sie nicht mehr.
+
+**Warum:** Ein einziges ISO für alle Rechner, ohne dass jemand etwas auswählen muss. Auf Rechnern
+ohne Nvidia bleibt der Nvidia-Treiber komplett aus und kann nichts stören.
+
+**Secure Boot mit Nvidia:** Der Nvidia-Treiber ist mit dem Schlüssel von Universal Blue signiert.
+Ist Secure Boot an, muss man diesen Schlüssel einmalig bestätigen. Nach dem Neustart erscheint ein
+blauer Bildschirm („MOK“), Passwort: `universalblue`. Das betrifft nur Nvidia-Rechner.
+
+---
+
+## D6 – Gaming-Software
+
+**Fest im System (RPM):** Steam, Wine, Winetricks, Lutris, GameMode, MangoHud, Gamescope.
+**Beim ersten Start mit Internet (Flatpak):** Heroic (Epic/GOG, z. B. für Rocket League),
+Bottles, ProtonUp-Qt.
+
+**Warum diese Aufteilung:** Steam und Wine gehören ins System, weil sie tief mit Treibern und
+32-Bit-Bibliotheken verzahnt sind. Wine funktioniert damit auch ohne Internet (das brauchen wir
+für den Test). Heroic, Bottles und ProtonUp-Qt veröffentlicht der Hersteller selbst als Flatpak.
+Dort sind sie am aktuellsten.
+
+**Leistungs-Einstellungen, die den Alltag nicht stören:**
+- `ntsync`: Ein Kernel-Modul, mit dem Wine und Proton Windows-Programme schneller synchronisieren.
+  Es wird nur benutzt, wenn ein Spiel läuft.
+- `split_lock_mitigate = 0`: Verhindert, dass manche Spiele künstlich ausgebremst werden.
+- **GameMode** schaltet die CPU nur *während eines Spiels* auf volle Leistung. Danach läuft sie
+  wieder im Stromsparmodus, gut für den Akku.
+
+**Bewusst NICHT gemacht:** Kein eigener Gaming-Kernel, keine geänderten Boot-Parameter, keine
+abgeschalteten Sicherheitsfunktionen. Das kostet höchstens ein paar Prozent FPS. Dafür bleiben
+Secure Boot, Anti-Cheat-Kompatibilität und Akku-Laufzeit unangetastet (siehe D7).
+
+---
+
+## D7 – Anti-Cheat und Secure Boot
+
+**Was:** Standard-Fedora-Kernel (signiert), Standard-Bootloader (shim + GRUB), keine
+Kernel-Patches, keine Sonder-Boot-Parameter für Gaming.
+**Warum:** Rocket League (Easy Anti-Cheat) läuft unter Proton bereits. Sollte Epic eines Tages
+Fortnite für Linux freigeben, wird es sehr wahrscheinlich ein unverändertes, Secure-Boot-fähiges
+System verlangen. Das haben wir dann schon.
+
+---
+
+## D8 – Alltags-Programme als Flatpak
+
+Firefox, LibreOffice und VLC kommen beim ersten Start mit Internet von Flathub.
+Dateimanager (Dolphin), Drucken (CUPS), WLAN, Bluetooth und Energieverwaltung sind fest im System.
+**Warum:** Flatpaks bekommen Updates direkt vom Hersteller. Sie laufen getrennt vom System, damit
+können sie das Grundsystem nicht beschädigen.
+
+---
+
+## D9 – Installations-ISO statt Live-System (vorerst)
+
+**Was:** Das ISO ist ein **Installer** (Anaconda, das Programm, das auch Fedora benutzt).
+Ein „Ausprobieren ohne Installation“ gibt es vorerst nicht.
+**Warum:** Für atomare Systeme ist das der offizielle, stabile Weg (Werkzeug
+`bootc-image-builder` von Fedora/Red Hat). Ein Live-ISO prüfen wir später als Verbesserung.
+
+---
+
+## D10 – Bauen und Testen nur in der Sandbox
+
+**Was:** Gebaut und getestet wird ausschließlich in einer **WSL2-Fedora-Umgebung** auf deinem
+Windows-PC. Darin läuft eine **QEMU/KVM-VM** mit Secure Boot. Dein Windows bleibt unberührt.
+**Warum:** WSL2 ist von Microsoft, sauber getrennt und mit einem Befehl wieder entfernbar.
+Fedora in WSL hat genau die Werkzeuge, die auch das Zielsystem nutzt (podman, bootc).

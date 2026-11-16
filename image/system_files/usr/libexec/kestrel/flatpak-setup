@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Installs the default Flatpak apps from Flathub (DECISIONS.md D6, D8).
+# Re-runs whenever the app list changes; apps removed by the user are not reinstalled until then.
+set -euo pipefail
+
+readonly LIST=/usr/share/kestrel/flatpaks.list
+readonly STATE_DIR=/var/lib/kestrel
+stamp="$STATE_DIR/flatpaks-$(sha256sum "$LIST" | cut -c1-16).done"
+
+[[ -e $stamp ]] && exit 0
+
+flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+mapfile -t apps < <(grep -Ev '^[[:space:]]*(#|$)' "$LIST")
+flatpak install --system --noninteractive --or-update flathub "${apps[@]}"
+
+mkdir -p "$STATE_DIR"
+rm -f "$STATE_DIR"/flatpaks-*.done
+touch "$stamp"

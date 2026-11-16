@@ -1,0 +1,7 @@
+# bootc-image-builder config for the public installer ISO.
+# Interactive: the user chooses disk, language, keyboard and creates their own account.
+[customizations.installer.modules]
+enable = [
+    "org.fedoraproject.Anaconda.Modules.Localization",
+    "org.fedoraproject.Anaconda.Modules.Users",
+]

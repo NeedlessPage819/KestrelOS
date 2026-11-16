@@ -1,0 +1,11 @@
+# Hardware and VM support. Guest services only start inside their hypervisor.
+open-vm-tools-desktop
+virtualbox-guest-additions
+qemu-guest-agent
+spice-vdagent
+thermald            # Intel thermal management; exits on other CPUs
+# Printing
+cups
+hplip
+foomatic-db-ppds
+gutenprint-cups

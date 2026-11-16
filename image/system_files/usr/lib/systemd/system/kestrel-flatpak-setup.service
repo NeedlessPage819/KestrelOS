@@ -1,0 +1,16 @@
+[Unit]
+Description=Kestrel OS: install default Flatpak apps
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/kestrel/flatpak-setup
+# No internet yet (e.g. Wi-Fi not configured): try again later.
+Restart=on-failure
+RestartSec=5min
+Nice=10
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=multi-user.target

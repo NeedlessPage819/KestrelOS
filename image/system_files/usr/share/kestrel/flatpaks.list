@@ -1,0 +1,10 @@
+# Default apps from Flathub. Changing this file makes kestrel-flatpak-setup run again.
+# Everyday
+org.mozilla.firefox
+org.libreoffice.LibreOffice
+org.videolan.VLC
+com.github.tchx84.Flatseal
+# Gaming
+com.heroicgameslauncher.hgl
+com.usebottles.bottles
+net.davidotek.pupgui2

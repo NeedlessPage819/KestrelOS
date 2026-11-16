@@ -1,0 +1,21 @@
+# Kestrel OS system image. Built by ../build.sh; all versions come from ../config.env.
+ARG FEDORA_VERSION=44
+ARG BASE_IMAGE=ghcr.io/ublue-os/kinoite-main
+ARG AKMODS_NVIDIA_IMAGE=ghcr.io/ublue-os/akmods-nvidia-open
+
+# Prebuilt, signed Nvidia kernel modules matching the base image kernel.
+FROM ${AKMODS_NVIDIA_IMAGE}:main-${FEDORA_VERSION} AS akmods-nvidia
+
+FROM ${BASE_IMAGE}:${FEDORA_VERSION}
+ARG OS_NAME="Kestrel OS"
+ARG IMAGE_NAME=kestrel
+
+COPY system_files/ /
+COPY packages/ /tmp/build/packages/
+COPY build/ /tmp/build/
+
+RUN --mount=type=bind,from=akmods-nvidia,src=/rpms,dst=/tmp/akmods-nvidia \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
+    OS_NAME="${OS_NAME}" IMAGE_NAME="${IMAGE_NAME}" /tmp/build/build.sh
+
+RUN bootc container lint

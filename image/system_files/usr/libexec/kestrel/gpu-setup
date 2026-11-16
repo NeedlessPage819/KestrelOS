@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Enables the Nvidia driver once per installation if a supported GPU is present (DECISIONS.md D5).
+# Turing (GTX 16xx / RTX 20xx) and newer use nvidia-open; everything else keeps Mesa/nouveau.
+set -euo pipefail
+
+readonly STATE_DIR=/var/lib/kestrel
+readonly DONE="$STATE_DIR/gpu-setup.done"
+readonly MODPROBE_OVERRIDE=/etc/modprobe.d/kestrel-gpu.conf
+readonly MOK_KEY=/etc/pki/akmods/certs/akmods-ublue.der
+readonly MOK_PASSWORD=universalblue
+# Device IDs from 0x1e00 upward are Turing or newer.
+readonly FIRST_TURING_ID=$((0x1e00))
+
+log() { echo "kestrel-gpu-setup: $*"; }
+
+supported_nvidia_gpu() {
+    local dev
+    for dev in /sys/bus/pci/devices/*; do
+        [[ $(<"$dev/vendor") == 0x10de && $(<"$dev/class") == 0x03* ]] || continue
+        (( $(<"$dev/device") >= FIRST_TURING_ID )) && return 0
+    done
+    return 1
+}
+
+secure_boot_enabled() {
+    mokutil --sb-state 2>/dev/null | grep -q 'SecureBoot enabled'
+}
+
+enable_nvidia() {
+    cat >"$MODPROBE_OVERRIDE" <<'EOF'
+# Written by kestrel-gpu-setup: supported Nvidia GPU found, nvidia-open enabled.
+blacklist nouveau
+options nvidia-drm modeset=1 fbdev=1
+EOF
+    systemctl enable nvidia-suspend.service nvidia-resume.service nvidia-hibernate.service
+    rpm-ostree kargs \
+        --append-if-missing=rd.driver.blacklist=nouveau \
+        --append-if-missing=modprobe.blacklist=nouveau
+
+    if secure_boot_enabled && [[ -f $MOK_KEY ]] && ! mokutil --test-key "$MOK_KEY" | grep -q 'already enrolled'; then
+        log "Secure Boot is on: requesting enrollment of the Nvidia module key (password: $MOK_PASSWORD)"
+        printf '%s\n%s\n' "$MOK_PASSWORD" "$MOK_PASSWORD" | mokutil --import "$MOK_KEY"
+        plymouth display-message --text="Nvidia: Beim Neustart 'Enroll MOK' wählen, Passwort: $MOK_PASSWORD" || true
+        sleep 10
+    fi
+}
+
+mkdir -p "$STATE_DIR"
+if supported_nvidia_gpu; then
+    log "supported Nvidia GPU found, enabling nvidia-open"
+    enable_nvidia
+    touch "$DONE"
+    systemctl reboot
+else
+    log "no supported Nvidia GPU, keeping Mesa drivers"
+    touch "$DONE"
+fi
