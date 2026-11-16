@@ -1,5 +1,4 @@
-# Gaming stack (see DECISIONS.md D6). Heroic, Bottles, ProtonUp-Qt come as Flatpaks.
-steam
+# Gaming stack (see DECISIONS.md D6). Steam: steps/25-steam.sh. Heroic, Bottles, ProtonUp-Qt come as Flatpaks.
 wine
 winetricks
 lutris
