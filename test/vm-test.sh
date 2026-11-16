@@ -13,6 +13,15 @@ readonly TEST_USER=tester TEST_PASSWORD=kestrel-test   # fixture from test/autoi
 OVMF_CODE=${OVMF_CODE:-$(ls /usr/share/edk2/ovmf/OVMF_CODE*.secboot.fd | head -n1)}
 OVMF_VARS=${OVMF_VARS:-$(ls /usr/share/edk2/ovmf/OVMF_VARS*.secboot.fd | head -n1)}
 
+# Without /dev/kvm (e.g. WSL without nested virtualization) fall back to software emulation:
+# same checks, roughly 10x slower, so every timeout is scaled.
+if [[ -e /dev/kvm ]]; then
+    readonly ACCEL=(-accel kvm -cpu host) SLOW=1
+else
+    echo "note: /dev/kvm missing, using software emulation (TCG); this takes hours" >&2
+    readonly ACCEL=(-accel tcg,thread=multi,tb-size=1024 -cpu max) SLOW=10
+fi
+
 failures=0
 
 log() { printf '\n=== %s\n' "$*"; }
@@ -31,7 +40,7 @@ check() {
 run_vm() {
     local phase=$1; shift
     qemu-system-x86_64 \
-        -machine q35,smm=on -accel kvm -cpu host -smp 4 -m 6144 \
+        -machine q35,smm=on "${ACCEL[@]}" -smp 4 -m 6144 \
         -global driver=cfi.pflash01,property=secure,value=on \
         -drive if=pflash,format=raw,unit=0,readonly=on,file="$OVMF_CODE" \
         -drive if=pflash,format=raw,unit=1,file="$WORK/OVMF_VARS.fd" \
@@ -72,7 +81,6 @@ wait_for() { # $1: timeout in seconds, rest: command
 }
 
 [[ -f $ISO ]] || { echo "missing $ISO, run: sudo ./build.sh test-iso" >&2; exit 1; }
-[[ -e /dev/kvm ]] || { echo "/dev/kvm missing: nested virtualization is not available" >&2; exit 1; }
 
 rm -rf "$WORK" && mkdir -p "$WORK"
 cp "$OVMF_VARS" "$WORK/OVMF_VARS.fd"
@@ -80,16 +88,16 @@ qemu-img create -q -f qcow2 "$WORK/disk.qcow2" 64G
 x86_64-w64-mingw32-gcc -O2 -o "$WORK/winhello.exe" test/winhello.c
 
 log "Installing (unattended, VM powers off when done)"
-timeout 60m run_vm install -cdrom "$ISO" -boot once=d
+timeout $((60 * SLOW))m run_vm install -cdrom "$ISO" -boot once=d
 
 log "Booting installed system"
 run_vm boot &
 vm_pid=$!
 trap 'kill $vm_pid 2>/dev/null || true' EXIT
 
-check "VM reachable over SSH" wait_for 600 remote true
-check "Plasma desktop session started" wait_for 300 remote 'pgrep -u "$USER" -x plasmashell >/dev/null'
-sleep 20
+check "VM reachable over SSH" wait_for $((600 * SLOW)) remote true
+check "Plasma desktop session started" wait_for $((300 * SLOW)) remote 'pgrep -u "$USER" -x plasmashell >/dev/null'
+sleep $((20 * SLOW))
 screenshot desktop
 
 check "Secure Boot enabled" remote 'mokutil --sb-state | grep -q "SecureBoot enabled"'
@@ -104,9 +112,9 @@ sshpass -p "$TEST_PASSWORD" scp -q -P "$SSH_PORT" \
     -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
     "$WORK/winhello.exe" "$TEST_USER@127.0.0.1:winhello.exe"
 check "Windows program runs via Wine" \
-    in_session 'WINEDEBUG=-all timeout 300 wine ~/winhello.exe | tee /dev/stderr | grep -q KESTREL-WINE-OK'
+    in_session "WINEDEBUG=-all timeout $((300 * SLOW)) wine ~/winhello.exe | tee /dev/stderr | grep -q KESTREL-WINE-OK"
 in_session 'WINEDEBUG=-all nohup wine ~/winhello.exe --gui >/dev/null 2>&1 &'
-sleep 15
+sleep $((15 * SLOW))
 screenshot wine-gui
 
 log "Result"
