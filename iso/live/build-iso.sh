@@ -9,7 +9,7 @@
 #
 # Adapted from Titanoboa's build_iso.sh (https://github.com/ublue-os/titanoboa, Apache-2.0,
 # commit 5c457c3d0518bd17e754be0fd98a60d29d26abb4). Kestrel additions: the boot menu theme,
-# German menu entries, the installer payload next to the squashfs, and a media checksum.
+# German menu entries drawn as images, the installer payload next to the squashfs, and a media checksum.
 set -euo pipefail
 : "${ISO_LABEL:?}" "${ISO_NAME:?}" "${OS_NAME:?}"
 
@@ -45,36 +45,35 @@ set default=0
 set menu_auto_hide=false
 search --no-floppy --set=root -l '$ISO_LABEL'
 
-# Graphical menu with the Kestrel theme. With Secure Boot GRUB cannot load modules; the
-# ones needed are built into Fedora's signed GRUB, and if not, the plain menu still works.
+# Graphical menu with the Kestrel theme. With Secure Boot GRUB cannot load modules or
+# fonts; the modules needed are built into Fedora's signed GRUB, and all text is in images.
 insmod all_video
 insmod gfxterm
 insmod png
 set gfxmode=auto
 set gfxpayload=keep
 terminal_output gfxterm
-# Fonts by name: wildcards need GRUB's regexp module, which Secure Boot GRUB cannot load.
-loadfont (\$root)/boot/grub2/themes/kestrel/inter-regular-22.pf2
-loadfont (\$root)/boot/grub2/themes/kestrel/inter-semibold-22.pf2
-loadfont (\$root)/boot/grub2/themes/kestrel/inter-regular-16.pf2
 set theme=(\$root)/boot/grub2/themes/kestrel/theme.txt
 export theme
 insmod gzio
 insmod part_gpt
 
-menuentry '$OS_NAME starten' --class kestrel {
+# Entry labels are pictures (the class icons from grub_theme.py): GRUB cannot load fonts
+# under Secure Boot. The titles are drawn transparent by the theme; they only show if the
+# theme fails to load, so they avoid umlauts (GRUB's built-in font has none).
+menuentry '$OS_NAME starten' --class start --id start {
   linux /images/pxeboot/vmlinuz $kernel_args
   initrd /images/pxeboot/initrd.img
 }
-menuentry '$OS_NAME starten (einfache Grafik)' --class kestrel {
+menuentry '$OS_NAME starten (einfache Grafik)' --class basic --id basic {
   linux /images/pxeboot/vmlinuz $kernel_args nomodeset
   initrd /images/pxeboot/initrd.img
 }
-menuentry 'USB-Stick prüfen und $OS_NAME starten' --class kestrel {
+menuentry 'USB-Stick pruefen und starten' --class check --id check {
   linux /images/pxeboot/vmlinuz $kernel_args rd.live.check
   initrd /images/pxeboot/initrd.img
 }
-menuentry 'Firmware-Einstellungen (UEFI)' --class settings {
+menuentry 'UEFI-Firmware-Einstellungen' --class firmware --id firmware {
   fwsetup
 }
 EOF

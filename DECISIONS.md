@@ -363,6 +363,9 @@ Entschieden mit dir.
 - **Startmenü des USB-Sticks** im Kestrel-Design: dunkler Hintergrund, weißer Vogel und Name,
   deutsche Einträge („Kestrel OS starten“, „… (einfache Grafik)“ für schwierige Grafikkarten,
   „USB-Stick prüfen …“, „Firmware-Einstellungen“). Es startet nach 10 Sekunden von selbst.
+  Alle Schrift im Menü ist als Bild gezeichnet: Mit Secure Boot lädt das Startprogramm aus
+  Sicherheitsgründen keine Schriftdateien, und seine eingebaute Schrift kennt keine Umlaute.
+  So sieht das Menü mit und ohne Secure Boot gleich aus.
 - **Live-System:** meldet sich automatisch als „liveuser“ an. Grafikkarten-Einrichtung,
   Flatpak-Downloads und automatische Updates sind im Live-System aus, damit nichts im
   Hintergrund passiert. Änderungen im Live-System sind nach dem Neustart weg.
