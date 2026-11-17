@@ -119,12 +119,11 @@ remote() {
         "$TEST_USER@127.0.0.1" "$@"
 }
 
-# Runs a command on the VM inside the user's graphical session environment.
+# Runs a command on the VM inside the user's graphical session environment: the complete
+# environment of plasmashell, so apps also pick up the KDE colours and platform theme.
 in_session() {
     remote 'pid=$(pgrep -u "$USER" -x plasmashell) &&
-        while IFS= read -r -d "" var; do
-            case $var in DISPLAY=*|WAYLAND_DISPLAY=*|XAUTHORITY=*|XDG_RUNTIME_DIR=*|DBUS_SESSION_BUS_ADDRESS=*) export "$var";; esac
-        done </proc/$pid/environ && '"$1"
+        while IFS= read -r -d "" var; do export "$var"; done </proc/$pid/environ && '"$1"
 }
 
 wait_for() { # $1: timeout in seconds, rest: command
@@ -197,6 +196,15 @@ check "Windows program runs via Wine" \
 in_session 'WINEDEBUG=-all setsid -f wine ~/winhello.exe --gui </dev/null >/dev/null 2>&1'
 sleep $((20 * slow))
 screenshot wine-gui
+
+# Dark mode: switch to the "Kestrel Dark" global theme as a user would (colours, window frame
+# and icons together), open a window, look at desktop, dock and window frame.
+in_session 'pkill -f winhello; wineserver -k' || true
+check "Dark mode can be switched on" in_session 'plasma-apply-lookandfeel --apply org.kestrel.desktop.dark >/dev/null'
+in_session 'setsid -f dolphin </dev/null >/dev/null 2>&1'
+sleep $((15 * slow))
+screenshot dark
+in_session 'pkill -x dolphin; plasma-apply-lookandfeel --apply org.kestrel.desktop >/dev/null' || true
 
 if [[ $main_fw == secure ]]; then
     check "Secure Boot enabled" remote 'mokutil --sb-state | grep -q "SecureBoot enabled"'

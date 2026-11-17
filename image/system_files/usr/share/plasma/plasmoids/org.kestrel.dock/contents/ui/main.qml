@@ -119,7 +119,15 @@ PlasmoidItem {
             function onWidthChanged() { Qt.callLater(dock.measure) }
             function onHeightChanged() { Qt.callLater(dock.measure) }
         }
-        Timer { interval: 1500; running: true; onTriggered: dock.measure() }
+        // On the very first login Plasma keeps rearranging the new panel for a while, not
+        // always with a signal we see; re-measure for the first minute to catch up.
+        Timer {
+            property int runs: 0
+            interval: 2000
+            repeat: true
+            running: runs < 30
+            onTriggered: { runs++; dock.measure() }
+        }
 
         function restLeft(k) {
             const start = mask.x + (mask.width - restRowWidth) / 2

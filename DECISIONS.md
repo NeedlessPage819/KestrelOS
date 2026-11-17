@@ -272,6 +272,11 @@ freie Symbol-Set **WhiteSur** (Lizenz GPL-3.0). Entschieden mit dir.
   Umriss-Symbole. Im großen Dock passte der Papierkorb so nicht zu den bunten App-Symbolen. Ein
   kleines eigenes Symbol-Set „Kestrel“ übernimmt alles von WhiteSur und tauscht nur den Papierkorb
   gegen die farbige Glas-Version. Der Launchpad-Knopf nutzt das farbige App-Raster.
+- **Symbole oben rechts (Lautstärke, Netzwerk usw.):** WhiteSur zeichnet diese kleinen
+  einfarbigen Symbole in festem Hellgrau, das Plasma nicht umfärben kann. Auf der hellen Top-Bar
+  waren sie kaum zu sehen. Kestrel nimmt dafür die sehr ähnlichen einfarbigen Symbole von Breeze.
+  Die richten sich nach dem Farbschema: dunkel auf hell, hell im Dunkelmodus. Die bunten
+  App-Symbole bleiben WhiteSur.
 
 ## D18 – Animationen und Gesten
 
@@ -313,3 +318,21 @@ kann das nicht. Deshalb hat Kestrel ein eigenes Dock-Widget. Entschieden mit dir
 - **Noch nicht drin:** Fenster-Vorschau beim Darüberfahren und Symbole per Ziehen umsortieren.
 - Alle Maße (Symbolgröße, Vergrößerung, Ränder) stehen an einer Stelle in
   `image/artwork/plasma_theme.py` und gelten für Design, Widget und Layout gemeinsam.
+
+## D20 – Dunkelmodus
+
+Der automatische Test schaltet jetzt auch in den Dunkelmodus und macht einen Screenshot. Dabei
+sind drei Fehler aufgefallen, die jetzt behoben sind:
+
+- **Fensterrahmen blieben hell.** Das eigene Fensterdesign kann seine Farben nicht selbst
+  wechseln. Es gibt deshalb eine dunkle Variante („KestrelDark“): dunkle Titelleiste, helle
+  Schrift, feiner heller Rand, wie macOS im Dunkelmodus.
+- **Symbole waren dunkel auf dunkel** (in Apps und oben rechts). Plasma färbt einfarbige Symbole
+  nur um, wenn das Symbol-Set das ausdrücklich erlaubt. WhiteSur und unser Kestrel-Set hatten
+  diese Angabe nicht. Jetzt haben sie sie.
+- **Umschalten in einem Schritt:** Es gibt zwei globale Designs, **„Kestrel“** (hell) und
+  **„Kestrel Dunkel“**. Sie stehen in den Systemeinstellungen unter „Globales Design“ und in den
+  Schnelleinstellungen. Ein Klick wechselt Farben, Fensterrahmen und Hintergrundbild zusammen. Die
+  Einstellung „Automatisch“ (hell am Tag, dunkel am Abend) nutzt ebenfalls diese beiden.
+- Wer nur unter „Farben“ ein dunkles Farbschema wählt, bekommt dunkle Apps und Symbole, aber
+  helle Fensterrahmen. Dafür ist das globale Design da.

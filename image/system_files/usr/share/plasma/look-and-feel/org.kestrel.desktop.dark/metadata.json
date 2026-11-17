@@ -1,0 +1,12 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [{ "Name": "Kestrel OS" }],
+        "Description": "Top bar and floating dock, dark",
+        "Id": "org.kestrel.desktop.dark",
+        "License": "GPL-2.0-or-later",
+        "Name": "Kestrel Dark",
+        "Name[de]": "Kestrel Dunkel",
+        "Version": "1.0"
+    }
+}

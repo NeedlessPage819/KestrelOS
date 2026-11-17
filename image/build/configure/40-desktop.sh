@@ -7,6 +7,10 @@ breeze=/usr/share/plasma/look-and-feel/org.kde.breeze.desktop/contents
 ours=/usr/share/plasma/look-and-feel/org.kestrel.desktop/contents
 [[ -d $breeze ]] || die "Breeze look-and-feel package not found"
 cp -rn "$breeze"/. "$ours"/
+# The dark package (DECISIONS.md D20) differs only in metadata and defaults.
+dark=/usr/share/plasma/look-and-feel/org.kestrel.desktop.dark/contents
+cp -rn "$ours"/. "$dark"/
+grep -q '^ColorScheme=BreezeDark$' "$dark/defaults" || die "dark look-and-feel lost its defaults"
 
 # Spotlight: open KRunner with Meta+Space in addition to the Plasma defaults.
 # Only the first entry is KRunner itself; later ones belong to its actions.
@@ -26,11 +30,23 @@ sed -i \
 # Its KDED module ignores config switches on first login, so remove the package.
 dnf5 -y remove plasma-welcome
 
-# Icon theme overrides: the dock trash uses the full-colour WhiteSur icon (see index.theme).
+# Icon theme overrides (see /usr/share/icons/Kestrel/index.theme).
 icons=/usr/share/icons
 mkdir -p "$icons/Kestrel/places/scalable"
 for name in user-trash user-trash-full; do
     [[ -f $icons/WhiteSur/places/scalable/$name.svg ]] || die "WhiteSur icon $name missing"
     ln -sf "../../../WhiteSur/places/scalable/$name.svg" "$icons/Kestrel/places/scalable/$name-symbolic.svg"
 done
+mkdir -p "$icons/Kestrel/symbolic"
+for icon in "$icons"/breeze/*/22/*-symbolic.svg; do
+    [[ ${icon##*/} == user-trash* ]] && continue    # the dock trash stays colourful (above)
+    link=$icons/Kestrel/symbolic/${icon##*/}
+    [[ -e $link ]] || ln -s "../../${icon#"$icons"/}" "$link"
+done
+[[ -e $icons/Kestrel/symbolic/audio-volume-high-symbolic.svg ]] || die "Breeze symbolic icons not linked"
+# WhiteSur's one-colour icons carry Plasma's colour-scheme markup but the theme does not
+# declare it, so Plasma never recolours them: dark icons on dark backgrounds in dark mode.
+grep -q '^FollowsColorScheme=' "$icons/WhiteSur/index.theme" ||
+    sed -i '/^\[Icon Theme\]$/a FollowsColorScheme=true' "$icons/WhiteSur/index.theme"
+grep -q '^FollowsColorScheme=true' "$icons/WhiteSur/index.theme" || die "could not mark WhiteSur as colour-scheme aware"
 gtk-update-icon-cache -qf "$icons/Kestrel" 2>/dev/null || true

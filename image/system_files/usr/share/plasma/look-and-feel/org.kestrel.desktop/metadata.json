@@ -2,7 +2,7 @@
     "KPackageStructure": "Plasma/LookAndFeel",
     "KPlugin": {
         "Authors": [{ "Name": "Kestrel OS" }],
-        "Description": "Top bar and floating dock",
+        "Description": "Top bar and floating dock, light",
         "Id": "org.kestrel.desktop",
         "License": "GPL-2.0-or-later",
         "Name": "Kestrel",

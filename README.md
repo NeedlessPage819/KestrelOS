@@ -25,7 +25,7 @@ geprüft werden muss, steht in [TESTING.md](TESTING.md).
 - Fensterknöpfe als Ampel links oben, weiche Schatten, abgerundete Ecken
 - Symbole im macOS-Stil (WhiteSur), Schrift Inter
 - Suche wie Spotlight mit **Meta+Leertaste**, Launchpad-Knopf im Dock
-- Wischgesten auf dem Touchpad, Hell- und Dunkelmodus
+- Wischgesten auf dem Touchpad, Hell- und Dunkelmodus („Kestrel“ und „Kestrel Dunkel“, auch automatisch)
 
 **Gaming**
 - Steam, Wine, Proton, Heroic, Lutris, Bottles, ProtonUp-Qt

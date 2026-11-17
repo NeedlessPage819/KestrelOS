@@ -9,6 +9,9 @@ fixed=JetBrains Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
 
 [KDE]
 LookAndFeelPackage=org.kestrel.desktop
+# Light/dark pair for Plasma's automatic switching (DECISIONS.md D20).
+DefaultLightLookAndFeel=org.kestrel.desktop
+DefaultDarkLookAndFeel=org.kestrel.desktop.dark
 
 [WM]
 activeFont=Inter,10,-1,5,600,0,0,0,0,0,0,0,0,0,0,1

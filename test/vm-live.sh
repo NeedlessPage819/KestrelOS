@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fast design loop on the VM installed by test/vm-test.sh (WSL/Linux with KVM only).
 #   test/vm-live.sh start        boot the installed test disk in the background
-#   test/vm-live.sh theme        install the current window decoration for the test user
+#   test/vm-live.sh theme [dark] install the current window decoration (light or dark) for the test user
 #   test/vm-live.sh plasma       install the current Plasma theme (dock, top bar) for the test user
 #   test/vm-live.sh dock         install the current Kestrel Dock widget and rebuild the dock with it
 #   test/vm-live.sh mouse X Y    move the pointer to screen position X, Y
@@ -25,7 +25,7 @@ remote() {
 in_session() {
     remote 'pid=$(pgrep -u "$USER" -x plasmashell) &&
         while IFS= read -r -d "" var; do
-            case $var in DISPLAY=*|XAUTHORITY=*|WAYLAND_DISPLAY=*|XDG_RUNTIME_DIR=*|DBUS_SESSION_BUS_ADDRESS=*) export "$var";; esac
+            export "$var"
         done </proc/$pid/environ && '"$1"
 }
 monitor() { echo "$1" | timeout 10 socat - TCP:127.0.0.1:${MONITOR_PORT},connect-timeout=3 >/dev/null; }
@@ -62,9 +62,10 @@ theme)
     # KWin caches decorations by name, so every push gets a fresh name.
     tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
     python3 image/artwork/aurorae.py "$tmp"
+    variant=Kestrel; [[ ${2:-} == dark ]] && variant=KestrelDark
     name=KestrelDev$(date +%s)
-    mv "$tmp/Kestrel" "$tmp/$name" && mv "$tmp/$name/Kestrelrc" "$tmp/$name/${name}rc"
-    sed -i "s/=Kestrel\$/=$name/" "$tmp/$name/metadata.desktop"
+    mv "$tmp/$variant" "$tmp/$name" && mv "$tmp/$name/${variant}rc" "$tmp/$name/${name}rc"
+    sed -i "s/=$variant\$/=$name/" "$tmp/$name/metadata.desktop"
     tar -C "$tmp" -c "$name" | remote 'rm -rf ~/.local/share/aurorae/themes/KestrelDev*; mkdir -p ~/.local/share/aurorae/themes;
         tar -C ~/.local/share/aurorae/themes -x'
     in_session "kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme __aurorae__svg__$name &&

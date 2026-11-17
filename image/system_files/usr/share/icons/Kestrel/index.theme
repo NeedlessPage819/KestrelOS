@@ -1,15 +1,28 @@
-# Kestrel icons: WhiteSur plus a few overrides for the dock (DECISIONS.md D17).
-# Panel applets ask for "-symbolic" icons, meant for the slim top bar; in the large dock the
-# trash should look like the other app icons. The overrides are links made at build time.
+# Kestrel icons: WhiteSur plus a few overrides (DECISIONS.md D17), all links made at build time
+# by image/build/configure/40-desktop.sh:
+# - places/scalable: panel applets ask for "-symbolic" icons, meant for the slim top bar; in
+#   the large dock the trash should look like the other app icons.
+# - symbolic: the small one-colour "-symbolic" icons (tray, menus) come from Breeze. WhiteSur's
+#   are drawn in a fixed light grey that Plasma cannot recolour, so on the light top bar they
+#   were nearly invisible. Breeze's follow the colour scheme: dark on light, light in dark mode.
 [Icon Theme]
 Name=Kestrel
+# Lets Plasma recolour one-colour icons to the colour scheme (dark on light, light on dark).
+FollowsColorScheme=true
 Comment=WhiteSur with dock-sized trash icons
 Inherits=WhiteSur,breeze,hicolor
-Directories=places/scalable
+Directories=places/scalable,symbolic
 
 [places/scalable]
 Size=64
 Context=Places
+MinSize=8
+MaxSize=512
+Type=Scalable
+
+[symbolic]
+Size=22
+Context=Status
 MinSize=8
 MaxSize=512
 Type=Scalable

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generates the "Kestrel" Aurorae window decoration (DECISIONS.md D15).
+"""Generates the "Kestrel" and "KestrelDark" Aurorae window decorations (DECISIONS.md D15, D20).
 
 Aurorae themes are plain SVG drawn by KWin itself, so Plasma updates cannot break them.
 Qt's SVG renderer has no blur or clipping, so the soft shadow is built from gradients:
@@ -14,19 +14,33 @@ Usage: aurorae.py OUTPUT_DIR
 import sys
 from pathlib import Path
 
-NAME = "Kestrel"
 SHADOW = 24          # shadow band on each side
 INNER = 10           # window body inside corner pieces (>= RADIUS)
 RADIUS = 10          # title bar corner radius
 TITLE = 30           # title bar height
 STRETCH = 2000       # middle pieces; tiles leave faint seams, so make one cover any window edge
 
-STATES = {
-    # prefix: (title bar colour, shadow opacity, outline opacity)
-    "decoration": ("#f3f3f5", 0.28, 0.14),
-    "decoration-inactive": ("#f7f7f8", 0.14, 0.10),
+# Light and dark variant (DECISIONS.md D20); the "Kestrel" and "Kestrel Dunkel" global
+# themes pick one each. Only colours differ.
+VARIANTS = {
+    "Kestrel": {
+        # prefix: (title bar colour, shadow opacity, outline opacity)
+        "states": {"decoration": ("#f3f3f5", 0.28, 0.14), "decoration-inactive": ("#f7f7f8", 0.14, 0.10)},
+        "maximized": {"decoration-maximized": "#f3f3f5", "decoration-maximized-inactive": "#f7f7f8"},
+        "outline": "#000",                       # dark hairline around light windows
+        "inactive_button": ("#dcdcde", "#c9c9cc"),
+        "text": ("58,58,60", "160,160,164"),     # active, inactive title text
+        "comment": "Kestrel OS window decoration",
+    },
+    "KestrelDark": {
+        "states": {"decoration": ("#2c2b30", 0.50, 0.16), "decoration-inactive": ("#302f34", 0.28, 0.10)},
+        "maximized": {"decoration-maximized": "#2c2b30", "decoration-maximized-inactive": "#302f34"},
+        "outline": "#fff",                       # light hairline around dark windows, as on macOS
+        "inactive_button": ("#4a4a4f", "#3e3e43"),
+        "text": ("230,230,232", "140,140,146"),
+        "comment": "Kestrel OS window decoration, dark",
+    },
 }
-MAXIMIZED = {"decoration-maximized": "#f3f3f5", "decoration-maximized-inactive": "#f7f7f8"}
 
 BUTTONS = {
     # name: (fill, border, glyph)
@@ -36,7 +50,6 @@ BUTTONS = {
     "restore": ("#28c840", "#1aa52c", "M7 15 L13 15"),
 }
 BUTTON_W, BUTTON_H, BUTTON_R = 20, 30, 6.5
-INACTIVE_BUTTON = ("#dcdcde", "#c9c9cc")
 
 
 def falloff_stops(opacity, start=0.0):
@@ -86,7 +99,7 @@ def framed_piece(svg, prefix, name, bounds, shadow, body, outline=()):
         piece(svg, f"mask-{name}", *bounds, body("mask"))
 
 
-def frame(svg, prefix, title, shadow, outline, ox):
+def frame(svg, prefix, title, shadow, outline, line_colour, ox):
     """Nine frame pieces for one state; ox shifts the state's virtual window on the canvas."""
     s, i, r = SHADOW, INNER, RADIUS
     side, top, bottom = s + i, s + TITLE, s + i
@@ -98,10 +111,10 @@ def frame(svg, prefix, title, shadow, outline, ox):
         # The 1 px outline is drawn as filled areas, never as strokes: Qt counts half a
         # stroke width beyond a piece's edge, which makes the piece half a pixel too large,
         # gets it scaled, and leaves a light seam in the shadow where pieces meet.
-        return [rect(x, y, w, h, "#000", f'fill-opacity="{outline}"')] if w > 0 and h > 0 else []
+        return [rect(x, y, w, h, line_colour, f'fill-opacity="{outline}"')] if w > 0 and h > 0 else []
 
     def ring(d):
-        return [f'<path d="{d}" fill="#000" fill-opacity="{outline}"/>']
+        return [f'<path d="{d}" fill="{line_colour}" fill-opacity="{outline}"/>']
 
     def hshadow(x, y, w, h, towards_left):
         edge = x + w if towards_left else x
@@ -189,23 +202,23 @@ def maximized_frame(svg, prefix, title, ox):
     return STRETCH + 2
 
 
-def decoration_svg():
+def decoration_svg(v):
     svg, ox = Svg(), 0
-    for prefix, (title, shadow, outline) in STATES.items():
-        ox += frame(svg, prefix, title, shadow, outline, ox) + 10
-    for prefix, title in MAXIMIZED.items():
+    for prefix, (title, shadow, outline) in v["states"].items():
+        ox += frame(svg, prefix, title, shadow, outline, v["outline"], ox) + 10
+    for prefix, title in v["maximized"].items():
         ox += maximized_frame(svg, prefix, title, ox) + 10
     return svg.text()
 
 
-def button_svg(fill, border, glyph):
+def button_svg(fill, border, glyph, inactive):
     cx, cy = BUTTON_W / 2, BUTTON_H / 2
     states = {
         "active": (fill, border, False),
         "hover": (fill, border, True),
         "pressed": (border, border, True),
-        "inactive": (*INACTIVE_BUTTON, False),
-        "deactivated": (*INACTIVE_BUTTON, False),
+        "inactive": (*inactive, False),
+        "deactivated": (*inactive, False),
     }
     body = []
     for n, (state, (f, b, show_glyph)) in enumerate(states.items()):
@@ -219,9 +232,10 @@ def button_svg(fill, border, glyph):
     return f'<svg xmlns="http://www.w3.org/2000/svg">{"".join(body)}</svg>\n'
 
 
-RC = f"""[General]
-ActiveTextColor=58,58,60
-InactiveTextColor=160,160,164
+def rc(v):
+    return f"""[General]
+ActiveTextColor={v["text"][0]}
+InactiveTextColor={v["text"][1]}
 TitleAlignment=Center
 TitleVerticalAlignment=Center
 Animation=150
@@ -252,10 +266,11 @@ PaddingLeft={SHADOW}
 PaddingRight={SHADOW}
 """
 
-METADATA = f"""[Desktop Entry]
-Name={NAME}
-Comment=Kestrel OS window decoration
-X-KDE-PluginInfo-Name={NAME}
+def metadata(name, v):
+    return f"""[Desktop Entry]
+Name={name}
+Comment={v["comment"]}
+X-KDE-PluginInfo-Name={name}
 X-KDE-PluginInfo-Author=Kestrel OS
 X-KDE-PluginInfo-License=GPL-2.0-or-later
 X-KDE-PluginInfo-Version=1.0
@@ -263,13 +278,14 @@ X-KDE-PluginInfo-Version=1.0
 
 
 def main():
-    out = Path(sys.argv[1]) / NAME
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "decoration.svg").write_text(decoration_svg())
-    for name, (fill, border, glyph) in BUTTONS.items():
-        (out / f"{name}.svg").write_text(button_svg(fill, border, glyph))
-    (out / f"{NAME}rc").write_text(RC)
-    (out / "metadata.desktop").write_text(METADATA)
+    for name, v in VARIANTS.items():
+        out = Path(sys.argv[1]) / name
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "decoration.svg").write_text(decoration_svg(v))
+        for button, (fill, border, glyph) in BUTTONS.items():
+            (out / f"{button}.svg").write_text(button_svg(fill, border, glyph, v["inactive_button"]))
+        (out / f"{name}rc").write_text(rc(v))
+        (out / "metadata.desktop").write_text(metadata(name, v))
 
 
 if __name__ == "__main__":
