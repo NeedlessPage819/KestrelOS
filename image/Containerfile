@@ -6,15 +6,16 @@ ARG AKMODS_NVIDIA_IMAGE=ghcr.io/ublue-os/akmods-nvidia-open
 # Prebuilt, signed Nvidia kernel modules matching the base image kernel.
 FROM ${AKMODS_NVIDIA_IMAGE}:main-${FEDORA_VERSION} AS akmods-nvidia
 
-# Render the artwork: wallpapers to PNG, window decoration from its generator,
-# so the final image needs no artwork tooling.
+# Render the artwork: wallpapers to PNG, window decoration and Plasma theme from their
+# generators, so the final image needs no artwork tooling.
 FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION} AS artwork
 RUN dnf5 -y install librsvg2-tools python3
 COPY artwork/ /src/
-RUN mkdir -p /out/wallpaper/images /out/wallpaper/images_dark /out/aurorae && \
+RUN mkdir -p /out/wallpaper/images /out/wallpaper/images_dark /out/aurorae /out/desktoptheme && \
     rsvg-convert -w 3840 -h 2160 -o /out/wallpaper/images/3840x2160.png /src/wallpaper-light.svg && \
     rsvg-convert -w 3840 -h 2160 -o /out/wallpaper/images_dark/3840x2160.png /src/wallpaper-dark.svg && \
-    python3 /src/aurorae.py /out/aurorae
+    python3 /src/aurorae.py /out/aurorae && \
+    python3 /src/plasma_theme.py /out/desktoptheme
 
 FROM ${BASE_IMAGE}:${FEDORA_VERSION}
 ARG OS_NAME="Kestrel OS"
@@ -33,6 +34,7 @@ RUN --mount=type=bind,from=akmods-nvidia,src=/rpms,dst=/tmp/akmods-nvidia \
 COPY system_files/ /
 COPY --from=artwork /out/wallpaper/ /usr/share/wallpapers/Kestrel/contents/
 COPY --from=artwork /out/aurorae/ /usr/share/aurorae/themes/
+COPY --from=artwork /out/desktoptheme/ /usr/share/plasma/desktoptheme/
 COPY build/build.sh build/lib.sh build/cleanup.sh /tmp/build/
 COPY build/configure/ /tmp/build/configure/
 RUN OS_NAME="${OS_NAME}" IMAGE_NAME="${IMAGE_NAME}" /tmp/build/build.sh configure

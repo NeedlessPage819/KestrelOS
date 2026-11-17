@@ -2,6 +2,7 @@
 # Fast design loop on the VM installed by test/vm-test.sh (WSL/Linux with KVM only).
 #   test/vm-live.sh start        boot the installed test disk in the background
 #   test/vm-live.sh theme        install the current window decoration for the test user
+#   test/vm-live.sh plasma       install the current Plasma theme (dock, top bar) for the test user
 #   test/vm-live.sh run CMD...   run a command inside the desktop session
 #   test/vm-live.sh shot NAME    screenshot to out/test/vm/NAME.png
 #   test/vm-live.sh stop
@@ -52,6 +53,15 @@ theme)
         tar -C ~/.local/share/aurorae/themes -x'
     in_session "kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme __aurorae__svg__$name &&
         dbus-send --session --type=signal /KWin org.kde.KWin.reloadConfig" ;;
+plasma)
+    # Plasma also caches themes by name: install under a fresh name each time.
+    tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+    python3 image/artwork/plasma_theme.py "$tmp"
+    name=kestreldev$(date +%s)
+    mv "$tmp/kestrel" "$tmp/$name" && sed -i "s/\"Id\": \"kestrel\"/\"Id\": \"$name\"/" "$tmp/$name/metadata.json"
+    tar -C "$tmp" -c "$name" | remote 'rm -rf ~/.local/share/plasma/desktoptheme/kestreldev*;
+        mkdir -p ~/.local/share/plasma/desktoptheme; tar -C ~/.local/share/plasma/desktoptheme -x'
+    in_session "plasma-apply-desktoptheme $name" ;;
 run)
     shift; in_session "$*" ;;
 shot)

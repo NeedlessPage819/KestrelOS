@@ -239,3 +239,18 @@ Nach dem ersten Blick auf den Desktop wirkte er noch nach „KDE mit Dock“. Ge
 - **Kein KDE-Begrüßungsfenster** beim ersten Login. Die Einrichtung übernimmt schon der
   Assistent (D13). Abschalten per Einstellung hat im Test nicht gereicht, deshalb wird das Paket
   `plasma-welcome` ganz entfernt. Nichts anderes hängt davon ab.
+
+## D16 – Design-Runde 3: Dock und Top-Bar wie Glas
+
+Neben macOS wirkte das Dock noch unruhig. Geändert:
+
+- **Eigenes Plasma-Design „Kestrel“** (erzeugt von `image/artwork/plasma_theme.py`). Es ersetzt nur
+  den Hintergrund von Dock und Top-Bar und die Markierung laufender Apps. Alles andere kommt
+  weiter von Breeze, deshalb bleibt es bei Plasma-Updates stabil.
+- **Dock:** durchscheinend wie Milchglas, stark abgerundete Ecken, Symbole füllen das Dock.
+  Auf echter Hardware verschwimmt der Hintergrund dahinter. In der Test-VM fehlt dafür die
+  3D-Beschleunigung, dort ist es nur durchscheinend.
+- **Laufende Apps** bekommen einen kleinen Strich unter dem Symbol statt eines blauen Kastens.
+- **Top-Bar:** flach und ebenfalls durchscheinend.
+- Die Farben kommen aus dem Farbschema, im Dunkelmodus wird alles automatisch dunkel.
+- **Fensterschatten repariert:** An den Fensterecken waren helle Lücken im Schatten zu sehen.
