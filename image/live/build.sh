@@ -42,7 +42,7 @@ mkdir -p /var/roothome
 DRACUT_NO_XATTR=1 dracut --no-hostonly --kver "$kver" --reproducible --zstd \
     --add "dmsquash-live dmsquash-live-autooverlay" -f "/usr/lib/modules/$kver/initramfs.img"
 rmdir /var/roothome
-lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep -q dmsquash-live || die "live modules missing in initramfs"
+lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep dmsquash-live >/dev/null || die "live modules missing in initramfs"
 
 # EFI boot files for the ISO, from the image's own signed packages (Secure Boot):
 # shim as EFI/BOOT/BOOTX64.EFI loads grubx64.efi from the same folder, which on a CD

@@ -16,5 +16,5 @@ kver=$(ls /usr/lib/modules)
 mkdir -p /var/roothome
 dracut --no-hostonly --kver "$kver" --reproducible --zstd --add ostree -f "/usr/lib/modules/$kver/initramfs.img"
 rmdir /var/roothome
-lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep -q 'plymouth/themes/kestrel/watermark.png' ||
+lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep 'plymouth/themes/kestrel/watermark.png' >/dev/null ||
     die "Kestrel boot screen not in the initramfs"
