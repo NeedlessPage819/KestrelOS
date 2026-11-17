@@ -21,3 +21,7 @@ sed -i \
     -e "s/^PRETTY_NAME=.*/PRETTY_NAME=\"${OS_NAME} $(rpm -E %fedora)\"/" \
     -e "s/^VARIANT_ID=.*/VARIANT_ID=${IMAGE_NAME}/" \
     /usr/lib/os-release
+
+# No KDE Welcome Center: Plasma Setup already onboards new users (DECISIONS.md D15).
+# Its KDED module ignores config switches on first login, so remove the package.
+dnf5 -y remove plasma-welcome

@@ -237,4 +237,5 @@ Nach dem ersten Blick auf den Desktop wirkte er noch nach „KDE mit Dock“. Ge
 - **Top-Bar:** schlanker, mit eigenem schlichten Logo (Vogel im Gleitflug) und Datum im Stil
   „Di. 17. Nov.“
 - **Kein KDE-Begrüßungsfenster** beim ersten Login. Die Einrichtung übernimmt schon der
-  Assistent (D13).
+  Assistent (D13). Abschalten per Einstellung hat im Test nicht gereicht, deshalb wird das Paket
+  `plasma-welcome` ganz entfernt. Nichts anderes hängt davon ab.

@@ -19,7 +19,7 @@ SHADOW = 24          # shadow band on each side
 INNER = 10           # window body inside corner pieces (>= RADIUS)
 RADIUS = 10          # title bar corner radius
 TITLE = 30           # title bar height
-STRETCH = 20         # size of the stretchable middle pieces
+STRETCH = 2000       # middle pieces; tiles leave faint seams, so make one cover any window edge
 
 STATES = {
     # prefix: (title bar colour, shadow opacity, outline opacity)
@@ -76,6 +76,16 @@ def piece(svg, element, x, y, w, h, shapes):
     svg.body.append(f'<g id="{element}">{rect(x, y, w, h, "#000", "fill-opacity=\"0\"")}{"".join(shapes)}</g>')
 
 
+def framed_piece(svg, prefix, name, bounds, shadow, body, outline=()):
+    """One frame piece plus its mask. KWin blurs the background behind the decoration's
+    mask; without an explicit one that is every visible pixel, so the shadow would show
+    frosted rectangles. The mask is the window body only, where blur is never visible.
+    Aurorae reads a single mask ("mask-topleft" ...) for every state, taken from the active one."""
+    piece(svg, f"{prefix}-{name}", *bounds, [*shadow, *body("title"), *outline])
+    if prefix == "decoration":
+        piece(svg, f"mask-{name}", *bounds, body("mask"))
+
+
 def frame(svg, prefix, title, shadow, outline, ox):
     """Nine frame pieces for one state; ox shifts the state's virtual window on the canvas."""
     s, i, r = SHADOW, INNER, RADIUS
@@ -102,53 +112,55 @@ def frame(svg, prefix, title, shadow, outline, ox):
     left, mid, right = ox, ox + side, ox + side + STRETCH
     ymid, ybot = top, top + STRETCH
 
-    piece(svg, f"{prefix}-topleft", left, 0, side, top, [
-        corner_shadow(left, 0, side, s + r, x0 + r, y0 + r, r),
-        hshadow(left, s + r, s, top - s - r, True),
-        f'<path d="M{x0} {top} V{y0 + r} A{r} {r} 0 0 1 {x0 + r} {y0} H{mid} V{top} Z" fill="{title}"/>',
+    fills = {"title": title, "mask": "#000"}
+
+    def body_path(d):
+        return lambda kind: [f'<path d="{d}" fill="{fills[kind]}"/>']
+
+    def body_rect(x, y, w, h):
+        return lambda kind: [rect(x, y, w, h, fills[kind])]
+
+    # Aurorae hands the padding band to KWin as a real shadow, which KWin rebuilds from
+    # SHADOW x SHADOW corner squares and stretched edges. So each corner's shadow must stay
+    # inside its square and the edges must be uniform along their length, or the stretched
+    # edges show light gaps next to the corners.
+    framed_piece(svg, prefix, "topleft", (left, 0, side, top), [
+        corner_shadow(left, 0, s, s, x0, y0, 0),
+        vshadow(x0, 0, i, s, True),
+        hshadow(left, y0, s, TITLE, True),
+    ], body_path(f"M{x0} {top} V{y0 + r} A{r} {r} 0 0 1 {x0 + r} {y0} H{mid} V{top} Z"), [
         f'<path d="M{x0 - 0.5} {top} V{y0 + r} A{r + 0.5} {r + 0.5} 0 0 1 {x0 + r} {y0 - 0.5} H{mid}" {line}/>',
     ])
-    piece(svg, f"{prefix}-top", mid, 0, STRETCH, top, [
+    framed_piece(svg, prefix, "top", (mid, 0, STRETCH, top), [
         vshadow(mid, 0, STRETCH, s, True),
-        rect(mid, y0, STRETCH, TITLE, title),
-        f'<path d="M{mid} {y0 - 0.5} H{right}" {line}/>',
-    ])
-    piece(svg, f"{prefix}-topright", right, 0, side, top, [
-        corner_shadow(right, 0, side, s + r, x1 - r, y0 + r, r),
-        hshadow(x1, s + r, s, top - s - r, False),
-        f'<path d="M{x1} {top} V{y0 + r} A{r} {r} 0 0 0 {x1 - r} {y0} H{right} V{top} Z" fill="{title}"/>',
+    ], body_rect(mid, y0, STRETCH, TITLE), [f'<path d="M{mid} {y0 - 0.5} H{right}" {line}/>'])
+    framed_piece(svg, prefix, "topright", (right, 0, side, top), [
+        corner_shadow(x1, 0, s, s, x1, y0, 0),
+        vshadow(right, 0, i, s, True),
+        hshadow(x1, y0, s, TITLE, False),
+    ], body_path(f"M{x1} {top} V{y0 + r} A{r} {r} 0 0 0 {x1 - r} {y0} H{right} V{top} Z"), [
         f'<path d="M{x1 + 0.5} {top} V{y0 + r} A{r + 0.5} {r + 0.5} 0 0 0 {x1 - r} {y0 - 0.5} H{right}" {line}/>',
     ])
-    piece(svg, f"{prefix}-left", left, ymid, side, STRETCH, [
+    framed_piece(svg, prefix, "left", (left, ymid, side, STRETCH), [
         hshadow(left, ymid, s, STRETCH, True),
-        rect(x0, ymid, i, STRETCH, title),
-        f'<path d="M{x0 - 0.5} {ymid} V{ybot}" {line}/>',
-    ])
-    piece(svg, f"{prefix}-center", mid, ymid, STRETCH, STRETCH, [rect(mid, ymid, STRETCH, STRETCH, title)])
-    piece(svg, f"{prefix}-right", right, ymid, side, STRETCH, [
+    ], body_rect(x0, ymid, i, STRETCH), [f'<path d="M{x0 - 0.5} {ymid} V{ybot}" {line}/>'])
+    framed_piece(svg, prefix, "center", (mid, ymid, STRETCH, STRETCH), [], body_rect(mid, ymid, STRETCH, STRETCH))
+    framed_piece(svg, prefix, "right", (right, ymid, side, STRETCH), [
         hshadow(x1, ymid, s, STRETCH, False),
-        rect(right, ymid, i, STRETCH, title),
-        f'<path d="M{x1 + 0.5} {ymid} V{ybot}" {line}/>',
-    ])
-    piece(svg, f"{prefix}-bottomleft", left, ybot, side, bottom, [
+    ], body_rect(right, ymid, i, STRETCH), [f'<path d="M{x1 + 0.5} {ymid} V{ybot}" {line}/>'])
+    framed_piece(svg, prefix, "bottomleft", (left, ybot, side, bottom), [
         hshadow(left, ybot, s, i, True),
         vshadow(x0, y1, i, s, False),
         corner_shadow(left, y1, s, s, x0, y1, 0),
-        rect(x0, ybot, i, i, title),
-        f'<path d="M{x0 - 0.5} {ybot} V{y1 + 0.5} H{mid}" {line}/>',
-    ])
-    piece(svg, f"{prefix}-bottom", mid, ybot, STRETCH, bottom, [
+    ], body_rect(x0, ybot, i, i), [f'<path d="M{x0 - 0.5} {ybot} V{y1 + 0.5} H{mid}" {line}/>'])
+    framed_piece(svg, prefix, "bottom", (mid, ybot, STRETCH, bottom), [
         vshadow(mid, y1, STRETCH, s, False),
-        rect(mid, ybot, STRETCH, i, title),
-        f'<path d="M{mid} {y1 + 0.5} H{right}" {line}/>',
-    ])
-    piece(svg, f"{prefix}-bottomright", right, ybot, side, bottom, [
+    ], body_rect(mid, ybot, STRETCH, i), [f'<path d="M{mid} {y1 + 0.5} H{right}" {line}/>'])
+    framed_piece(svg, prefix, "bottomright", (right, ybot, side, bottom), [
         hshadow(x1, ybot, s, i, False),
         vshadow(right, y1, i, s, False),
         corner_shadow(x1, y1, s, s, x1, y1, 0),
-        rect(right, ybot, i, i, title),
-        f'<path d="M{x1 + 0.5} {ybot} V{y1 + 0.5} H{right}" {line}/>',
-    ])
+    ], body_rect(right, ybot, i, i), [f'<path d="M{x1 + 0.5} {ybot} V{y1 + 0.5} H{right}" {line}/>'])
     return width
 
 
@@ -161,8 +173,9 @@ def maximized_frame(svg, prefix, title, ox):
         "bottomleft": (ox, TITLE + STRETCH, 1, 1), "bottom": (ox + 1, TITLE + STRETCH, STRETCH, 1),
         "bottomright": (ox + 1 + STRETCH, TITLE + STRETCH, 1, 1),
     }
+    fills = {"title": title, "mask": "#000"}
     for name, (x, y, w, h) in pieces.items():
-        piece(svg, f"{prefix}-{name}", x, y, w, h, [rect(x, y, w, h, title)])
+        framed_piece(svg, prefix, name, (x, y, w, h), [], lambda kind, b=(x, y, w, h): [rect(*b, fills[kind])])
     return STRETCH + 2
 
 

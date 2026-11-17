@@ -1,7 +1,0 @@
-# No KDE Welcome Center at login: Plasma Setup already onboards new users (DECISIONS.md D13, D15).
-# KDED names the module with or without the "kded_" prefix depending on version; cover both.
-[Module-plasma_welcome]
-autoload=false
-
-[Module-kded_plasma_welcome]
-autoload=false

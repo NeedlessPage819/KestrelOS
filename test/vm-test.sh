@@ -186,7 +186,8 @@ sshpass -p "$TEST_PASSWORD" scp -q -P "$SSH_PORT" \
     -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
     "$WORK/winhello.exe" "$TEST_USER@127.0.0.1:winhello.exe"
 check "Windows program runs via Wine" \
-    in_session "WINEDEBUG=-all timeout $((600 * slow)) wine ~/winhello.exe | tee /dev/stderr | grep -q KESTREL-WINE-OK"
+    in_session "WINEDEBUG=-all timeout $((600 * slow)) wine ~/winhello.exe </dev/null >~/wine.out 2>&1;
+        wineserver -k; cat ~/wine.out >&2; grep -q KESTREL-WINE-OK ~/wine.out"
 in_session 'WINEDEBUG=-all nohup wine ~/winhello.exe --gui >/dev/null 2>&1 &'
 sleep $((20 * slow))
 screenshot wine-gui
