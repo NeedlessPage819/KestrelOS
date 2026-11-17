@@ -16,6 +16,9 @@ poweroff
 
 %post --erroronfail
 systemctl enable sshd.service
+# Text-mode installs default to multi-user.target; the account exists, so skip Plasma Setup.
+systemctl set-default graphical.target
+touch /etc/plasma-setup-done
 mkdir -p /etc/plasmalogin.conf.d
 cat > /etc/plasmalogin.conf.d/zz-kestrel-test-autologin.conf <<'EOF'
 [Autologin]

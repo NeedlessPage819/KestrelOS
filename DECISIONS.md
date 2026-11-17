@@ -192,3 +192,28 @@ vorher nach. Bis dahin aktualisiert man durch Neuinstallation mit einem neuen IS
 **Warum:** Fertige „macOS-Themes“ aus dem Internet kopieren oft Apple-Grafiken (rechtlich heikel)
 und gehen bei Plasma-Updates gerne kaputt. Breeze wird von KDE selbst gepflegt und bleibt bei
 Updates stabil. Wir passen nur Farben, Schrift und Anordnung an.
+
+---
+
+## D13 – Einrichtung beim ersten Start mit dem „Plasma Setup“-Assistenten
+
+**Was:** Das Installationsprogramm fragt nur noch, auf welche Festplatte installiert wird.
+Beim ersten Start begrüßt dich dann ein Assistent von KDE. Dort wählst du Sprache, Tastatur
+und WLAN und legst dein Benutzerkonto an.
+**Warum:** Das fühlt sich an wie der Einrichtungsassistent am Mac: erst installieren, dann
+in Ruhe einrichten. Fedora KDE 44 macht es genauso. Wir nutzen also den offiziellen,
+gepflegten Weg.
+
+---
+
+## D14 – Kleine Korrekturen für fehlerfreie Systemdienste
+
+- `systemd-remount-fs` startet nicht mehr auf atomaren Systemen. Er versucht dort, den
+  schreibgeschützten Systembereich neu einzuhängen, und das schlägt immer fehl. Dieser Fehler
+  betrifft nur eine Meldung, keine Funktion.
+- `mcelog` (meldet Hardwarefehler der CPU) läuft nur noch auf echter Hardware. In VMs gibt es
+  nichts zu melden, dort bricht der Dienst nur mit einem Fehler ab.
+- Rechnername ist standardmäßig `kestrel` statt `fedora`.
+
+**Warum:** Ein sauberes System zeigt keine roten Fehlermeldungen. Der automatische Test prüft,
+dass kein Systemdienst fehlschlägt.

@@ -1,7 +1,6 @@
-# bootc-image-builder config for the public installer ISO.
-# Interactive: the user chooses disk, language, keyboard and creates their own account.
+# bootc-image-builder config for the public installer ISO (DECISIONS.md D13).
+# The installer only asks for the disk; language, keyboard, Wi-Fi and the user account
+# are set up on first boot by the Plasma Setup wizard, as in Fedora KDE.
 [customizations.installer.modules]
-enable = [
-    "org.fedoraproject.Anaconda.Modules.Localization",
-    "org.fedoraproject.Anaconda.Modules.Users",
-]
+enable = ["org.fedoraproject.Anaconda.Modules.Localization"]
+disable = ["org.fedoraproject.Anaconda.Modules.Users"]
