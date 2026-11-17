@@ -33,6 +33,9 @@ Bitte jeden Punkt abhaken und Probleme mit kurzer Beschreibung notieren.
 - [ ] Touchpad: Tippen = Klick, Zwei-Finger-Scrollen, 4-Finger-Wischen (Übersicht / Arbeitsfläche)
 - [ ] Meta+Leertaste öffnet die Suche (Spotlight)
 - [ ] Windows-Taste allein drücken: es passiert nichts (soll im Spiel nicht stören)
+- [ ] Animationen wirken flüssig: Fenster öffnen/schließen (Zoom), Minimieren ins Dock (Wunderlampe), Maximieren
+- [ ] Touchpad: 4 Finger nach oben = Fensterübersicht, 4 Finger seitlich = Arbeitsfläche wechseln
+- [ ] Dock und Top-Bar zeigen den verschwommenen Hintergrund (Milchglas)
 
 ### Gaming
 - [ ] Steam startet, Anmeldung klappt

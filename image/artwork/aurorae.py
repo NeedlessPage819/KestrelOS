@@ -93,7 +93,15 @@ def frame(svg, prefix, title, shadow, outline, ox):
     width = side + STRETCH + side
     height = top + STRETCH + bottom
     x0, y0, x1, y1 = ox + s, s, ox + width - s, height - s   # window rectangle
-    line = f'stroke="#000" stroke-opacity="{outline}" stroke-width="1" fill="none"'
+
+    def bar(x, y, w, h):
+        # The 1 px outline is drawn as filled areas, never as strokes: Qt counts half a
+        # stroke width beyond a piece's edge, which makes the piece half a pixel too large,
+        # gets it scaled, and leaves a light seam in the shadow where pieces meet.
+        return [rect(x, y, w, h, "#000", f'fill-opacity="{outline}"')] if w > 0 and h > 0 else []
+
+    def ring(d):
+        return [f'<path d="{d}" fill="#000" fill-opacity="{outline}"/>']
 
     def hshadow(x, y, w, h, towards_left):
         edge = x + w if towards_left else x
@@ -129,38 +137,40 @@ def frame(svg, prefix, title, shadow, outline, ox):
         vshadow(x0, 0, i, s, True),
         hshadow(left, y0, s, TITLE, True),
     ], body_path(f"M{x0} {top} V{y0 + r} A{r} {r} 0 0 1 {x0 + r} {y0} H{mid} V{top} Z"), [
-        f'<path d="M{x0 - 0.5} {top} V{y0 + r} A{r + 0.5} {r + 0.5} 0 0 1 {x0 + r} {y0 - 0.5} H{mid}" {line}/>',
+        *bar(x0 - 1, y0 + r, 1, top - y0 - r), *bar(x0 + r, y0 - 1, mid - x0 - r, 1),
+        *ring(f"M{x0 - 1} {y0 + r} A{r + 1} {r + 1} 0 0 1 {x0 + r} {y0 - 1} V{y0} A{r} {r} 0 0 0 {x0} {y0 + r} Z"),
     ])
     framed_piece(svg, prefix, "top", (mid, 0, STRETCH, top), [
         vshadow(mid, 0, STRETCH, s, True),
-    ], body_rect(mid, y0, STRETCH, TITLE), [f'<path d="M{mid} {y0 - 0.5} H{right}" {line}/>'])
+    ], body_rect(mid, y0, STRETCH, TITLE), bar(mid, y0 - 1, STRETCH, 1))
     framed_piece(svg, prefix, "topright", (right, 0, side, top), [
         corner_shadow(x1, 0, s, s, x1, y0, 0),
         vshadow(right, 0, i, s, True),
         hshadow(x1, y0, s, TITLE, False),
     ], body_path(f"M{x1} {top} V{y0 + r} A{r} {r} 0 0 0 {x1 - r} {y0} H{right} V{top} Z"), [
-        f'<path d="M{x1 + 0.5} {top} V{y0 + r} A{r + 0.5} {r + 0.5} 0 0 0 {x1 - r} {y0 - 0.5} H{right}" {line}/>',
+        *bar(x1, y0 + r, 1, top - y0 - r), *bar(right, y0 - 1, x1 - r - right, 1),
+        *ring(f"M{x1 + 1} {y0 + r} A{r + 1} {r + 1} 0 0 0 {x1 - r} {y0 - 1} V{y0} A{r} {r} 0 0 1 {x1} {y0 + r} Z"),
     ])
     framed_piece(svg, prefix, "left", (left, ymid, side, STRETCH), [
         hshadow(left, ymid, s, STRETCH, True),
-    ], body_rect(x0, ymid, i, STRETCH), [f'<path d="M{x0 - 0.5} {ymid} V{ybot}" {line}/>'])
+    ], body_rect(x0, ymid, i, STRETCH), bar(x0 - 1, ymid, 1, STRETCH))
     framed_piece(svg, prefix, "center", (mid, ymid, STRETCH, STRETCH), [], body_rect(mid, ymid, STRETCH, STRETCH))
     framed_piece(svg, prefix, "right", (right, ymid, side, STRETCH), [
         hshadow(x1, ymid, s, STRETCH, False),
-    ], body_rect(right, ymid, i, STRETCH), [f'<path d="M{x1 + 0.5} {ymid} V{ybot}" {line}/>'])
+    ], body_rect(right, ymid, i, STRETCH), bar(x1, ymid, 1, STRETCH))
     framed_piece(svg, prefix, "bottomleft", (left, ybot, side, bottom), [
         hshadow(left, ybot, s, i, True),
         vshadow(x0, y1, i, s, False),
         corner_shadow(left, y1, s, s, x0, y1, 0),
-    ], body_rect(x0, ybot, i, i), [f'<path d="M{x0 - 0.5} {ybot} V{y1 + 0.5} H{mid}" {line}/>'])
+    ], body_rect(x0, ybot, i, i), [*bar(x0 - 1, ybot, 1, y1 + 1 - ybot), *bar(x0, y1, mid - x0, 1)])
     framed_piece(svg, prefix, "bottom", (mid, ybot, STRETCH, bottom), [
         vshadow(mid, y1, STRETCH, s, False),
-    ], body_rect(mid, ybot, STRETCH, i), [f'<path d="M{mid} {y1 + 0.5} H{right}" {line}/>'])
+    ], body_rect(mid, ybot, STRETCH, i), bar(mid, y1, STRETCH, 1))
     framed_piece(svg, prefix, "bottomright", (right, ybot, side, bottom), [
         hshadow(x1, ybot, s, i, False),
         vshadow(right, y1, i, s, False),
         corner_shadow(x1, y1, s, s, x1, y1, 0),
-    ], body_rect(right, ybot, i, i), [f'<path d="M{x1 + 0.5} {ybot} V{y1 + 0.5} H{right}" {line}/>'])
+    ], body_rect(right, ybot, i, i), [*bar(x1, ybot, 1, y1 + 1 - ybot), *bar(right, y1, x1 - right, 1)])
     return width
 
 

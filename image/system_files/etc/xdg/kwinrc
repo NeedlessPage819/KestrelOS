@@ -1,7 +1,12 @@
+# Animations (DECISIONS.md D18): windows zoom in and out like on macOS, minimizing
+# uses the genie-like Magic Lamp into the dock. Fade and squash would do the same job.
 [Plugins]
 blurEnabled=true
+scaleEnabled=true
+fadeEnabled=false
 magiclampEnabled=true
 squashEnabled=false
+maximizeEnabled=true
 
 [org.kde.kdecoration2]
 library=org.kde.kwin.aurorae

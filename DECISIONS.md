@@ -272,3 +272,13 @@ freie Symbol-Set **WhiteSur** (Lizenz GPL-3.0). Entschieden mit dir.
   Umriss-Symbole. Im großen Dock passte der Papierkorb so nicht zu den bunten App-Symbolen. Ein
   kleines eigenes Symbol-Set „Kestrel“ übernimmt alles von WhiteSur und tauscht nur den Papierkorb
   gegen die farbige Glas-Version. Der Launchpad-Knopf nutzt das farbige App-Raster.
+
+## D18 – Animationen und Gesten
+
+- **Fenster** zoomen beim Öffnen und Schließen sanft auf und zu, wie auf dem Mac. **Minimieren**
+  saugt das Fenster mit der „Wunderlampe“ ins Dock. **Maximieren** ist animiert.
+- **Touchpad:** Plasma nutzt **vier** Finger: nach oben für die Fensterübersicht, seitlich zum
+  Wechseln der Arbeitsfläche. Der Mac nutzt drei. Plasma bietet dafür keine Einstellung, und
+  KWin dafür umzubauen wäre genau die Art Änderung, die bei Updates kaputtgeht. Deshalb vier.
+- In der Test-VM gibt es keine 3D-Beschleunigung, dort sind alle Effekte aus. Ob alles flüssig
+  wirkt, steht deshalb in der Test-Liste für den Laptop.
