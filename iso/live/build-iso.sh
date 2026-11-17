@@ -53,7 +53,10 @@ insmod png
 set gfxmode=auto
 set gfxpayload=keep
 terminal_output gfxterm
-for font in (\$root)/boot/grub2/themes/kestrel/*.pf2; do loadfont "\$font"; done
+# Fonts by name: wildcards need GRUB's regexp module, which Secure Boot GRUB cannot load.
+loadfont (\$root)/boot/grub2/themes/kestrel/inter-regular-22.pf2
+loadfont (\$root)/boot/grub2/themes/kestrel/inter-semibold-22.pf2
+loadfont (\$root)/boot/grub2/themes/kestrel/inter-regular-16.pf2
 set theme=(\$root)/boot/grub2/themes/kestrel/theme.txt
 export theme
 insmod gzio
