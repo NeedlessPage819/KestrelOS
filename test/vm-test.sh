@@ -7,6 +7,7 @@
 #
 # Backend (auto-detected, override with VM_BACKEND=kvm|whpx|tcg):
 #   kvm   Linux with /dev/kvm: one fast VM with Secure Boot for everything.
+#         Under WSL (nested KVM on Hyper-V) SMM is unreliable, so it behaves like whpx below.
 #   whpx  WSL without nested virtualization: Windows QEMU on the Windows hypervisor for the main
 #         test. WHPX has no SMM, so the Secure Boot boot runs in software emulation (slow).
 #   tcg   software emulation only: same checks, takes hours.
@@ -141,6 +142,10 @@ if [[ $BACKEND == whpx ]]; then
     cp "/mnt/c/Program Files/qemu/share/edk2-i386-vars.fd" "$WORK/vars-plain.fd"
     cp "$ISO" "$WORK/autoinstall.iso"
     iso=$WORK/autoinstall.iso main_fw=plain slow=1
+elif [[ $BACKEND == kvm ]] && grep -qi microsoft /proc/version; then
+    cp "$LINUX_FW/OVMF_CODE.fd" "$WORK/code-plain.fd"
+    cp "$LINUX_FW/OVMF_VARS.fd" "$WORK/vars-plain.fd"
+    iso=$ISO main_fw=plain slow=1
 else
     iso=$ISO main_fw=secure slow=$([[ $BACKEND == tcg ]] && echo 10 || echo 1)
 fi
