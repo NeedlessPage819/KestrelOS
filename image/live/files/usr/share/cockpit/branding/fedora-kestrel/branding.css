@@ -1,0 +1,39 @@
+/* Kestrel OS branding for the installer (Anaconda Web UI, DECISIONS.md D22).
+ * Cockpit picks branding/<ID>-<VARIANT_ID> (fedora-kestrel) before Fedora's own. */
+#badge {
+    inline-size: 64px;
+    block-size: 64px;
+    background-image: url("logo.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#brand::before {
+    content: "${NAME}";
+}
+
+.anaconda {
+    /* Kestrel accent (kdeglobals AccentColor 91,108,240) */
+    --brand-default-light: #8d9af6;
+    --brand-default: #5b6cf0;
+    --brand-default-dark: #3f4ab8;
+
+    .logo {
+        background-image: url("logo.png");
+    }
+
+    /* Header: the Kestrel wallpaper gradient instead of Fedora blue. */
+    .pf-v6-c-masthead {
+        background: linear-gradient(90deg, #6d7cf2 0%, #8d6fd8 55%, #c06fae 100%);
+    }
+}
+
+:not(.pf-v6-theme-dark) .anaconda {
+    --pf-t--global--color--brand--default: var(--brand-default);
+    --pf-t--global--color--brand--hover: var(--brand-default-dark);
+}
+
+.pf-v6-theme-dark .anaconda {
+    --pf-t--global--color--brand--default: var(--brand-default-light);
+    --pf-t--global--color--brand--hover: var(--brand-default);
+}

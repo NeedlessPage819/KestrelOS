@@ -2,8 +2,7 @@
 # Live ISO test (DECISIONS.md D22). Run in the build sandbox after `sudo ./build.sh iso`:
 #   test/live-test.sh [ISO]          default: newest out/kestrel-*.iso
 # Boots the ISO in a VM and saves screenshots to out/test/live/:
-#   menu.png       the boot menu (Kestrel theme)
-#   splash.png     the boot screen
+#   boot-NN.png    the first 40 seconds, every 2 s: firmware, boot menu, boot screen
 #   desktop.png    the live desktop, logged in automatically
 #   installer.png  the installer, started from the dock
 #   secure-menu.png, secure-boot.png   the same ISO with Secure Boot enforced (software
@@ -63,8 +62,9 @@ echo "=== Live ISO: $ISO"
 
 echo "=== Booting (KVM)"
 start_vm "-accel kvm -cpu host" plain
-sleep 7;  shot menu
-sleep 12; shot splash
+# Menu and boot screen show for a few seconds each; take a picture every 2 seconds and keep
+# them all (menu-NN.png), then pick the right ones by eye.
+for n in $(seq -w 2 2 40); do sleep 2; monitor "screendump $OUT/boot-$n.png -f png"; done
 # Live boot unpacks the system into memory; give the desktop time without 3D acceleration.
 for _ in $(seq 24); do sleep 10; shot desktop >/dev/null; done; shot desktop
 # The installer is the second icon in the dock (after Launchpad). The dock is centred and

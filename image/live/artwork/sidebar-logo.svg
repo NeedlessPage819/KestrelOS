@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" viewBox="0 0 200 120">
-  <!-- The Kestrel mark (same path as kestrel-logo-symbolic.svg) and the name, in white. -->
-  <g transform="translate(68 0) scale(4)">
-    <path fill="#ffffff"
-          d="M1 6.2 C3.4 4.2 5.9 4.4 8 7.6 C10.1 4.4 12.6 4.2 15 6.2 C12.4 5.9 10.2 7.2 8 11.2 C5.8 7.2 3.6 5.9 1 6.2 Z"/>
-  </g>
-  <text x="100" y="98" text-anchor="middle" fill="#ffffff"
-        font-family="Inter" font-weight="600" font-size="24">Kestrel OS</text>
-</svg>
