@@ -1,5 +1,8 @@
 # bootc-image-builder config for the automated VM test ISO. NEVER use on real hardware:
 # it wipes the first disk without asking. Test-only account: tester / kestrel-test.
+[customizations.installer.modules]
+enable = ["org.fedoraproject.Anaconda.Modules.Localization"]
+
 [customizations.installer.kickstart]
 contents = """
 text --non-interactive
@@ -20,10 +23,27 @@ systemctl enable sshd.service
 systemctl set-default graphical.target
 touch /etc/plasma-setup-done
 mkdir -p /etc/plasmalogin.conf.d
-cat > /etc/plasmalogin.conf.d/zz-kestrel-test-autologin.conf <<'EOF'
+cat > /etc/plasmalogin.conf.d/zz-kestrel-test-autologin.conf <<'EOF2'
 [Autologin]
 User=tester
 Session=plasma
-EOF
+EOF2
+
+# Keep the test session visible: no screen lock, no display power-off.
+install -d -o tester -g tester /home/tester/.config
+cat > /home/tester/.config/kscreenlockerrc <<'EOF2'
+[Daemon]
+Autolock=false
+LockOnResume=false
+EOF2
+cat > /home/tester/.config/powerdevilrc <<'EOF2'
+[AC][Display]
+DimDisplayWhenIdle=false
+TurnOffDisplayWhenIdle=false
+
+[AC][SuspendAndShutdown]
+AutoSuspendAction=0
+EOF2
+chown tester:tester /home/tester/.config/kscreenlockerrc /home/tester/.config/powerdevilrc
 %end
 """

@@ -17,6 +17,8 @@ var clock = topBar.addWidget("org.kde.plasma.digitalclock");
 clock.currentConfigGroup = ["Appearance"];
 clock.writeConfig("showDate", true);
 clock.writeConfig("dateDisplayFormat", "BesideTime");
+clock.writeConfig("dateFormat", "custom");
+clock.writeConfig("customDateFormat", "ddd d. MMM");
 
 var dock = new Panel;
 dock.location = "bottom";

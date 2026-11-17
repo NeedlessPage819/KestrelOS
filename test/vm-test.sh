@@ -103,6 +103,8 @@ stop_vm() {
 }
 
 screenshot() {
+    monitor "sendkey shift"   # wake the display in case it went idle
+    sleep 3
     monitor "screendump $(vm_path "$vm_accel" "$WORK/$1.png") -f png"
     sleep 2
     [[ $WORK == "$RESULTS" ]] || cp "$WORK/$1.png" "$RESULTS/"
@@ -119,7 +121,7 @@ remote() {
 in_session() {
     remote 'pid=$(pgrep -u "$USER" -x plasmashell) &&
         while IFS= read -r -d "" var; do
-            case $var in DISPLAY=*|WAYLAND_DISPLAY=*|XDG_RUNTIME_DIR=*|DBUS_SESSION_BUS_ADDRESS=*) export "$var";; esac
+            case $var in DISPLAY=*|WAYLAND_DISPLAY=*|XAUTHORITY=*|XDG_RUNTIME_DIR=*|DBUS_SESSION_BUS_ADDRESS=*) export "$var";; esac
         done </proc/$pid/environ && '"$1"
 }
 
