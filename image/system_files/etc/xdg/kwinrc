@@ -4,5 +4,7 @@ magiclampEnabled=true
 squashEnabled=false
 
 [org.kde.kdecoration2]
+library=org.kde.kwin.aurorae
+theme=__aurorae__svg__Kestrel
 ButtonsOnLeft=XIA
 ButtonsOnRight=

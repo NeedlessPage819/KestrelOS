@@ -76,7 +76,7 @@ start_vm() {
     fi
     [[ -n $iso ]] && args+=(-cdrom "$(vm_path "$accel" "$iso")" -boot once=d)
     "$qemu" \
-        -machine "$machine" "${args[@]}" -smp 4 -m 6144 \
+        -machine "$machine" "${args[@]}" -smp 4 -m 4096 \
         -drive if=pflash,format=raw,unit=0,readonly=on,file="$(vm_path "$accel" "$WORK/code-$firmware.fd")" \
         -drive if=pflash,format=raw,unit=1,file="$(vm_path "$accel" "$WORK/vars-$firmware.fd")" \
         -drive if=virtio,format=qcow2,file="$(vm_path "$accel" "$WORK/disk-$firmware.qcow2")" \
@@ -135,6 +135,12 @@ wait_for() { # $1: timeout in seconds, rest: command
 
 [[ -f $ISO ]] || { echo "missing $ISO, run: sudo ./build.sh test-iso" >&2; exit 1; }
 echo "backend: $BACKEND, VM files: $WORK"
+for port in $SSH_PORT $MONITOR_PORT; do
+    if (exec 3<>"/dev/tcp/127.0.0.1/$port") 2>/dev/null; then
+        echo "port $port is already in use (another test VM still running?)" >&2
+        exit 1
+    fi
+done
 
 rm -rf "$WORK" "$RESULTS" && mkdir -p "$WORK" "$RESULTS"
 cp "$LINUX_FW/OVMF_CODE.secboot.fd" "$WORK/code-secure.fd"
