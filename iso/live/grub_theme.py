@@ -72,10 +72,17 @@ desktop-image: "background.png"
 desktop-color: "#050506"
 title-text: ""
 terminal-font: "{item}"
+# While GRUB loads the system after a choice, it shows its text area. Full screen and
+# without a border it is just black, like the Mac between choosing and the boot screen.
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+terminal-border: "0"
 
 + boot_menu {{
-    left = 36%
-    width = 28%
+    left = 31%
+    width = 38%
     top = 47%
     height = 36%
     item_font = "{item}"

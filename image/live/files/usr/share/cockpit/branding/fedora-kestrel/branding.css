@@ -18,13 +18,13 @@
     --brand-default: #5b6cf0;
     --brand-default-dark: #3f4ab8;
 
+    /* The header gradient comes from the brand colours above. The logo file is larger than
+     * its box, so it must be scaled down to show at all. */
     .logo {
         background-image: url("logo.png");
-    }
-
-    /* Header: the Kestrel wallpaper gradient instead of Fedora blue. */
-    .pf-v6-c-masthead {
-        background: linear-gradient(90deg, #6d7cf2 0%, #8d6fd8 55%, #c06fae 100%);
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 }
 
