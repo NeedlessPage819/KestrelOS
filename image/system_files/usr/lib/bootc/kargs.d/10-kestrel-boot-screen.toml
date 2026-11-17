@@ -1,0 +1,3 @@
+# Graphical boot screen without kernel messages, like macOS (DECISIONS.md D21).
+# bootc applies these at install and keeps them across updates.
+kargs = ["rhgb", "quiet"]

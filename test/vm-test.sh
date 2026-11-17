@@ -168,6 +168,13 @@ stop_vm
 
 log "Booting installed system"
 start_vm "$BACKEND" "$main_fw" boot
+# The boot screen shows for a few seconds only; catch it at several points in time.
+# No key press here (screenshot() sends Shift, which would open the GRUB menu).
+for n in 1 2 3; do
+    sleep $((6 * slow))
+    monitor "screendump $(vm_path "$vm_accel" "$WORK/boot-$n.png") -f png"
+    [[ $WORK == "$RESULTS" ]] || cp "$WORK/boot-$n.png" "$RESULTS/" 2>/dev/null || true
+done
 
 check "VM reachable over SSH" wait_for $((600 * slow)) remote true
 check "Plasma desktop session started" wait_for $((300 * slow)) remote 'pgrep -u "$USER" -x plasmashell >/dev/null'
@@ -183,6 +190,7 @@ check "Kestrel Dock loads without errors" remote     '! journalctl --user -b --n
 check "GPU setup ran" remote 'test -f /var/lib/kestrel/gpu-setup.done'
 check "kestrel command works" remote 'kestrel help | grep -q rollback'
 check "ntsync device available" remote 'test -c /dev/ntsync'
+check "Boot screen: Kestrel theme, graphical boot" remote     'grep -qw rhgb /proc/cmdline && grep -qx "Theme=kestrel" /etc/plymouth/plymouthd.conf'
 check "No failed system units" remote '! systemctl --failed --no-legend --plain | grep -v kestrel-flatpak-setup | grep .'
 remote 'systemctl --failed --no-legend --plain' || true
 

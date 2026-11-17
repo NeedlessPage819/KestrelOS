@@ -1,0 +1,67 @@
+[Plymouth Theme]
+Name=Kestrel
+Description=Kestrel OS boot screen: the Kestrel mark and a thin progress bar on black (DECISIONS.md D21)
+ModuleName=two-step
+
+[two-step]
+Font=Inter 12
+TitleFont=Inter Light 24
+ImageDir=/usr/share/plymouth/themes/kestrel
+# watermark.png is the logo; the throbber is an invisible placeholder (no spinner).
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.45
+HorizontalAlignment=.5
+VerticalAlignment=.6
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.6
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.6
+MessageBelowAnimation=true
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x000000
+BackgroundEndColor=0x000000
+ProgressBarBackgroundColor=0x3a3a3c
+ProgressBarForegroundColor=0xffffff
+ProgressBarHorizontalAlignment=.5
+ProgressBarVerticalAlignment=.6
+ProgressBarWidth=180
+ProgressBarHeight=4
+
+[boot-up]
+UseEndAnimation=false
+UseProgressBar=true
+
+[shutdown]
+UseEndAnimation=false
+
+[reboot]
+UseEndAnimation=false
+
+[updates]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Updates werden installiert …
+SubTitle=Bitte den Computer nicht ausschalten
+
+[system-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=System wird aktualisiert …
+SubTitle=Bitte den Computer nicht ausschalten
+
+[firmware-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Firmware wird aktualisiert …
+SubTitle=Bitte den Computer nicht ausschalten
+
+[system-reset]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=System wird zurückgesetzt …
+SubTitle=Bitte den Computer nicht ausschalten

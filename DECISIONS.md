@@ -336,3 +336,20 @@ sind drei Fehler aufgefallen, die jetzt behoben sind:
   Einstellung „Automatisch“ (hell am Tag, dunkel am Abend) nutzt ebenfalls diese beiden.
 - Wer nur unter „Farben“ ein dunkles Farbschema wählt, bekommt dunkle Apps und Symbole, aber
   helle Fensterrahmen. Dafür ist das globale Design da.
+
+## D21 – Eigener Startbildschirm
+
+Beim Einschalten zeigt Kestrel statt des Fedora-Logos einen schwarzen Bildschirm mit dem weißen
+Kestrel-Vogel in der Mitte und einem dünnen Fortschrittsbalken darunter, wie das Apple-Logo beim
+Mac-Start.
+
+- Gebaut mit Plymouth, dem Startbildschirm-Programm von Fedora, und dessen Modul „two-step“, das
+  schon im System ist. Es kommt kein neues Paket dazu.
+- Die Abfrage des Passworts für verschlüsselte Festplatten nutzt weiter die Grafiken von Fedora.
+- Kernel-Meldungen beim Start sind ausgeblendet (`rhgb quiet`). Wer sie sehen will, drückt beim
+  Start Esc.
+- Das Startmenü (GRUB) bleibt wie bei Fedora versteckt. Es erscheint nur nach einem
+  fehlgeschlagenen Start oder wenn man beim Einschalten Shift gedrückt hält. Auf dem Mac gibt es
+  ebenfalls keins.
+- Secure Boot bleibt unberührt: Es ändern sich nur Bilder und Einstellungen, keine signierten
+  Startprogramme.
