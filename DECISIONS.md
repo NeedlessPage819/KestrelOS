@@ -254,3 +254,17 @@ Neben macOS wirkte das Dock noch unruhig. Geändert:
 - **Top-Bar:** flach und ebenfalls durchscheinend.
 - Die Farben kommen aus dem Farbschema, im Dunkelmodus wird alles automatisch dunkel.
 - **Fensterschatten repariert:** An den Fensterecken waren helle Lücken im Schatten zu sehen.
+
+## D17 – Symbole im macOS-Stil (WhiteSur)
+
+Die Breeze-Symbole sahen im Dock durcheinander aus: flache Ordner, runde Logos, dunkle Quadrate.
+Auf dem Mac haben alle App-Symbole dieselbe abgerundete Quadrat-Form. Deshalb nutzt Kestrel das
+freie Symbol-Set **WhiteSur** (Lizenz GPL-3.0). Entschieden mit dir.
+
+- Es ist nicht in Fedora enthalten und wird beim Bauen von GitHub geholt.
+- **Sicherheit:** Die Version ist fest auf `2026-09-10` eingestellt, und der Build prüft den
+  genauen Stand (Commit `73d8040`). Weicht etwas ab, bricht der Build ab. Das Installations-
+  skript läuft nur in einem abgetrennten Bau-Container, nicht im fertigen System.
+- **Updates:** Eine neue Version kommt nur, wenn wir sie in `config.env` bewusst eintragen.
+- Die Alternative wäre Papirus aus Fedora gewesen: geprüft und einheitlich, aber flach und nicht
+  macOS-artig.

@@ -17,6 +17,18 @@ RUN mkdir -p /out/wallpaper/images /out/wallpaper/images_dark /out/aurorae /out/
     python3 /src/aurorae.py /out/aurorae && \
     python3 /src/plasma_theme.py /out/desktoptheme
 
+# macOS-style icons (DECISIONS.md D17). Built in its own stage: the clone is pinned to a
+# tag and checked against the expected commit, and its installer never runs in the image.
+FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION} AS icons
+ARG WHITESUR_ICONS_REPO
+ARG WHITESUR_ICONS_TAG
+ARG WHITESUR_ICONS_COMMIT
+RUN dnf5 -y install git-core gtk-update-icon-cache findutils && \
+    git clone --depth 1 --branch "${WHITESUR_ICONS_TAG}" "${WHITESUR_ICONS_REPO}" /src && \
+    test "$(git -C /src rev-parse HEAD)" = "${WHITESUR_ICONS_COMMIT}" && \
+    mkdir -p /out && cd /src && ./install.sh -d /out && \
+    test -f /out/WhiteSur/index.theme
+
 FROM ${BASE_IMAGE}:${FEDORA_VERSION}
 ARG OS_NAME="Kestrel OS"
 ARG IMAGE_NAME=kestrel
@@ -35,6 +47,7 @@ COPY system_files/ /
 COPY --from=artwork /out/wallpaper/ /usr/share/wallpapers/Kestrel/contents/
 COPY --from=artwork /out/aurorae/ /usr/share/aurorae/themes/
 COPY --from=artwork /out/desktoptheme/ /usr/share/plasma/desktoptheme/
+COPY --from=icons /out/ /usr/share/icons/
 COPY build/build.sh build/lib.sh build/cleanup.sh /tmp/build/
 COPY build/configure/ /tmp/build/configure/
 RUN OS_NAME="${OS_NAME}" IMAGE_NAME="${IMAGE_NAME}" /tmp/build/build.sh configure

@@ -23,6 +23,9 @@ build_image() {
         --build-arg AKMODS_NVIDIA_IMAGE="$AKMODS_NVIDIA_IMAGE" \
         --build-arg OS_NAME="$OS_NAME" \
         --build-arg IMAGE_NAME="$IMAGE_NAME" \
+        --build-arg WHITESUR_ICONS_REPO="$WHITESUR_ICONS_REPO" \
+        --build-arg WHITESUR_ICONS_TAG="$WHITESUR_ICONS_TAG" \
+        --build-arg WHITESUR_ICONS_COMMIT="$WHITESUR_ICONS_COMMIT" \
         --tag "$TAG" \
         image/
     write_manifest
@@ -39,6 +42,7 @@ write_manifest() {
         for ref in "$BASE_IMAGE:$FEDORA_VERSION" "$AKMODS_NVIDIA_IMAGE:main-$FEDORA_VERSION"; do
             echo "input:   $ref $(podman image inspect --format '{{.Digest}}' "$ref")"
         done
+        echo "input:   $WHITESUR_ICONS_REPO $WHITESUR_ICONS_TAG $WHITESUR_ICONS_COMMIT"
     } >"$OUT/manifest.txt"
     podman run --rm "$TAG" rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort >"$OUT/packages.txt"
 }
