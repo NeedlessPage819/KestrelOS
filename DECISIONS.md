@@ -353,3 +353,29 @@ Mac-Start.
   ebenfalls keins.
 - Secure Boot bleibt unberührt: Es ändern sich nur Bilder und Einstellungen, keine signierten
   Startprogramme.
+
+## D22 – Live-USB-Stick: erst ausprobieren, dann installieren
+
+Das ISO startet jetzt ein vollständiges Kestrel OS direkt vom USB-Stick, ohne etwas auf der
+Festplatte zu ändern. Wer es behalten will, klickt im Dock auf **„Kestrel OS installieren“**.
+Entschieden mit dir.
+
+- **Startmenü des USB-Sticks** im Kestrel-Design: dunkler Hintergrund, weißer Vogel und Name,
+  deutsche Einträge („Kestrel OS starten“, „… (einfache Grafik)“ für schwierige Grafikkarten,
+  „USB-Stick prüfen …“, „Firmware-Einstellungen“). Es startet nach 10 Sekunden von selbst.
+- **Live-System:** meldet sich automatisch als „liveuser“ an. Grafikkarten-Einrichtung,
+  Flatpak-Downloads und automatische Updates sind im Live-System aus, damit nichts im
+  Hintergrund passiert. Änderungen im Live-System sind nach dem Neustart weg.
+- **Installer:** Fedoras Installer (Anaconda) mit Kestrel-Farben und -Logo. Er fragt nur nach
+  Festplatte, Sprache und Tastatur. Das Benutzerkonto legt wie bisher der Einrichtungsassistent
+  beim ersten Start an (D13). Installiert wird das Kestrel-Image, das auf dem Stick liegt: Es
+  braucht kein Internet.
+- **Wie es gebaut ist:** Ein eigenes Live-Image auf Basis des Kestrel-Images bekommt die Teile
+  für den Live-Start und den Installer. Diese Teile landen nicht im installierten System. Die
+  Bauanleitung für das ISO stammt aus Titanoboa von Universal Blue (freie Lizenz Apache-2.0),
+  übernommen und angepasst, statt das Werkzeug fremd auszuführen.
+- **Secure Boot:** Das ISO nutzt die signierten Startprogramme aus dem System selbst. Der Test
+  startet es auch mit erzwungenem Secure Boot.
+- **Einschränkungen:** Das Live-ISO startet nur im UEFI-Modus (alle aktuellen Laptops; in
+  VirtualBox und VMware muss „EFI“ eingeschaltet sein). Für alte BIOS-Rechner gibt es weiter das
+  reine Installations-ISO (`build.sh installer-iso`). Der USB-Stick braucht mindestens 16 GB.

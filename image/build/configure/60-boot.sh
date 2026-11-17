@@ -12,6 +12,9 @@ plymouth-set-default-theme kestrel
 # The boot screen lives in the initramfs, so rebuild it for the image's kernel.
 kver=$(ls /usr/lib/modules)
 [[ $(wc -w <<<"$kver") -eq 1 ]] || die "expected exactly one kernel, found: $kver"
+# /root links to /var/roothome, which only exists on an installed system; dracut follows it.
+mkdir -p /var/roothome
 dracut --no-hostonly --kver "$kver" --reproducible --zstd --add ostree -f "/usr/lib/modules/$kver/initramfs.img"
+rmdir /var/roothome
 lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep -q 'plymouth/themes/kestrel/watermark.png' ||
     die "Kestrel boot screen not in the initramfs"
