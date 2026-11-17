@@ -8,3 +8,8 @@ library=org.kde.kwin.aurorae
 theme=__aurorae__svg__Kestrel
 ButtonsOnLeft=XIA
 ButtonsOnRight=
+
+# A lone Super/Windows key press does nothing (as on macOS). Otherwise an accidental press
+# in a game opens the launcher and pulls focus out of it. Search stays on Meta+Space.
+[ModifierOnlyShortcuts]
+Meta=

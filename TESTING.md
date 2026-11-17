@@ -32,6 +32,7 @@ Bitte jeden Punkt abhaken und Probleme mit kurzer Beschreibung notieren.
 - [ ] Helligkeit- und Lautstärketasten funktionieren
 - [ ] Touchpad: Tippen = Klick, Zwei-Finger-Scrollen, 4-Finger-Wischen (Übersicht / Arbeitsfläche)
 - [ ] Meta+Leertaste öffnet die Suche (Spotlight)
+- [ ] Windows-Taste allein drücken: es passiert nichts (soll im Spiel nicht stören)
 
 ### Gaming
 - [ ] Steam startet, Anmeldung klappt
@@ -39,6 +40,9 @@ Bitte jeden Punkt abhaken und Probleme mit kurzer Beschreibung notieren.
 - [ ] Rocket League startet mit Proton (in Heroic: Proton-GE über ProtonUp-Qt installieren und auswählen)
 - [ ] **Rocket League verbindet sich online** (Easy Anti-Cheat) und ein Online-Match funktioniert
 - [ ] FPS mit MangoHud anzeigen (in Heroic: „MangoHud aktivieren“). FPS über 10 Minuten notieren, Ruckler?
+- [ ] Im Spiel (Vollbild oder randloses Fenster) sind Dock und Top-Bar nicht zu sehen
+- [ ] Spiel läuft in voller Bildschirmauflösung, nicht unscharf hochskaliert
+- [ ] Controller (Xbox/PlayStation) wird in Steam und in Heroic erkannt
 - [ ] GameMode aktiv (in Heroic aktivieren; Prüfen: `gamemoded -s` im Terminal während das Spiel läuft)
 
 ### Updates und Rollback
