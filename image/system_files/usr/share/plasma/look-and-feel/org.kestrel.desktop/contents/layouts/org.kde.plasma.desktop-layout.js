@@ -21,6 +21,12 @@ clock.writeConfig("showDate", true);
 clock.writeConfig("dateDisplayFormat", "BesideTime");
 clock.writeConfig("dateFormat", "custom");
 clock.writeConfig("customDateFormat", "ddd d. MMM");
+// Same size and weight as the rest of the top bar, like the macOS menu bar clock. By
+// default Plasma scales the clock to the bar's height, which made it larger than the menus.
+clock.writeConfig("autoFontAndSize", false);
+clock.writeConfig("fontFamily", "Inter");
+clock.writeConfig("fontSize", 10);
+clock.writeConfig("fontWeight", 400);
 
 // The Kestrel Dock widget holds Launchpad, apps and trash. The panel is taller than the
 // visible glass: icons magnify into the empty band above it. The height is filled in at
