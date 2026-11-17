@@ -115,6 +115,13 @@ QUICK=1 test/vm-test.sh       # schneller Test für Design-Runden, ohne Secure-B
 
 Screenshots landen in `out/test/vm/`.
 
+**Wächter für lange Builds** (auf der Windows-Seite, in Git Bash): meldet, wenn WSL nicht mehr
+antwortet, der Build lange keine Ausgabe mehr schreibt oder Windows der Speicher ausgeht.
+
+```bash
+sandbox/watchdog.sh <systemd-unit> <build-log> [minuten-ohne-ausgabe]
+```
+
 **Design live ausprobieren** (die VM aus dem letzten Test wird weiterverwendet):
 
 ```bash
