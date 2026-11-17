@@ -2,9 +2,9 @@
 wine
 winetricks
 lutris
-gamemode
+gamemode.x86_64
 gamemode.i686
-mangohud
+mangohud.x86_64
 mangohud.i686
 gamescope
 vulkan-tools

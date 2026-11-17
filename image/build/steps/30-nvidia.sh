@@ -10,14 +10,22 @@ kmod=$(find "$akmods/kmods" -name "kmod-nvidia-${kernel}-*.rpm" -print -quit)
 
 # The addons package provides the Nvidia repo definition and the module signing key.
 dnf_install "$akmods"/ublue-os/ublue-os-nvidia-addons-*.rpm
-dnf_install \
-    "$kmod" \
-    nvidia-driver \
-    nvidia-driver-libs.i686 \
-    nvidia-driver-cuda \
-    nvidia-settings \
-    libva-nvidia-driver
+pkgs=(
+    nvidia-driver.x86_64
+    nvidia-driver-libs.x86_64
+    nvidia-driver-libs.i686
+    nvidia-driver-cuda.x86_64
+    nvidia-settings.x86_64
+    libva-nvidia-driver.x86_64
+)
+dnf_install "$kmod" "${pkgs[@]}"
+rpm -q "${pkgs[@]}" >/dev/null || die "Nvidia packages missing after install"
 
-# Driver packages may ship their own nouveau blacklist and kernel arguments; drop them so
-# that non-Nvidia and pre-Turing machines are untouched (kestrel-gpu-setup decides instead).
-rm -f /usr/lib/modprobe.d/nvidia*blacklist*.conf /usr/lib/bootc/kargs.d/*nvidia*.toml
+# The driver packages blacklist nouveau/nova for every machine. Keep their power-management
+# options but drop the blacklist, so non-Nvidia and pre-Turing machines are untouched;
+# kestrel-gpu-setup adds the blacklist only where nvidia-open is used.
+sed -i '/^blacklist /d' /usr/lib/modprobe.d/nvidia*.conf
+rm -f /usr/lib/bootc/kargs.d/*nvidia*.toml
+if grep -rqsE '^blacklist (nouveau|nova)' /usr/lib/modprobe.d /usr/lib/bootc/kargs.d; then
+    die "a global nouveau/nova blacklist is still present"
+fi
