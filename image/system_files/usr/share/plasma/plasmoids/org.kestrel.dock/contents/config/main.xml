@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <!-- Apps kept in the dock, as desktop-file URLs ("applications:org.kde.dolphin.desktop").
+         The panel layout sets the defaults; "Keep in Dock" in the context menu edits it. -->
+    <entry name="launchers" type="StringList">
+      <default></default>
+    </entry>
+  </group>
+</kcfg>

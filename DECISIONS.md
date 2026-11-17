@@ -282,3 +282,34 @@ freie Symbol-Set **WhiteSur** (Lizenz GPL-3.0). Entschieden mit dir.
   KWin dafür umzubauen wäre genau die Art Änderung, die bei Updates kaputtgeht. Deshalb vier.
 - In der Test-VM gibt es keine 3D-Beschleunigung, dort sind alle Effekte aus. Ob alles flüssig
   wirkt, steht deshalb in der Test-Liste für den Laptop.
+
+## D19 – Eigenes Dock mit Vergrößerung („Kestrel Dock“)
+
+Auf dem Mac werden die Symbole im Dock größer, wenn die Maus darüberfährt. Plasmas eigenes Dock
+kann das nicht. Deshalb hat Kestrel ein eigenes Dock-Widget. Entschieden mit dir.
+
+- **Wie es gebaut ist:** reines QML (Plasmas Oberflächen-Sprache), kein kompilierter Code. Es nutzt
+  nur Plasmas offizielle Bausteine für die Liste der Apps. Kompilierte Zusätze wie Latte Dock
+  gehen bei Plasma-Updates kaputt, weil sie zur genauen Version passen müssen. QML hat das
+  Problem nicht.
+- **Warum Updates es nicht kaputtmachen:** Plasma-Updates kommen nur über das Kestrel-Image. Jedes
+  Image durchläuft den automatischen VM-Test, und der prüft, dass das Dock ohne Fehler lädt.
+  Bricht ein Update das Dock, fällt der Test durch, bevor das Update auf deinem Laptop landet.
+- **Das Dock enthält alles:** Launchpad, angeheftete und laufende Apps, Trennstrich, Papierkorb.
+  So wird alles gemeinsam größer, wie auf dem Mac.
+- **Platz für die Vergrößerung:** Das Dock ist unsichtbar höher und breiter als das sichtbare
+  Milchglas. Die Symbole und der App-Name wachsen in diesen leeren Rand. Klicks dort gehen ganz
+  normal an das Fenster oder den Desktop dahinter.
+- **Milchglas:** Das Dock zeichnet sein Glas selbst, damit es mit den Symbolen mitwachsen kann.
+  In Ruhe liegt es genau dort, wo Plasma den Hintergrund verschwimmen lässt. Nur die Ränder, die
+  beim Vergrößern kurz dazukommen, sind durchscheinend, aber nicht verschwommen.
+- **Nebeneffekt:** Das Dock weicht Fenstern aus. Weil Plasma den unsichtbaren Rand mitzählt,
+  weicht es schon aus, wenn ein Fenster bis etwa 100 Pixel über den unteren Bildschirmrand reicht.
+- **Launchpad:** Das Vogel-Symbol oben links und das Launchpad-Symbol im Dock öffnen beide das
+  Vollbild-App-Raster.
+- **Kleine Extras:** App-Name über dem vergrößerten Symbol, Hüpfen beim Starten einer App, Punkt unter
+  laufenden Apps, Rechtsklick-Menü (Neues Fenster, Im Dock behalten, Beenden), Dateien auf den
+  Papierkorb ziehen.
+- **Noch nicht drin:** Fenster-Vorschau beim Darüberfahren und Symbole per Ziehen umsortieren.
+- Alle Maße (Symbolgröße, Vergrößerung, Ränder) stehen an einer Stelle in
+  `image/artwork/plasma_theme.py` und gelten für Design, Widget und Layout gemeinsam.

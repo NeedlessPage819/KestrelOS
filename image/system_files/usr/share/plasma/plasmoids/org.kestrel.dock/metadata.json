@@ -1,0 +1,15 @@
+{
+    "KPlugin": {
+        "Id": "org.kestrel.dock",
+        "Name": "Kestrel Dock",
+        "Description": "macOS-style dock with magnification (Kestrel OS)",
+        "Category": "Windows and Tasks",
+        "Icon": "user-desktop",
+        "License": "GPL-2.0-or-later",
+        "Version": "1.0",
+        "Authors": [{ "Name": "Kestrel OS" }],
+        "FormFactors": ["panel"]
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

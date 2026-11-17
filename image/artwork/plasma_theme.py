@@ -5,16 +5,32 @@ Only the dock/top bar background and the task indicators are our own; Plasma tak
 other element from the default Breeze theme. Colours come from the active colour scheme
 (current-color-scheme stylesheet), so light and dark mode both work.
 
-Usage: plasma_theme.py OUTPUT_DIR
+Usage: plasma_theme.py OUTPUT_DIR [DOCK_GEOMETRY_JS]
+       plasma_theme.py --dock-height
+The dock geometry below is the single source for the theme, the Kestrel Dock widget
+(written to DOCK_GEOMETRY_JS) and the dock height in the panel layout (--dock-height).
 """
 import json
 import sys
 from pathlib import Path
 
 NAME = "kestrel"
-RADIUS = 18          # panel corner radius (the dock is about 64 px tall)
-MARGIN = 3           # space between panel edge and its content (icons fill the dock)
+RADIUS = 18          # dock glass corner radius (the glass is 64 px tall)
+GLASS_OPACITY = 0.62 # dock and top bar glass; the dock widget extends it with the same value
 TILE = 2000          # edge pieces; one tile covers any panel, so tiling leaves no seams
+
+# Kestrel Dock (DECISIONS.md D19). Icons rest at DOCK_ICON px and grow up to DOCK_ZOOM times
+# under the pointer, into an empty band above (DOCK_OVERFLOW, which also holds the name
+# label) and beside (DOCK_SIDE) the glass. The dock widget draws the glass itself, with RADIUS and GLASS_OPACITY from here.
+DOCK_ICON = 48
+DOCK_ZOOM = 1.6
+DOCK_PAD = 6         # glass above the icons and between glass edge and first/last icon
+DOCK_BOTTOM = 10     # glass below the icons, holds the running-app dot
+DOCK_SPACING = 6     # between icons
+DOCK_LABEL = 30      # room above a magnified icon for its name label
+DOCK_OVERFLOW = round(DOCK_ICON * (DOCK_ZOOM - 1)) + 2 + DOCK_LABEL
+DOCK_SIDE = round(DOCK_ICON * (DOCK_ZOOM - 1) * 1.5)
+DOCK_HEIGHT = DOCK_OVERFLOW + DOCK_PAD + DOCK_ICON + DOCK_BOTTOM
 
 STYLE = ('<style id="current-color-scheme" type="text/css">'
          '.ColorScheme-Background{color:#eff0f1}.ColorScheme-Text{color:#232629}'
@@ -35,20 +51,24 @@ class Svg:
                 f'{"".join(self.body)}</svg>\n')
 
 
-def rounded_frame(svg, prefix, x, y, radius, shape):
-    """Nine pieces of a rounded rectangle; shape(name, path) draws one piece's part of it."""
-    r, t = radius, TILE
+def rounded_frame(svg, prefix, x, y, radius, shape, top_band=0, side_band=0):
+    """Nine pieces of a rounded rectangle; shape(name, path) draws one piece's part of it.
+    top_band/side_band leave empty space above and beside the shape inside the pieces."""
+    r, t, tb, sb = radius, TILE, top_band, side_band
+    vx, vy = x + sb, y + tb          # top-left corner of the rounded rectangle itself
     pieces = {
-        "topleft": (x, y, r, r, f"M{x} {y + r} A{r} {r} 0 0 1 {x + r} {y} V{y + r} Z"),
-        "top": (x + r, y, t, r, f"M{x + r} {y} H{x + r + t} V{y + r} H{x + r} Z"),
-        "topright": (x + r + t, y, r, r, f"M{x + r + t} {y} A{r} {r} 0 0 1 {x + 2 * r + t} {y + r} H{x + r + t} Z"),
-        "left": (x, y + r, r, t, f"M{x} {y + r} H{x + r} V{y + r + t} H{x} Z"),
-        "center": (x + r, y + r, t, t, f"M{x + r} {y + r} h{t} v{t} h{-t} Z"),
-        "right": (x + r + t, y + r, r, t, f"M{x + r + t} {y + r} h{r} v{t} h{-r} Z"),
-        "bottomleft": (x, y + r + t, r, r, f"M{x} {y + r + t} H{x + r} V{y + 2 * r + t} A{r} {r} 0 0 1 {x} {y + r + t} Z"),
-        "bottom": (x + r, y + r + t, t, r, f"M{x + r} {y + r + t} h{t} v{r} h{-t} Z"),
-        "bottomright": (x + r + t, y + r + t, r, r,
-                        f"M{x + r + t} {y + r + t} H{x + 2 * r + t} A{r} {r} 0 0 1 {x + r + t} {y + 2 * r + t} Z"),
+        "topleft": (x, y, sb + r, tb + r, f"M{vx} {vy + r} A{r} {r} 0 0 1 {vx + r} {vy} V{vy + r} Z"),
+        "top": (vx + r, y, t, tb + r, f"M{vx + r} {vy} H{vx + r + t} V{vy + r} H{vx + r} Z"),
+        "topright": (vx + r + t, y, r + sb, tb + r,
+                     f"M{vx + r + t} {vy} A{r} {r} 0 0 1 {vx + 2 * r + t} {vy + r} H{vx + r + t} Z"),
+        "left": (x, vy + r, sb + r, t, f"M{vx} {vy + r} H{vx + r} V{vy + r + t} H{vx} Z"),
+        "center": (vx + r, vy + r, t, t, f"M{vx + r} {vy + r} h{t} v{t} h{-t} Z"),
+        "right": (vx + r + t, vy + r, r + sb, t, f"M{vx + r + t} {vy + r} h{r} v{t} h{-r} Z"),
+        "bottomleft": (x, vy + r + t, sb + r, r,
+                       f"M{vx} {vy + r + t} H{vx + r} V{vy + 2 * r + t} A{r} {r} 0 0 1 {vx} {vy + r + t} Z"),
+        "bottom": (vx + r, vy + r + t, t, r, f"M{vx + r} {vy + r + t} h{t} v{r} h{-t} Z"),
+        "bottomright": (vx + r + t, vy + r + t, r + sb, r,
+                        f"M{vx + r + t} {vy + r + t} H{vx + 2 * r + t} A{r} {r} 0 0 1 {vx + r + t} {vy + 2 * r + t} Z"),
     }
     for name, (px, py, w, h, d) in pieces.items():
         svg.element(f"{prefix}{name}", px, py, w, h, shape(name, d))
@@ -60,21 +80,36 @@ def panel_background():
 
     def glass(name, d):
         # Frosted glass: translucent fill; KWin blurs what is behind it (see mask below).
-        return [f'<path d="{d}" {fill} fill-opacity="0.62"/>']
+        return [f'<path d="{d}" {fill} fill-opacity="{GLASS_OPACITY}"/>']
 
     def mask(name, d):
         # Blur region: KWin blurs the background behind exactly this shape.
         return [f'<path d="{d}" fill="#000"/>']
 
+    def empty(name, d):
+        # Invisible but not empty: Plasma treats elements without any drawing as missing
+        # and falls back to another background.
+        return [f'<path d="{d}" fill="#000" fill-opacity="0"/>']
+
     # Plasma first looks for pieces prefixed with the panel's screen edge, else the plain
-    # ones. Only the dock at the bottom ("south") is rounded. The plain pieces stay flat:
-    # a new panel briefly uses them before its edge is known, and rounded corners there
-    # would lock the top bar to a minimum height of twice the radius.
-    for prefix, radius, margin, y in (("", 1, 1, 0), ("south-", RADIUS, MARGIN, 6000)):
-        rounded_frame(svg, prefix, 0, y, radius, glass)
-        rounded_frame(svg, f"mask-{prefix}", 0, y + 3000, radius, mask)
-        for side in ("top", "bottom", "left", "right"):
-            svg.element(f"{prefix}hint-{side}-margin", 0, -100, margin, margin)
+    # ones. The plain pieces are the flat top bar: a new panel briefly uses them before its
+    # edge is known, and rounded corners there would lock the top bar to twice the radius.
+    rounded_frame(svg, "", 0, 0, 1, glass)
+    rounded_frame(svg, "mask-", 0, 3000, 1, mask)
+    for side in ("top", "bottom", "left", "right"):
+        svg.element(f"hint-{side}-margin", 0, -100, 1, 1)
+
+    # The dock ("south") draws its own glass, so it can grow with the magnified icons
+    # (DECISIONS.md D19): its visible pieces are empty. Plasma uses the mask both as the
+    # blur region and as the area that takes mouse input, so the mask is the dock's glass
+    # at rest: inset by the empty bands the icons grow into. An empty mask would mean
+    # "blur the whole window". Margins are 1 px, not 0: Plasma ignores zero-sized margin
+    # hints and falls back to the piece sizes.
+    bands = (DOCK_OVERFLOW, DOCK_SIDE)
+    rounded_frame(svg, "south-", 0, 6000, RADIUS, empty, *bands)
+    rounded_frame(svg, "mask-south-", 0, 9000, RADIUS, mask, *bands)
+    for side in ("top", "bottom", "left", "right"):
+        svg.element(f"south-hint-{side}-margin", 0, -100, 1, 1)
     svg.element("hint-stretch-borders", 0, -200, 1, 1)
     return svg.text()
 
@@ -153,7 +188,23 @@ def metadata():
     }, indent=4) + "\n"
 
 
+def dock_geometry_js():
+    values = {"icon": DOCK_ICON, "zoom": DOCK_ZOOM, "pad": DOCK_PAD, "bottom": DOCK_BOTTOM,
+              "spacing": DOCK_SPACING, "overflow": DOCK_OVERFLOW, "side": DOCK_SIDE,
+              "radius": RADIUS, "glassOpacity": GLASS_OPACITY, "label": DOCK_LABEL}
+    lines = [".pragma library",
+             "// Generated by image/artwork/plasma_theme.py; edit the DOCK_* values there."]
+    lines += [f"var {k} = {v};" for k, v in values.items()]
+    return "\n".join(lines) + "\n"
+
+
 def main():
+    if sys.argv[1] == "--dock-height":
+        print(DOCK_HEIGHT)
+        return
+    if len(sys.argv) > 2:
+        Path(sys.argv[2]).parent.mkdir(parents=True, exist_ok=True)
+        Path(sys.argv[2]).write_text(dock_geometry_js())
     out = Path(sys.argv[1]) / NAME
     (out / "widgets").mkdir(parents=True, exist_ok=True)
     (out / "metadata.json").write_text(metadata())

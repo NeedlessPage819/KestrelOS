@@ -3,6 +3,9 @@
 #   test/vm-live.sh start        boot the installed test disk in the background
 #   test/vm-live.sh theme        install the current window decoration for the test user
 #   test/vm-live.sh plasma       install the current Plasma theme (dock, top bar) for the test user
+#   test/vm-live.sh dock         install the current Kestrel Dock widget and rebuild the dock with it
+#   test/vm-live.sh mouse X Y    move the pointer to screen position X, Y
+#   test/vm-live.sh click X Y    left click at screen position X, Y
 #   test/vm-live.sh run CMD...   run a command inside the desktop session
 #   test/vm-live.sh shot NAME    screenshot to out/test/vm/NAME.png
 #   test/vm-live.sh stop
@@ -11,7 +14,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 WORK=out/test/vm
-SSH_PORT=2222 MONITOR_PORT=4444
+SSH_PORT=2222 MONITOR_PORT=4444 QMP_PORT=4445
+SCREEN_W=1280 SCREEN_H=800    # virtio-vga default mode in the test VM
 TEST_USER=tester TEST_PASSWORD=kestrel-test   # fixture from test/autoinstall.toml
 
 remote() {
@@ -21,10 +25,22 @@ remote() {
 in_session() {
     remote 'pid=$(pgrep -u "$USER" -x plasmashell) &&
         while IFS= read -r -d "" var; do
-            case $var in WAYLAND_DISPLAY=*|XDG_RUNTIME_DIR=*|DBUS_SESSION_BUS_ADDRESS=*) export "$var";; esac
+            case $var in DISPLAY=*|XAUTHORITY=*|WAYLAND_DISPLAY=*|XDG_RUNTIME_DIR=*|DBUS_SESSION_BUS_ADDRESS=*) export "$var";; esac
         done </proc/$pid/environ && '"$1"
 }
 monitor() { echo "$1" | timeout 10 socat - TCP:127.0.0.1:${MONITOR_PORT},connect-timeout=3 >/dev/null; }
+
+# Pointer input through QMP: the USB tablet takes absolute positions, scaled to 0..32767.
+qmp_input() {
+    printf '{"execute":"qmp_capabilities"}
+{"execute":"input-send-event","arguments":{"events":[%s]}}
+' "$1" |
+        timeout 10 socat - TCP:127.0.0.1:${QMP_PORT},connect-timeout=3 >/dev/null
+}
+pointer_to() {
+    qmp_input "{\"type\":\"abs\",\"data\":{\"axis\":\"x\",\"value\":$(( $1 * 32767 / SCREEN_W ))}},{\"type\":\"abs\",\"data\":{\"axis\":\"y\",\"value\":$(( $2 * 32767 / SCREEN_H ))}}"
+}
+button() { qmp_input "{\"type\":\"btn\",\"data\":{\"down\":$1,\"button\":\"left\"}}"; }
 
 case ${1:-} in
 start)
@@ -33,8 +49,8 @@ start)
         -drive if=pflash,format=raw,unit=0,readonly=on,file="$WORK/code-plain.fd" \
         -drive if=pflash,format=raw,unit=1,file="$WORK/vars-plain.fd" \
         -drive if=virtio,format=qcow2,file="$WORK/disk-plain.qcow2" \
-        -device virtio-vga -display none \
-        -monitor tcp:127.0.0.1:${MONITOR_PORT},server,nowait \
+        -device virtio-vga -display none -device qemu-xhci -device usb-tablet \
+        -monitor tcp:127.0.0.1:${MONITOR_PORT},server,nowait         -qmp tcp:127.0.0.1:${QMP_PORT},server,nowait \
         -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:${SSH_PORT}-:22 \
         -serial file:"$WORK/serial-live.log" </dev/null >/dev/null 2>&1 &
     for _ in $(seq 60); do
@@ -62,6 +78,33 @@ plasma)
     tar -C "$tmp" -c "$name" | remote 'rm -rf ~/.local/share/plasma/desktoptheme/kestreldev*;
         mkdir -p ~/.local/share/plasma/desktoptheme; tar -C ~/.local/share/plasma/desktoptheme -x'
     in_session "plasma-apply-desktoptheme $name" ;;
+dock)
+    # Plasma caches QML, so the shell restarts before the dock is rebuilt with the widget.
+    src=image/system_files/usr/share/plasma/plasmoids/org.kestrel.dock
+    tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+    cp -r "$src" "$tmp/"
+    python3 image/artwork/plasma_theme.py "$tmp/theme" "$tmp/org.kestrel.dock/contents/ui/geometry.js"
+    height=$(python3 image/artwork/plasma_theme.py --dock-height)
+    tar -C "$tmp" -c org.kestrel.dock | remote 'rm -rf ~/.local/share/plasma/plasmoids/org.kestrel.dock;
+        mkdir -p ~/.local/share/plasma/plasmoids; tar -C ~/.local/share/plasma/plasmoids -x'
+    in_session "systemctl --user restart plasma-plasmashell"
+    sleep 25
+    in_session "dbus-send --session --print-reply --dest=org.kde.plasmashell /PlasmaShell         org.kde.PlasmaShell.evaluateScript string:'
+        panels().forEach(function (p) {
+            if (p.location !== \"bottom\") return;
+            p.widgets().forEach(function (w) { w.remove(); });
+            p.height = $height;
+            var d = p.addWidget(\"org.kestrel.dock\");
+            d.currentConfigGroup = [\"General\"];
+            d.writeConfig(\"launchers\", [\"applications:org.kde.dolphin.desktop\",
+                \"applications:org.mozilla.firefox.desktop\", \"applications:steam.desktop\",
+                \"applications:org.kde.discover.desktop\", \"applications:org.kde.konsole.desktop\",
+                \"applications:systemsettings.desktop\"]);
+        });'" >/dev/null ;;
+mouse)
+    pointer_to "${2:?x}" "${3:?y}" ;;
+click)
+    pointer_to "${2:?x}" "${3:?y}"; sleep 0.3; button true; sleep 0.1; button false ;;
 run)
     shift; in_session "$*" ;;
 shot)
@@ -71,5 +114,5 @@ shot)
 stop)
     monitor quit || true ;;
 *)
-    sed -n '2,8p' "$0"; exit 1 ;;
+    sed -n "2,10p" "$0"; exit 1 ;;
 esac

@@ -5,7 +5,9 @@ topBar.location = "top";
 topBar.height = Math.round(gridUnit * 1.5);
 topBar.floating = false;
 
-var launcher = topBar.addWidget("org.kde.plasma.kickoff");
+// The bird opens the full-screen app grid (Launchpad). The dock's Launchpad icon opens the
+// same grid: it asks Plasma for "the launcher", which is this widget (DECISIONS.md D19).
+var launcher = topBar.addWidget("org.kde.plasma.kickerdash");
 launcher.currentConfigGroup = ["General"];
 launcher.writeConfig("icon", "kestrel-logo-symbolic");
 
@@ -20,22 +22,21 @@ clock.writeConfig("dateDisplayFormat", "BesideTime");
 clock.writeConfig("dateFormat", "custom");
 clock.writeConfig("customDateFormat", "ddd d. MMM");
 
+// The Kestrel Dock widget holds Launchpad, apps and trash. The panel is taller than the
+// visible glass: icons magnify into the empty band above it. The height is filled in at
+// build time from image/artwork/plasma_theme.py, which also draws that band.
 var dock = new Panel;
 dock.location = "bottom";
-dock.height = Math.round(gridUnit * 3.6);
+dock.height = @DOCK_HEIGHT@;
 dock.alignment = "center";
 dock.lengthMode = "fit";
 dock.floating = true;
 dock.hiding = "dodgewindows";
 
-var launchpad = dock.addWidget("org.kde.plasma.kickerdash");
-launchpad.currentConfigGroup = ["General"];
-launchpad.writeConfig("icon", "view-app-grid");
-
-var tasks = dock.addWidget("org.kde.plasma.icontasks");
+var apps = dock.addWidget("org.kestrel.dock");
 // Only apps that are part of the image: Flatpaks arrive later and would show as blank icons.
-tasks.currentConfigGroup = ["General"];
-tasks.writeConfig("launchers", [
+apps.currentConfigGroup = ["General"];
+apps.writeConfig("launchers", [
     "applications:org.kde.dolphin.desktop",
     "applications:org.mozilla.firefox.desktop",
     "applications:steam.desktop",
@@ -43,9 +44,6 @@ tasks.writeConfig("launchers", [
     "applications:org.kde.konsole.desktop",
     "applications:systemsettings.desktop"
 ]);
-
-dock.addWidget("org.kde.plasma.marginsseparator");
-dock.addWidget("org.kde.plasma.trash");
 
 var desktops = desktopsForActivity(currentActivity());
 for (var i = 0; i < desktops.length; i++) {

@@ -178,7 +178,9 @@ screenshot desktop
 
 check "Session is Wayland" remote \
     'loginctl show-session "$(loginctl list-sessions --no-legend | awk -v u="$USER" "\$3==u {print \$1; exit}")" -p Type --value | grep -qx wayland'
-check "Kestrel layout applied" remote 'grep -q org.kde.plasma.kickerdash ~/.config/plasma-org.kde.plasma.desktop-appletsrc'
+check "Kestrel layout applied" remote 'grep -q org.kestrel.dock ~/.config/plasma-org.kde.plasma.desktop-appletsrc'
+# The dock is our own QML: a Plasma update that breaks it must fail the test, not the user.
+check "Kestrel Dock loads without errors" remote     '! journalctl --user -b --no-pager | grep -i "org.kestrel.dock" | grep -iE "error|unavailable|not (a type|installed)|failed"'
 check "GPU setup ran" remote 'test -f /var/lib/kestrel/gpu-setup.done'
 check "kestrel command works" remote 'kestrel help | grep -q rollback'
 check "ntsync device available" remote 'test -c /dev/ntsync'

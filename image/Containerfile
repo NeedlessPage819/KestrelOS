@@ -30,9 +30,14 @@ RUN share=/rootfs/usr/share && \
     rsvg-convert -w 3840 -h 2160 -o $share/wallpapers/Kestrel/contents/images/3840x2160.png /src/wallpaper-light.svg && \
     rsvg-convert -w 3840 -h 2160 -o $share/wallpapers/Kestrel/contents/images_dark/3840x2160.png /src/wallpaper-dark.svg && \
     python3 /src/aurorae.py $share/aurorae/themes && \
-    python3 /src/plasma_theme.py $share/plasma/desktoptheme
+    python3 /src/plasma_theme.py $share/plasma/desktoptheme \
+        $share/plasma/plasmoids/org.kestrel.dock/contents/ui/geometry.js
 COPY --from=icons /out/ /rootfs/usr/share/icons/
 COPY system_files/ /rootfs/
+# The dock height comes from the same generator as the theme and the dock widget.
+RUN layout=/rootfs/usr/share/plasma/look-and-feel/org.kestrel.desktop/contents/layouts/org.kde.plasma.desktop-layout.js && \
+    sed -i "s/@DOCK_HEIGHT@/$(python3 /src/plasma_theme.py --dock-height)/" "$layout" && \
+    ! grep -q "@DOCK_HEIGHT@" "$layout"
 COPY build/build.sh build/lib.sh build/cleanup.sh /rootfs/tmp/build/
 COPY build/configure/ /rootfs/tmp/build/configure/
 
