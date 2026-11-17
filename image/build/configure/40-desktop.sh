@@ -28,6 +28,7 @@ dnf5 -y remove plasma-welcome
 
 # Icon theme overrides: the dock trash uses the full-colour WhiteSur icon (see index.theme).
 icons=/usr/share/icons
+mkdir -p "$icons/Kestrel/places/scalable"
 for name in user-trash user-trash-full; do
     [[ -f $icons/WhiteSur/places/scalable/$name.svg ]] || die "WhiteSur icon $name missing"
     ln -sf "../../../WhiteSur/places/scalable/$name.svg" "$icons/Kestrel/places/scalable/$name-symbolic.svg"
