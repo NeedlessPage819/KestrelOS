@@ -62,6 +62,8 @@ build_iso() {
 }
 
 [[ $EUID -eq 0 ]] || die "run as root: bootc-image-builder needs rootful podman"
+# Hand build results back to the invoking user, so tests can run without root.
+trap '[[ -n ${SUDO_UID:-} && -d $OUT ]] && chown -R "$SUDO_UID:$SUDO_GID" "$OUT"' EXIT
 
 case "${1:-}" in
     image)

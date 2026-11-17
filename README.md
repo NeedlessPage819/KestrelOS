@@ -23,7 +23,9 @@ sandbox/setup.sh      richtet die Build-Umgebung ein
 
 Gebaut wird nur in der Sandbox: Fedora in WSL2 auf Windows (oder einer Linux-VM).
 
-Einmalig in Windows (PowerShell als Administrator, danach neu starten):
+Einmalig in Windows: unter „Windows-Features aktivieren oder deaktivieren“ die
+**Windows-Hypervisor-Plattform** einschalten (für die Test-VM), dann in PowerShell als
+Administrator (danach neu starten):
 
 ```powershell
 wsl --install --no-distribution
