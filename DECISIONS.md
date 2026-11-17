@@ -217,3 +217,24 @@ gepflegten Weg.
 
 **Warum:** Ein sauberes System zeigt keine roten Fehlermeldungen. Der automatische Test prüft,
 dass kein Systemdienst fehlschlägt.
+
+---
+
+## D15 – Aufgeräumteres macOS-Gefühl (Design-Runde 2)
+
+Nach dem ersten Blick auf den Desktop wirkte er noch nach „KDE mit Dock“. Geändert:
+
+- **Fensterknöpfe als farbige „Ampel“** (rot, gelb, grün; Symbole erscheinen beim Darüberfahren),
+  schlanke helle Titelleiste, abgerundete obere Ecken, weicher Schatten. Das ist ein **eigenes
+  Fensterdesign** („Aurorae“-Theme, erzeugt von `image/artwork/aurorae.py`).
+  *Warum eigenes:* Fertige Lösungen wie „Klassy“ sind kompilierte Programme, die zur genauen
+  Plasma-Version passen müssen. Für Fedora 44 gibt es keine Pakete, und ein Plasma-Update könnte
+  die Fensterrahmen kaputt machen. Aurorae-Designs sind nur Grafiken, die KWin selbst zeichnet.
+  Updates können sie nicht beschädigen.
+- **Dock:** größere Symbole und nur Apps, die immer installiert sind (Dateien, Firefox, Steam,
+  Discover, Terminal, Einstellungen). Keine leeren Platzhalter mehr. Der Launchpad-Knopf zeigt ein
+  App-Raster.
+- **Top-Bar:** schlanker, mit eigenem schlichten Logo (Vogel im Gleitflug) und Datum im Stil
+  „Di. 17. Nov.“
+- **Kein KDE-Begrüßungsfenster** beim ersten Login. Die Einrichtung übernimmt schon der
+  Assistent (D13).

@@ -2,12 +2,12 @@
 
 var topBar = new Panel;
 topBar.location = "top";
-topBar.height = Math.round(gridUnit * 1.8);
+topBar.height = Math.round(gridUnit * 1.5);
 topBar.floating = false;
 
 var launcher = topBar.addWidget("org.kde.plasma.kickoff");
 launcher.currentConfigGroup = ["General"];
-launcher.writeConfig("icon", "start-here-kde-symbolic");
+launcher.writeConfig("icon", "kestrel-logo-symbolic");
 
 topBar.addWidget("org.kde.plasma.appmenu");
 topBar.addWidget("org.kde.plasma.panelspacer");
@@ -22,23 +22,23 @@ clock.writeConfig("customDateFormat", "ddd d. MMM");
 
 var dock = new Panel;
 dock.location = "bottom";
-dock.height = Math.round(gridUnit * 3.2);
+dock.height = Math.round(gridUnit * 3.6);
 dock.alignment = "center";
 dock.lengthMode = "fit";
 dock.floating = true;
 dock.hiding = "dodgewindows";
 
-dock.addWidget("org.kde.plasma.kickerdash");
+var launchpad = dock.addWidget("org.kde.plasma.kickerdash");
+launchpad.currentConfigGroup = ["General"];
+launchpad.writeConfig("icon", "view-app-grid-symbolic");
 
 var tasks = dock.addWidget("org.kde.plasma.icontasks");
+// Only apps that are part of the image: Flatpaks arrive later and would show as blank icons.
 tasks.currentConfigGroup = ["General"];
 tasks.writeConfig("launchers", [
     "applications:org.kde.dolphin.desktop",
     "applications:org.mozilla.firefox.desktop",
-    "applications:org.libreoffice.LibreOffice.desktop",
-    "applications:org.videolan.VLC.desktop",
     "applications:steam.desktop",
-    "applications:com.heroicgameslauncher.hgl.desktop",
     "applications:org.kde.discover.desktop",
     "applications:org.kde.konsole.desktop",
     "applications:systemsettings.desktop"
