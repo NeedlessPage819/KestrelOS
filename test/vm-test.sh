@@ -11,6 +11,8 @@
 #   whpx  WSL without nested virtualization: Windows QEMU on the Windows hypervisor for the main
 #         test. WHPX has no SMM, so the Secure Boot boot runs in software emulation (slow).
 #   tcg   software emulation only: same checks, takes hours.
+# QUICK=1 skips the slow software-emulated Secure Boot boot (step 3 on kvm under WSL and whpx).
+# Use it for design rounds only; a release build always runs the full test.
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")/.."
 
@@ -170,7 +172,8 @@ start_vm "$BACKEND" "$main_fw" boot
 
 check "VM reachable over SSH" wait_for $((600 * slow)) remote true
 check "Plasma desktop session started" wait_for $((300 * slow)) remote 'pgrep -u "$USER" -x plasmashell >/dev/null'
-sleep $((30 * slow))
+# Without 3D acceleration the panels need well over 30 s to appear after login.
+sleep $((90 * slow))
 screenshot desktop
 
 check "Session is Wayland" remote \
@@ -188,13 +191,17 @@ sshpass -p "$TEST_PASSWORD" scp -q -P "$SSH_PORT" \
 check "Windows program runs via Wine" \
     in_session "WINEDEBUG=-all timeout $((600 * slow)) wine ~/winhello.exe </dev/null >~/wine.out 2>&1;
         wineserver -k; cat ~/wine.out >&2; grep -q KESTREL-WINE-OK ~/wine.out"
-in_session 'WINEDEBUG=-all nohup wine ~/winhello.exe --gui >/dev/null 2>&1 &'
+# setsid and closed stdin: otherwise ssh waits for the window to close.
+in_session 'WINEDEBUG=-all setsid -f wine ~/winhello.exe --gui </dev/null >/dev/null 2>&1'
 sleep $((20 * slow))
 screenshot wine-gui
 
 if [[ $main_fw == secure ]]; then
     check "Secure Boot enabled" remote 'mokutil --sb-state | grep -q "SecureBoot enabled"'
     stop_vm
+elif [[ ${QUICK:-0} == 1 ]]; then
+    stop_vm
+    log "QUICK=1: Secure Boot boot skipped"
 else
     stop_vm
     log "Booting once more with Secure Boot enforced (software emulation, slow)"

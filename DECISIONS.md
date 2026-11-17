@@ -268,3 +268,7 @@ freie Symbol-Set **WhiteSur** (Lizenz GPL-3.0). Entschieden mit dir.
 - **Updates:** Eine neue Version kommt nur, wenn wir sie in `config.env` bewusst eintragen.
 - Die Alternative wäre Papirus aus Fedora gewesen: geprüft und einheitlich, aber flach und nicht
   macOS-artig.
+- **Papierkorb und Launchpad im Dock:** Plasma zeigt Widgets in Leisten absichtlich als schlichte
+  Umriss-Symbole. Im großen Dock passte der Papierkorb so nicht zu den bunten App-Symbolen. Ein
+  kleines eigenes Symbol-Set „Kestrel“ übernimmt alles von WhiteSur und tauscht nur den Papierkorb
+  gegen die farbige Glas-Version. Der Launchpad-Knopf nutzt das farbige App-Raster.

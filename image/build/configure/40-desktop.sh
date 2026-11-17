@@ -25,3 +25,11 @@ sed -i \
 # No KDE Welcome Center: Plasma Setup already onboards new users (DECISIONS.md D15).
 # Its KDED module ignores config switches on first login, so remove the package.
 dnf5 -y remove plasma-welcome
+
+# Icon theme overrides: the dock trash uses the full-colour WhiteSur icon (see index.theme).
+icons=/usr/share/icons
+for name in user-trash user-trash-full; do
+    [[ -f $icons/WhiteSur/places/scalable/$name.svg ]] || die "WhiteSur icon $name missing"
+    ln -sf "../../../WhiteSur/places/scalable/$name.svg" "$icons/Kestrel/places/scalable/$name-symbolic.svg"
+done
+gtk-update-icon-cache -qf "$icons/Kestrel" 2>/dev/null || true

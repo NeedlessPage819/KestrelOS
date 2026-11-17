@@ -5,7 +5,7 @@ widgetStyle=Breeze
 ColorScheme=BreezeLight
 
 [kdeglobals][Icons]
-Theme=WhiteSur
+Theme=Kestrel
 
 [plasmarc][Theme]
 name=kestrel

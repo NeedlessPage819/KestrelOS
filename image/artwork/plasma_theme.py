@@ -66,15 +66,15 @@ def panel_background():
         # Blur region: KWin blurs the background behind exactly this shape.
         return [f'<path d="{d}" fill="#000"/>']
 
-    # Plasma first looks for pieces prefixed with the panel's screen edge. The top bar
-    # ("north") is a flat strip: rounded corners there would also force a minimum height
-    # of twice the radius. Every other panel, i.e. the dock, gets the rounded pieces.
-    for prefix, radius, y in (("", RADIUS, 0), ("north-", 1, 6000)):
+    # Plasma first looks for pieces prefixed with the panel's screen edge, else the plain
+    # ones. Only the dock at the bottom ("south") is rounded. The plain pieces stay flat:
+    # a new panel briefly uses them before its edge is known, and rounded corners there
+    # would lock the top bar to a minimum height of twice the radius.
+    for prefix, radius, margin, y in (("", 1, 1, 0), ("south-", RADIUS, MARGIN, 6000)):
         rounded_frame(svg, prefix, 0, y, radius, glass)
         rounded_frame(svg, f"mask-{prefix}", 0, y + 3000, radius, mask)
         for side in ("top", "bottom", "left", "right"):
-            m = MARGIN if prefix == "" else 1
-            svg.element(f"{prefix}hint-{side}-margin", 0, -100, m, m)
+            svg.element(f"{prefix}hint-{side}-margin", 0, -100, margin, margin)
     svg.element("hint-stretch-borders", 0, -200, 1, 1)
     return svg.text()
 

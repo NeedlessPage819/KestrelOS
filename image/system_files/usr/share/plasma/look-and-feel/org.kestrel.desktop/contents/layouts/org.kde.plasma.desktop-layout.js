@@ -30,7 +30,7 @@ dock.hiding = "dodgewindows";
 
 var launchpad = dock.addWidget("org.kde.plasma.kickerdash");
 launchpad.currentConfigGroup = ["General"];
-launchpad.writeConfig("icon", "view-app-grid-symbolic");
+launchpad.writeConfig("icon", "view-app-grid");
 
 var tasks = dock.addWidget("org.kde.plasma.icontasks");
 // Only apps that are part of the image: Flatpaks arrive later and would show as blank icons.
