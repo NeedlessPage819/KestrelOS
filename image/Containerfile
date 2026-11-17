@@ -20,14 +20,21 @@ FROM ${BASE_IMAGE}:${FEDORA_VERSION}
 ARG OS_NAME="Kestrel OS"
 ARG IMAGE_NAME=kestrel
 
+# Phase 1, packages: only invalidated by package lists or install steps, so design and
+# configuration changes below rebuild in minutes instead of reinstalling everything.
+COPY packages/ /tmp/build/packages/
+COPY build/build.sh build/lib.sh build/cleanup.sh /tmp/build/
+COPY build/install/ /tmp/build/install/
+RUN --mount=type=bind,from=akmods-nvidia,src=/rpms,dst=/tmp/akmods-nvidia \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
+    /tmp/build/build.sh install
+
+# Phase 2, configuration and artwork.
 COPY system_files/ /
 COPY --from=artwork /out/wallpaper/ /usr/share/wallpapers/Kestrel/contents/
 COPY --from=artwork /out/aurorae/ /usr/share/aurorae/themes/
-COPY packages/ /tmp/build/packages/
-COPY build/ /tmp/build/
-
-RUN --mount=type=bind,from=akmods-nvidia,src=/rpms,dst=/tmp/akmods-nvidia \
-    --mount=type=cache,dst=/var/cache/libdnf5 \
-    OS_NAME="${OS_NAME}" IMAGE_NAME="${IMAGE_NAME}" /tmp/build/build.sh
+COPY build/build.sh build/lib.sh build/cleanup.sh /tmp/build/
+COPY build/configure/ /tmp/build/configure/
+RUN OS_NAME="${OS_NAME}" IMAGE_NAME="${IMAGE_NAME}" /tmp/build/build.sh configure
 
 RUN bootc container lint

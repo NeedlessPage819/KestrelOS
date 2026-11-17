@@ -11,7 +11,7 @@ Tests in [TESTING.md](TESTING.md).
 config.env            alle Versionen und Namen an einem Ort
 build.sh              baut Image und ISO
 image/Containerfile   das System als Container-Image
-image/build/steps/    Bauschritte, der Reihe nach
+image/build/           Bauschritte: install/ (Pakete), configure/ (Einstellungen)
 image/packages/       Paketlisten (eine Zeile = ein Paket)
 image/system_files/   Dateien, die 1:1 ins System kopiert werden
 iso/release.toml      Einstellungen für das Installations-ISO
