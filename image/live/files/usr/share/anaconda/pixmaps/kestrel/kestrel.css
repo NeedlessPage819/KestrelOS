@@ -1,0 +1,31 @@
+/* Kestrel OS installer style (DECISIONS.md D22). Replaces Fedora's blue sidebar and top
+ * bar with the Kestrel gradient and logo; everything else stays Anaconda's default. */
+
+@define-color kestrel #5b6cf0;
+
+.logo-sidebar {
+    background-image: url('/usr/share/anaconda/pixmaps/kestrel/sidebar-bg.png');
+    background-color: @kestrel;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.logo {
+    background-image: url('/usr/share/anaconda/pixmaps/kestrel/sidebar-logo.png');
+    background-position: 50% 40px;
+    background-repeat: no-repeat;
+    background-color: transparent;
+}
+
+.product-logo {
+    background-image: none;
+    background-color: transparent;
+}
+
+AnacondaSpokeWindow #nav-box {
+    background-color: @kestrel;
+    background-image: url('/usr/share/anaconda/pixmaps/kestrel/topbar-bg.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+}

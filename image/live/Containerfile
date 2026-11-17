@@ -1,0 +1,20 @@
+# Kestrel OS live system (DECISIONS.md D22): the Kestrel image plus what a live session and
+# the installer need. Only used to build the live ISO. The installer installs the plain
+# Kestrel image, so nothing from here ends up on an installed system.
+ARG BASE_IMAGE=localhost/kestrel:44
+ARG FEDORA_VERSION=44
+
+# Installer artwork (sidebar, top bar, logo), rendered from SVG.
+FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION} AS artwork
+RUN dnf5 -y install librsvg2-tools rsms-inter-fonts
+COPY artwork/ /src/
+RUN mkdir -p /out && \
+    rsvg-convert -w 406 -h 767 -o /out/sidebar-bg.png /src/sidebar-bg.svg && \
+    rsvg-convert -w 1040 -h 132 -o /out/topbar-bg.png /src/topbar-bg.svg && \
+    rsvg-convert -w 200 -h 120 -o /out/sidebar-logo.png /src/sidebar-logo.svg
+
+FROM ${BASE_IMAGE}
+COPY files/ /tmp/live/files/
+COPY build.sh /tmp/live/build.sh
+COPY --from=artwork /out/ /tmp/live/files/usr/share/anaconda/pixmaps/kestrel/
+RUN --mount=type=cache,dst=/var/cache/libdnf5 bash -euo pipefail /tmp/live/build.sh

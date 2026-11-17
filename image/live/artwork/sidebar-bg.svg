@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="406" height="767" viewBox="0 0 406 767">
+  <!-- Installer sidebar: the Kestrel wallpaper colours, top to bottom. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#6d7cf2"/>
+      <stop offset="0.55" stop-color="#8d6fd8"/>
+      <stop offset="1" stop-color="#c06fae"/>
+    </linearGradient>
+  </defs>
+  <rect width="406" height="767" fill="url(#g)"/>
+</svg>

@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Kestrel OS build. Run inside the build sandbox (see README.md), never on a daily-use system.
 #
-#   sudo ./build.sh image      build the system container image
-#   sudo ./build.sh iso        image + interactive installer ISO     -> out/kestrel-<ver>-<date>.iso
-#   sudo ./build.sh test-iso   image + unattended test ISO (VM only) -> out/test/autoinstall.iso
+#   sudo ./build.sh image          build the system container image
+#   sudo ./build.sh iso            image + live ISO (try, then install)  -> out/kestrel-<ver>-<date>.iso
+#   sudo ./build.sh installer-iso  image + plain installer ISO (also BIOS) -> out/kestrel-<ver>-<date>-installer.iso
+#   sudo ./build.sh test-iso       image + unattended test ISO (VM only) -> out/test/autoinstall.iso
 #
 # All inputs are pinned in config.env; resolved digests and the package list land in out/.
 set -euo pipefail
@@ -12,6 +13,7 @@ source config.env
 
 readonly OUT=out
 readonly TAG="localhost/${IMAGE_NAME}:${FEDORA_VERSION}"
+readonly LIVE_TAG="localhost/${IMAGE_NAME}-live:${FEDORA_VERSION}"
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
@@ -65,6 +67,18 @@ build_iso() {
     rm -rf "$dest/bootiso"
 }
 
+# Live ISO (DECISIONS.md D22): a live image built on top of the Kestrel image, packed by
+# iso/live/build-iso.sh together with the plain image as the installer's payload.
+# $1: ISO file name
+build_live_iso() {
+    local name=$1 payload=$OUT/live/payload
+    podman build         --build-arg BASE_IMAGE="$TAG"         --build-arg FEDORA_VERSION="$FEDORA_VERSION"         --tag "$LIVE_TAG"         image/live/
+    rm -rf "$payload" && mkdir -p "$OUT/live"
+    podman save --format oci-dir --compress -o "$payload" "$TAG"
+    podman run --rm         --cap-add sys_admin --security-opt label=disable         --mount type=image,source="$LIVE_TAG",dst=/rootfs         -v "$PWD/$payload:/oci:ro"         -v "$PWD/iso/live:/src:ro"         -v "$PWD/$OUT:/output"         -e ISO_LABEL="Kestrel-${FEDORA_VERSION}" -e ISO_NAME="$name" -e OS_NAME="$OS_NAME"         "registry.fedoraproject.org/fedora:${FEDORA_VERSION}"         bash /src/build-iso.sh
+    rm -rf "$payload"
+}
+
 [[ $EUID -eq 0 ]] || die "run as root: bootc-image-builder needs rootful podman"
 # Hand build results back to the invoking user, so tests can run without root.
 trap '[[ -n ${SUDO_UID:-} && -d $OUT ]] && chown -R "$SUDO_UID:$SUDO_GID" "$OUT"' EXIT
@@ -74,11 +88,14 @@ case "${1:-}" in
         build_image ;;
     iso)
         build_image
-        build_iso iso/release.toml "$OUT" "${IMAGE_NAME}-${FEDORA_VERSION}-$(date +%Y%m%d).iso" ;;
+        build_live_iso "${IMAGE_NAME}-${FEDORA_VERSION}-$(date +%Y%m%d).iso" ;;
+    installer-iso)
+        build_image
+        build_iso iso/release.toml "$OUT" "${IMAGE_NAME}-${FEDORA_VERSION}-$(date +%Y%m%d)-installer.iso" ;;
     test-iso)
         build_image
         build_iso test/autoinstall.toml "$OUT/test" autoinstall.iso ;;
     *)
-        sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'
+        sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
         exit 2 ;;
 esac
