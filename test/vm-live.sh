@@ -24,7 +24,7 @@ in_session() {
             case $var in WAYLAND_DISPLAY=*|XDG_RUNTIME_DIR=*|DBUS_SESSION_BUS_ADDRESS=*) export "$var";; esac
         done </proc/$pid/environ && '"$1"
 }
-monitor() { echo "$1" | socat - TCP:127.0.0.1:${MONITOR_PORT} >/dev/null; }
+monitor() { echo "$1" | timeout 10 socat - TCP:127.0.0.1:${MONITOR_PORT},connect-timeout=3 >/dev/null; }
 
 case ${1:-} in
 start)

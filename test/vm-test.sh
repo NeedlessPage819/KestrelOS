@@ -93,7 +93,7 @@ start_vm() {
 vm_running() { kill -0 "$vm_pid" 2>/dev/null; }
 
 monitor() {
-    echo "$1" | socat - TCP:127.0.0.1:${MONITOR_PORT} >/dev/null
+    echo "$1" | timeout 10 socat - TCP:127.0.0.1:${MONITOR_PORT},connect-timeout=3 >/dev/null
 }
 
 stop_vm() {
