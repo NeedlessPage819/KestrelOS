@@ -5,6 +5,7 @@
 #   test/vm-live.sh plasma       install the current Plasma theme (dock, top bar) for the test user
 #   test/vm-live.sh dock         install the current Kestrel Dock widget and rebuild the dock with it
 #   test/vm-live.sh lock         install the current lock screen (until reboot) and lock the session
+#   test/vm-live.sh unlock       unlock the session
 #   test/vm-live.sh lockopt K V  change lock screen setting K to V
 #   test/vm-live.sh mouse X Y    move the pointer to screen position X, Y
 #   test/vm-live.sh click X Y    left click at screen position X, Y
@@ -112,10 +113,12 @@ lock)
         echo '$TEST_PASSWORD' | sudo -S -p '' sh -c '
             [ -w /usr ] || bootc usroverlay >/dev/null 2>&1
             tar -C /$lock -xf /tmp/lockscreen.tar'"
-    in_session "loginctl lock-session" ;;
+    in_session "dbus-send --session --type=method_call --dest=org.freedesktop.ScreenSaver /ScreenSaver org.freedesktop.ScreenSaver.Lock" ;;
+unlock)
+    remote "echo '$TEST_PASSWORD' | sudo -S -p '' loginctl unlock-sessions" ;;
 lockopt)
     # lockopt KEY VALUE: change a lock screen setting (config.xml) for the test user.
-    in_session "kwriteconfig6 --file kscreenlockerrc --group Greeter --group LnF --group General --key ${2:?key} ${3:?value}" ;;
+    in_session "kwriteconfig6 --file kscreenlockerrc --group Greeter --group LnF --group General --key ${2:?key} $(printf %q "${3?value}")" ;;
 mouse)
     pointer_to "${2:?x}" "${3:?y}" ;;
 click)
@@ -129,5 +132,5 @@ shot)
 stop)
     monitor quit || true ;;
 *)
-    sed -n "2,12p" "$0"; exit 1 ;;
+    sed -n "2,13p" "$0"; exit 1 ;;
 esac

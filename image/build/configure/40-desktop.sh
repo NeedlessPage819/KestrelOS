@@ -64,7 +64,7 @@ ln -s Kestrel "$wallpapers/Default"
 # the shape our files expect, else a Plasma update could leave a broken lock screen.
 lock=/usr/share/plasma/shells/org.kde.plasma.desktop/contents/lockscreen
 for f in LockScreen.qml LockScreenUi.qml MainBlock.qml KestrelClock.qml KestrelBackground.qml \
-         KestrelMedia.qml KestrelActionButton.qml NoPasswordUnlock.qml LockOsd.qml PasswordSync.qml qmldir \
+         KestrelMedia.qml KestrelActionButton.qml KestrelAvatar.qml KestrelBattery.qml NoPasswordUnlock.qml LockOsd.qml PasswordSync.qml qmldir \
          config.qml config.xml; do
     [[ -f $lock/$f ]] || die "lock screen file $f missing"
 done

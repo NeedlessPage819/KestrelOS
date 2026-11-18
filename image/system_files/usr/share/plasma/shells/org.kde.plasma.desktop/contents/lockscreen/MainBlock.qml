@@ -49,14 +49,21 @@ Item {
 
     function playHighlightAnimation() { shakeAnimation.restart() }
 
-    onAuthenticationTypeItemChanged: if (authenticationTypeItem) authenticationTypeItem.parent = authTypes
-    onActionItemsChanged: for (const item of actionItems) item.parent = actions
+    onAuthenticationTypeItemChanged: { if (authenticationTypeItem) authenticationTypeItem.parent = authTypes }
+    onActionItemsChanged: { for (const item of actionItems) item.parent = actions }
+    Component.onCompleted: {
+        if (authenticationTypeItem) authenticationTypeItem.parent = authTypes
+        for (const item of actionItems) item.parent = actions
+    }
 
     ColumnLayout {
         id: column
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Math.round(parent.height * 0.09)
+        anchors.top: parent.top
+        // The picture always sits at the same height (58 % down, like the Mac); a message from
+        // the settings goes above it, and the prompt below it can appear without moving it.
+        anchors.topMargin: Math.round(parent.height * 0.58)
+            - (messageText.visible ? messageText.height + spacing + Kirigami.Units.largeSpacing : 0)
         spacing: Kirigami.Units.largeSpacing
 
         // Custom message from the settings ("Wenn gefunden, bitte melden: ...").
@@ -64,6 +71,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.maximumWidth: Kirigami.Units.gridUnit * 30
             Layout.bottomMargin: Kirigami.Units.largeSpacing
+            id: messageText
             visible: text.length > 0
             text: config.message
             color: "white"
@@ -74,7 +82,7 @@ Item {
             font.pixelSize: 14
         }
 
-        Kirigami.Avatar {
+        KestrelAvatar {
             id: avatar
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: config.avatarSize === 1 ? 96 : 64
@@ -152,9 +160,9 @@ Item {
                 selectedTextColor: "white"
                 font.family: "Inter"
                 font.pixelSize: 13
-                font.letterSpacing: echoMode === TextInput.Password ? 2 : 0
-                horizontalAlignment: TextInput.AlignHCenter
-                leftPadding: 30
+                font.letterSpacing: echoMode === TextInput.Password && length > 0 ? 2 : 0
+                horizontalAlignment: TextInput.AlignLeft
+                leftPadding: 14
                 rightPadding: 30
                 topPadding: 0
                 bottomPadding: 0
@@ -251,7 +259,7 @@ Item {
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             opacity: block.lockScreenUiVisible ? 1 : 0
-            visible: opacity > 0
+
             Behavior on opacity { NumberAnimation { duration: Kirigami.Units.longDuration } }
 
             Item { id: authTypes; implicitWidth: childrenRect.width; implicitHeight: childrenRect.height }
@@ -272,7 +280,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: Kirigami.Units.largeSpacing
             spacing: Kirigami.Units.gridUnit * 2
-            visible: config.showPowerButtons && opacity > 0
+            visible: config.showPowerButtons   // keeps its space while faded out, so nothing jumps
             opacity: block.lockScreenUiVisible ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Kirigami.Units.longDuration } }
         }

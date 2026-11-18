@@ -59,6 +59,7 @@ Item {
             Layout.alignment: Qt.AlignHCenter
             visible: config.showDate
             text: clock.dateText()
+            renderType: Text.CurveRendering
             color: "white"
             opacity: 0.92
             font.family: "Inter"
@@ -68,6 +69,7 @@ Item {
 
         Text {
             id: time
+            renderType: Text.CurveRendering   // crisp large digits, no colour fringes
             Layout.alignment: Qt.AlignHCenter
             visible: clock.style !== 2
             text: Qt.locale().toString(clock.now, clock.timeFormat())
@@ -76,7 +78,7 @@ Item {
             font.family: "Inter"
             font.weight: clock.weights[Math.max(0, Math.min(3, config.clockWeight))]
             font.pixelSize: Math.round(clock.screenHeight * (clock.style === 0 ? 0.15 : 0.075))
-            font.letterSpacing: -font.pixelSize * 0.02
+            font.letterSpacing: -Math.round(clock.screenHeight * (clock.style === 0 ? 0.15 : 0.075)) * 0.02
             font.features: { "tnum": 1 }   // digits of equal width, so the time does not wobble
             // Tight line box: the large digits otherwise leave a big gap under the date.
             lineHeight: 0.92

@@ -95,18 +95,18 @@ Item {
                 }
 
                 MediaButton {
-                    icon: LayoutMirroring.enabled ? "media-skip-forward" : "media-skip-backward"
+                    iconName: LayoutMirroring.enabled ? "media-skip-forward" : "media-skip-backward"
                     enabled: card.model.canGoPrevious
                     onClicked: card.model.container.Previous()
                 }
                 MediaButton {
                     big: true
-                    icon: card.model.playbackStatus === Mpris.PlaybackStatus.Playing ? "media-playback-pause" : "media-playback-start"
+                    iconName: card.model.playbackStatus === Mpris.PlaybackStatus.Playing ? "media-playback-pause" : "media-playback-start"
                     enabled: card.model.canControl
                     onClicked: card.model.container.PlayPause()
                 }
                 MediaButton {
-                    icon: LayoutMirroring.enabled ? "media-skip-backward" : "media-skip-forward"
+                    iconName: LayoutMirroring.enabled ? "media-skip-backward" : "media-skip-forward"
                     enabled: card.model.canGoNext
                     onClicked: card.model.container.Next()
                 }
@@ -119,7 +119,7 @@ Item {
 
     component MediaButton : QQC2.AbstractButton {
         id: mediaButton
-        property string icon
+        property string iconName
         property bool big: false
         implicitWidth: big ? 34 : 28
         implicitHeight: implicitWidth
@@ -128,7 +128,7 @@ Item {
         opacity: enabled ? 1 : 0.35
         onClicked: media.interacted()
         contentItem: Kirigami.Icon {
-            source: mediaButton.icon
+            source: mediaButton.iconName
             color: "white"
             isMask: true
         }

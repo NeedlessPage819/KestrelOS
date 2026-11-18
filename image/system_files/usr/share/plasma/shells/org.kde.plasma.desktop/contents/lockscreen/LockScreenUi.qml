@@ -269,7 +269,8 @@ Item {
                 text: lockScreenUi.tr("Bildschirmtastatur", "Virtual Keyboard")
                 display: AbstractButton.IconOnly
                 icon.name: Keyboards.KWinVirtualKeyboard.visible ? "input-keyboard-virtual-on" : "input-keyboard-virtual-off"
-                visible: Keyboards.KWinVirtualKeyboard.available
+                visible: Keyboards.KWinVirtualKeyboard.available && lockScreenRoot.uiVisible
+                icon.color: "white"
                 onClicked: {
                     if (Keyboards.KWinVirtualKeyboard.visible) {
                         Keyboards.KWinVirtualKeyboard.active = false;
@@ -281,7 +282,7 @@ Item {
                 }
             }
 
-            Battery { visible: config.showBattery }
+            KestrelBattery { visible: config.showBattery && present }
         }
 
         StackView {
