@@ -1,412 +1,432 @@
-# Entscheidungen
+# Decisions
 
-Hier steht jede wichtige Entscheidung: **was**, **warum** und **was wir dafür in Kauf nehmen**.
-Neueste Einträge kommen ans Ende.
-
----
-
-## D1 – Arbeitsname „Kestrel OS“
-
-**Was:** Das System heißt vorerst *Kestrel OS* (Kestrel = Turmfalke: klein, schnell).
-**Warum:** Wir brauchen einen Namen für Dateien und Menüs. Er steht nur an einer Stelle
-(`config.env`) und lässt sich jederzeit ändern.
+Every important decision is listed here: **what**, **why**, and **what we accept in return**.
+New entries go at the end.
 
 ---
 
-## D2 – Basis: Fedora Kinoite (Atomic Desktop) über Universal Blue
+## D1 – Working name "Kestrel OS"
 
-**Was:** Wir bauen auf **Fedora Kinoite** auf. Das ist das offizielle Fedora mit KDE Plasma,
-als „atomares“ System. Als Startpunkt nehmen wir das Image `kinoite-main` von
-**Universal Blue**. Das ist dasselbe Fedora, nur schon mit Multimedia-Codecs und
-fertig signierten Nvidia-Treibern. Darauf bauen auch Bazzite und Aurora auf.
+**What:** For now the system is called *Kestrel OS* (a kestrel is a small, fast falcon).
+**Why:** We need a name for files and menus. It is set in only one place
+(`config.env`) and can be changed at any time.
 
-**Warum, einfach erklärt:**
+---
 
-| Anforderung | Warum Fedora Atomic passt |
+## D2 – Base: Fedora Kinoite (Atomic Desktop) via Universal Blue
+
+**What:** We build on **Fedora Kinoite**. This is the official Fedora with KDE Plasma,
+as an "atomic" system. As a starting point we use the `kinoite-main` image from
+**Universal Blue**. It is the same Fedora, but it already has multimedia codecs and
+ready-signed Nvidia drivers. Bazzite and Aurora are built on it too.
+
+**Why, in simple terms:**
+
+| Requirement | Why Fedora Atomic fits |
 |---|---|
-| Updates dürfen nichts kaputt machen | Ein Update wird komplett im Hintergrund vorbereitet und erst beim Neustart aktiv. Geht etwas schief, wählst du im Startmenü einfach die vorherige Version (**Rollback eingebaut**, ohne Extra-Werkzeug). |
-| Secure Boot / Anti-Cheat | Fedora startet mit einem von Microsoft signierten Bootloader. Secure Boot kann also **an** bleiben. Kernel und Bootvorgang bleiben Standard. |
-| Aktuelle Treiber | Fedora liefert neue Kernel und Mesa-Versionen (AMD/Intel-Grafik) innerhalb weniger Wochen. Debian/Ubuntu-LTS sind hier oft ein Jahr hinterher. |
-| Reproduzierbarer Build | Das ganze System wird wie ein Container aus einer Datei (`image/Containerfile`) gebaut. Gleiche Eingaben ergeben das gleiche System. |
-| Verbreitet und gepflegt | Fedora wird von Red Hat und einer großen Community gepflegt. Gaming-Distros wie Bazzite beweisen, dass genau dieser Stapel für Spiele funktioniert. |
+| Updates must not break anything | An update is prepared fully in the background and only becomes active at the next restart. If something goes wrong, you just pick the previous version in the boot menu (**rollback built in**, no extra tool). |
+| Secure Boot / anti-cheat | Fedora starts with a boot loader signed by Microsoft. So Secure Boot can stay **on**. The kernel and the boot process stay standard. |
+| Current drivers | Fedora ships new kernels and Mesa versions (AMD/Intel graphics) within a few weeks. Debian/Ubuntu LTS are often a year behind here. |
+| Reproducible build | The whole system is built like a container from one file (`image/Containerfile`). The same inputs give the same system. |
+| Widely used and maintained | Fedora is maintained by Red Hat and a large community. Gaming distros like Bazzite prove that exactly this stack works for games. |
 
-**Verworfene Alternativen:**
-- *Arch Linux + archiso:* Neueste Pakete, aber Secure Boot geht nicht direkt, und ein Rollback
-  müsste man selbst bauen (Btrfs + Snapper). Bei Rolling Release ist die Gefahr größer,
-  dass ein Update den Alltag stört.
-- *Ubuntu/Debian + live-build:* Stabil, aber Grafiktreiber und Mesa sind für Gaming oft zu alt.
-  Auch hier gibt es kein eingebautes Rollback.
-- *openSUSE Tumbleweed:* Hat Snapshots und Secure Boot, ist aber bei Gaming-Software und
-  Nvidia-Paketen weniger verbreitet.
+**Rejected alternatives:**
+- *Arch Linux + archiso:* Newest packages, but Secure Boot does not work directly, and you would
+  have to build rollback yourself (Btrfs + Snapper). With a rolling release the risk is higher
+  that an update disrupts daily use.
+- *Ubuntu/Debian + live-build:* Stable, but graphics drivers and Mesa are often too old for gaming.
+  There is no built-in rollback here either.
+- *openSUSE Tumbleweed:* Has snapshots and Secure Boot, but is less common for gaming software and
+  Nvidia packages.
 
-**Was wir dafür in Kauf nehmen:** Programme installiert man im Alltag als **Flatpak**
-(über „Discover“), nicht mit `dnf`. Für normale Nutzer ist das sogar einfacher.
-
----
-
-## D3 – Fedora-Version: 44 (nicht das ganz neue 45)
-
-**Was:** Standard ist Fedora 44 (Einstellung `FEDORA_VERSION` in `config.env`).
-**Warum:** Fedora 45 ist gerade erst erschienen. Nach unserer Regel „Alltag geht vor“
-nehmen wir die seit Monaten bewährte Version. Fedora 44 bekommt noch bis etwa Mitte 2027
-Updates. Sobald 45 ein paar Wochen ohne große Fehler läuft, wechseln wir. Dafür ändert
-man nur eine Zahl.
+**What we accept in return:** In daily use you install programs as **Flatpak**
+(through "Discover"), not with `dnf`. For normal users this is actually easier.
 
 ---
 
-## D4 – Desktop: KDE Plasma 6 im macOS-Stil
+## D3 – Fedora version: 44 (not the brand-new 45)
 
-**Was:** KDE Plasma 6 (Wayland) mit eigenem Layout:
-- **Top-Bar:** Startmenü-Knopf links, Programm-Menü (globales Menü), rechts Symbole und Uhr.
-- **Dock:** schwebend und zentriert unten. Weicht Fenstern aus und enthält Launchpad-Knopf,
-  Lieblings-Apps und Papierkorb.
-- **Blur** (Milchglas-Effekt) und weiche Animationen. Fenster minimieren sich mit dem
-  „Magic Lamp“-Effekt (wie der Genie-Effekt).
-- **Fensterknöpfe links** (Schließen, Minimieren, Maximieren), wie am Mac.
-- **Schrift:** *Inter* (sehr gut lesbar, ähnlich wie SF Pro) und *JetBrains Mono* für Code.
-- **Spotlight:** KRunner öffnet sich mit **Meta+Leertaste** (Meta = Windows-Taste, entspricht
-  Cmd am Mac). KRunner findet Apps, Dateien, rechnet und rechnet Einheiten um.
-- **Gesten:** Plasma hat Touchpad-Gesten eingebaut (Wischen mit 4 Fingern: Übersicht und
-  Arbeitsflächen wechseln). Tippen zum Klicken ist an.
-
-**Warum KDE und nicht GNOME:** GNOME braucht für Dock und Blur *Erweiterungen*. Die gehen bei
-GNOME-Updates oft kaputt, und das widerspricht „Updates dürfen nichts kaputt machen“.
-In Plasma sind Dock, Blur, globales Menü und Spotlight **fest eingebaut**.
-
-**Bewusst nicht gemacht:** Wir kopieren keine Apple-Grafiken, Logos oder Icons.
-Wir übernehmen das *Gefühl*, nicht das Markenzeichen.
+**What:** The default is Fedora 44 (setting `FEDORA_VERSION` in `config.env`).
+**Why:** Fedora 45 has only just come out. Under our rule "daily use comes first"
+we take the version that has proven itself for months. Fedora 44 still gets updates until about
+mid-2027. As soon as 45 has run for a few weeks without big bugs, we switch. To do that you
+only change one number.
 
 ---
 
-## D5 – Grafiktreiber: automatisch nach Hardware
+## D4 – Desktop: KDE Plasma 6 in macOS style
 
-**Was:**
-- **AMD und Intel:** Treiber stecken im Kernel und in Mesa und laufen sofort. Es gibt nichts
-  einzurichten. Das gilt auch für deinen Acer (AMD Radeon).
-- **Nvidia (GTX 16xx / RTX 20xx und neuer):** Der offizielle Nvidia-Treiber („nvidia-open“) ist
-  im System enthalten, aber zunächst *ausgeschaltet*. Beim ersten Start prüft der Dienst
-  `kestrel-gpu-setup`, ob eine passende Nvidia-Karte da ist. Nur dann schaltet er den Treiber ein
-  und startet einmal neu.
-- **Ältere Nvidia-Karten (GTX 10xx und älter):** Sie behalten den freien Treiber „nouveau“.
-  Der neue Nvidia-Treiber unterstützt sie nicht mehr.
+**What:** KDE Plasma 6 (Wayland) with its own layout:
+- **Top bar:** start menu button on the left, app menu (global menu), icons and clock on the right.
+- **Dock:** floating and centered at the bottom. It gets out of the way of windows and holds the
+  Launchpad button, favorite apps and the trash.
+- **Blur** (frosted glass effect) and smooth animations. Windows minimize with the
+  "Magic Lamp" effect (like the Genie effect).
+- **Window buttons on the left** (close, minimize, maximize), like on a Mac.
+- **Font:** *Inter* (very easy to read, similar to SF Pro) and *JetBrains Mono* for code.
+- **Spotlight:** KRunner opens with **Meta+Space** (Meta = the Windows key, same as
+  Cmd on a Mac). KRunner finds apps and files, does math and converts units.
+- **Gestures:** Plasma has touchpad gestures built in (swipe with 4 fingers: overview and
+  switching workspaces). Tap to click is on.
 
-**Warum:** Ein einziges ISO für alle Rechner, ohne dass jemand etwas auswählen muss. Auf Rechnern
-ohne Nvidia bleibt der Nvidia-Treiber komplett aus und kann nichts stören.
+**Why KDE and not GNOME:** GNOME needs *extensions* for a dock and blur. These often break with
+GNOME updates, and that goes against "updates must not break anything".
+In Plasma, dock, blur, global menu and Spotlight are **built in**.
 
-**Secure Boot mit Nvidia:** Der Nvidia-Treiber ist mit dem Schlüssel von Universal Blue signiert.
-Ist Secure Boot an, muss man diesen Schlüssel einmalig bestätigen. Nach dem Neustart erscheint ein
-blauer Bildschirm („MOK“), Passwort: `universalblue`. Das betrifft nur Nvidia-Rechner.
+**Deliberately not done:** We do not copy Apple graphics, logos or icons.
+We take the *feel*, not the trademark.
 
 ---
 
-## D6 – Gaming-Software
+## D5 – Graphics drivers: automatic, based on hardware
 
-**Fest im System (RPM):** Steam, Wine, Winetricks, Lutris, GameMode, MangoHud, Gamescope.
-**Beim ersten Start mit Internet (Flatpak):** Heroic (Epic/GOG, z. B. für Rocket League),
+**What:**
+- **AMD and Intel:** The drivers are in the kernel and in Mesa and work right away. There is
+  nothing to set up. This is also true for your Acer (AMD Radeon).
+- **Nvidia (GTX 16xx / RTX 20xx and newer):** The official Nvidia driver ("nvidia-open") is
+  included in the system, but *switched off* at first. On the first start the service
+  `kestrel-gpu-setup` checks whether a matching Nvidia card is present. Only then does it switch
+  the driver on and restart once.
+- **Older Nvidia cards (GTX 10xx and older):** They keep the free "nouveau" driver.
+  The new Nvidia driver no longer supports them.
+
+**Why:** One single ISO for all computers, without anyone having to choose anything. On computers
+without Nvidia the Nvidia driver stays fully off and cannot cause problems.
+
+**Secure Boot with Nvidia:** The Nvidia driver is signed with the Universal Blue key.
+If Secure Boot is on, you have to confirm this key once. After the restart a
+blue screen ("MOK") appears, password: `universalblue`. This only affects Nvidia computers.
+
+---
+
+## D6 – Gaming software
+
+**Built into the system (RPM):** Steam, Wine, Winetricks, Lutris, GameMode, MangoHud, Gamescope.
+**On the first start with internet (Flatpak):** Heroic (Epic/GOG, for example for Rocket League),
 Bottles, ProtonUp-Qt.
 
-**Warum diese Aufteilung:** Steam und Wine gehören ins System, weil sie tief mit Treibern und
-32-Bit-Bibliotheken verzahnt sind. Wine funktioniert damit auch ohne Internet (das brauchen wir
-für den Test). Heroic, Bottles und ProtonUp-Qt veröffentlicht der Hersteller selbst als Flatpak.
-Dort sind sie am aktuellsten.
+**Why this split:** Steam and Wine belong in the system because they are closely tied to drivers
+and 32-bit libraries. This way Wine also works without internet (we need that
+for the test). Heroic, Bottles and ProtonUp-Qt are published as Flatpak by their makers.
+That is where they are most up to date.
 
-**Leistungs-Einstellungen, die den Alltag nicht stören:**
-- `ntsync`: Ein Kernel-Modul, mit dem Wine und Proton Windows-Programme schneller synchronisieren.
-  Es wird nur benutzt, wenn ein Spiel läuft.
-- `split_lock_mitigate = 0`: Verhindert, dass manche Spiele künstlich ausgebremst werden.
-- **GameMode** schaltet die CPU nur *während eines Spiels* auf volle Leistung. Danach läuft sie
-  wieder im Stromsparmodus, gut für den Akku.
+**Performance settings that do not disturb daily use:**
+- `ntsync`: A kernel module that lets Wine and Proton sync Windows programs faster.
+  It is only used while a game is running.
+- `split_lock_mitigate = 0`: Stops some games from being slowed down artificially.
+- **GameMode** switches the CPU to full power only *while a game runs*. After that it
+  goes back to power-saving mode, which is good for the battery.
 
-**Bewusst NICHT gemacht:** Kein eigener Gaming-Kernel, keine geänderten Boot-Parameter, keine
-abgeschalteten Sicherheitsfunktionen. Das kostet höchstens ein paar Prozent FPS. Dafür bleiben
-Secure Boot, Anti-Cheat-Kompatibilität und Akku-Laufzeit unangetastet (siehe D7).
-
----
-
-## D7 – Anti-Cheat und Secure Boot
-
-**Was:** Standard-Fedora-Kernel (signiert), Standard-Bootloader (shim + GRUB), keine
-Kernel-Patches, keine Sonder-Boot-Parameter für Gaming.
-**Warum:** Rocket League (Easy Anti-Cheat) läuft unter Proton bereits. Sollte Epic eines Tages
-Fortnite für Linux freigeben, wird es sehr wahrscheinlich ein unverändertes, Secure-Boot-fähiges
-System verlangen. Das haben wir dann schon.
+**Deliberately NOT done:** No custom gaming kernel, no changed boot parameters, no
+disabled security features. This costs a few percent FPS at most. In return,
+Secure Boot, anti-cheat compatibility and battery life stay untouched (see D7).
 
 ---
 
-## D8 – Alltags-Programme als Flatpak
+## D7 – Anti-cheat and Secure Boot
 
-LibreOffice und VLC kommen beim ersten Start mit Internet von Flathub.
-Firefox, Dateimanager (Dolphin), Drucken (CUPS), WLAN, Bluetooth und Energieverwaltung sind fest
-im System. Flathub ist die einzige App-Quelle, damit Discover keine Apps doppelt anzeigt.
-**Warum:** Flatpaks bekommen Updates direkt vom Hersteller. Sie laufen getrennt vom System, damit
-können sie das Grundsystem nicht beschädigen.
-
----
-
-## D9 – Installations-ISO statt Live-System (vorerst)
-
-**Was:** Das ISO ist ein **Installer** (Anaconda, das Programm, das auch Fedora benutzt).
-Ein „Ausprobieren ohne Installation“ gibt es vorerst nicht.
-**Warum:** Für atomare Systeme ist das der offizielle, stabile Weg (Werkzeug
-`bootc-image-builder` von Fedora/Red Hat). Ein Live-ISO prüfen wir später als Verbesserung.
+**What:** Standard Fedora kernel (signed), standard boot loader (shim + GRUB), no
+kernel patches, no special boot parameters for gaming.
+**Why:** Rocket League (Easy Anti-Cheat) already runs under Proton. If Epic one day
+allows Fortnite on Linux, it will very likely require an unchanged system that supports
+Secure Boot. We will already have that.
 
 ---
 
-## D10 – Bauen und Testen nur in der Sandbox
+## D8 – Everyday programs as Flatpak
 
-**Was:** Gebaut und getestet wird ausschließlich in einer **WSL2-Fedora-Umgebung** auf deinem
-Windows-PC. Darin läuft eine **QEMU/KVM-VM** mit Secure Boot. Dein Windows bleibt unberührt.
-**Warum:** WSL2 ist von Microsoft, sauber getrennt und mit einem Befehl wieder entfernbar.
-Fedora in WSL hat genau die Werkzeuge, die auch das Zielsystem nutzt (podman, bootc).
-
----
-
-## D11 – Ein einfacher Befehl für Updates: `kestrel`
-
-**Was:** Im Terminal gibt es den Befehl `kestrel`:
-- `kestrel update`: lädt das neue System und aktualisiert alle Apps. Das neue System gilt ab dem
-  nächsten Neustart. Das alte bleibt als Notfall-Version erhalten.
-- `kestrel rollback`: beim nächsten Start wieder die vorherige Version nehmen.
-- `kestrel status`: zeigt, welche Versionen installiert sind.
-
-Updates gehen auch per Mausklick in **Discover** (dem App-Store von KDE).
-
-**Warum:** Die eigentlichen Werkzeuge (`bootc`, `flatpak`) sind für Anfänger unübersichtlich.
-Ein Befehl mit deutschen Meldungen ist einfacher.
-
-**Offen:** Damit installierte Rechner Updates *finden*, muss das fertige System-Image im Internet
-liegen (z. B. kostenlos auf GitHub). Das ist eine Veröffentlichung nach außen, deshalb frage ich
-vorher nach. Bis dahin aktualisiert man durch Neuinstallation mit einem neuen ISO.
+LibreOffice and VLC come from Flathub on the first start with internet.
+Firefox, the file manager (Dolphin), printing (CUPS), Wi-Fi, Bluetooth and power management are
+built into the system. Flathub is the only app source, so Discover does not show apps twice.
+**Why:** Flatpaks get updates directly from their makers. They run separately from the system, so
+they cannot damage the base system.
 
 ---
 
-## D12 – Eigenes Design statt fremder Themes
+## D9 – Installer ISO instead of a live system (for now)
 
-**Was:**
-- **Hintergrundbild:** eigene Vektorgrafik (Farbverlauf mit weichen Wellen), hell und dunkel.
-  Plasma wählt automatisch die passende Variante zum hellen oder dunklen Farbschema. Dasselbe Bild
-  erscheint auf dem Sperrbildschirm.
-- **Akzentfarbe:** ein ruhiges Blau-Violett (`#5B6CF0`), passend zum Hintergrund.
-- **Grundlage:** das Standard-Design „Breeze“ von KDE, nur angepasst.
-
-**Warum:** Fertige „macOS-Themes“ aus dem Internet kopieren oft Apple-Grafiken (rechtlich heikel)
-und gehen bei Plasma-Updates gerne kaputt. Breeze wird von KDE selbst gepflegt und bleibt bei
-Updates stabil. Wir passen nur Farben, Schrift und Anordnung an.
+**What:** The ISO is an **installer** (Anaconda, the program Fedora also uses).
+There is no "try without installing" for now.
+**Why:** For atomic systems this is the official, stable way (the tool
+`bootc-image-builder` from Fedora/Red Hat). We will look at a live ISO later as an improvement.
 
 ---
 
-## D13 – Einrichtung beim ersten Start mit dem „Plasma Setup“-Assistenten
+## D10 – Build and test only in the sandbox
 
-**Was:** Das Installationsprogramm fragt nur noch, auf welche Festplatte installiert wird.
-Beim ersten Start begrüßt dich dann ein Assistent von KDE. Dort wählst du Sprache, Tastatur
-und WLAN und legst dein Benutzerkonto an.
-**Warum:** Das fühlt sich an wie der Einrichtungsassistent am Mac: erst installieren, dann
-in Ruhe einrichten. Fedora KDE 44 macht es genauso. Wir nutzen also den offiziellen,
-gepflegten Weg.
+**What:** Building and testing happen only in a **WSL2 Fedora environment** on your
+Windows PC. Inside it runs a **QEMU/KVM VM** with Secure Boot. Your Windows stays untouched.
+**Why:** WSL2 is made by Microsoft, cleanly separated, and can be removed again with one command.
+Fedora in WSL has exactly the tools the target system also uses (podman, bootc).
 
 ---
 
-## D14 – Kleine Korrekturen für fehlerfreie Systemdienste
+## D11 – One simple command for updates: `kestrel`
 
-- `systemd-remount-fs` startet nicht mehr auf atomaren Systemen. Er versucht dort, den
-  schreibgeschützten Systembereich neu einzuhängen, und das schlägt immer fehl. Dieser Fehler
-  betrifft nur eine Meldung, keine Funktion.
-- `mcelog` (meldet Hardwarefehler der CPU) läuft nur noch auf echter Hardware. In VMs gibt es
-  nichts zu melden, dort bricht der Dienst nur mit einem Fehler ab.
-- Rechnername ist standardmäßig `kestrel` statt `fedora`.
+**What:** In the terminal there is the command `kestrel`:
+- `kestrel update`: downloads the new system and updates all apps. The new system takes effect
+  from the next restart. The old one is kept as an emergency version.
+- `kestrel rollback`: use the previous version again at the next start.
+- `kestrel status`: shows which versions are installed.
 
-**Warum:** Ein sauberes System zeigt keine roten Fehlermeldungen. Der automatische Test prüft,
-dass kein Systemdienst fehlschlägt.
+Updates also work with a mouse click in **Discover** (the KDE app store).
+
+**Why:** The real tools (`bootc`, `flatpak`) are confusing for beginners.
+One command with German messages is easier.
+
+**Open:** For installed computers to *find* updates, the finished system image has to be on the
+internet (for example for free on GitHub). That is publishing something to the outside, so I will
+ask first. Until then you update by reinstalling with a new ISO.
 
 ---
 
-## D15 – Aufgeräumteres macOS-Gefühl (Design-Runde 2)
+## D12 – Our own design instead of third-party themes
 
-Nach dem ersten Blick auf den Desktop wirkte er noch nach „KDE mit Dock“. Geändert:
+**What:**
+- **Wallpaper:** our own vector graphic (color gradient with soft waves), light and dark.
+  Plasma automatically picks the variant that matches the light or dark color scheme. The same
+  picture appears on the lock screen.
+- **Accent color:** a calm blue-violet (`#5B6CF0`) that matches the background.
+- **Base:** KDE's standard design "Breeze", only adjusted.
 
-- **Fensterknöpfe als farbige „Ampel“** (rot, gelb, grün; Symbole erscheinen beim Darüberfahren),
-  schlanke helle Titelleiste, abgerundete obere Ecken, weicher Schatten. Das ist ein **eigenes
-  Fensterdesign** („Aurorae“-Theme, erzeugt von `image/artwork/aurorae.py`).
-  *Warum eigenes:* Fertige Lösungen wie „Klassy“ sind kompilierte Programme, die zur genauen
-  Plasma-Version passen müssen. Für Fedora 44 gibt es keine Pakete, und ein Plasma-Update könnte
-  die Fensterrahmen kaputt machen. Aurorae-Designs sind nur Grafiken, die KWin selbst zeichnet.
-  Updates können sie nicht beschädigen.
-- **Dock:** größere Symbole und nur Apps, die immer installiert sind (Dateien, Firefox, Steam,
-  Discover, Terminal, Einstellungen). Keine leeren Platzhalter mehr. Der Launchpad-Knopf zeigt ein
-  App-Raster.
-- **Top-Bar:** schlanker, mit eigenem schlichten Logo (Vogel im Gleitflug) und Datum im Stil
-  „Di. 17. Nov.“
-- **Kein KDE-Begrüßungsfenster** beim ersten Login. Die Einrichtung übernimmt schon der
-  Assistent (D13). Abschalten per Einstellung hat im Test nicht gereicht, deshalb wird das Paket
-  `plasma-welcome` ganz entfernt. Nichts anderes hängt davon ab.
+**Why:** Ready-made "macOS themes" from the internet often copy Apple graphics (legally risky)
+and tend to break with Plasma updates. Breeze is maintained by KDE itself and stays stable
+through updates. We only adjust colors, font and layout.
 
-## D16 – Design-Runde 3: Dock und Top-Bar wie Glas
+---
 
-Neben macOS wirkte das Dock noch unruhig. Geändert:
+## D13 – Setup on first start with the "Plasma Setup" assistant
 
-- **Eigenes Plasma-Design „Kestrel“** (erzeugt von `image/artwork/plasma_theme.py`). Es ersetzt nur
-  den Hintergrund von Dock und Top-Bar und die Markierung laufender Apps. Alles andere kommt
-  weiter von Breeze, deshalb bleibt es bei Plasma-Updates stabil.
-- **Dock:** durchscheinend wie Milchglas, stark abgerundete Ecken, Symbole füllen das Dock.
-  Auf echter Hardware verschwimmt der Hintergrund dahinter. In der Test-VM fehlt dafür die
-  3D-Beschleunigung, dort ist es nur durchscheinend.
-- **Laufende Apps** bekommen einen kleinen Strich unter dem Symbol statt eines blauen Kastens.
-- **Top-Bar:** flach und ebenfalls durchscheinend.
-- Die Farben kommen aus dem Farbschema, im Dunkelmodus wird alles automatisch dunkel.
-- **Fensterschatten repariert:** An den Fensterecken waren helle Lücken im Schatten zu sehen.
+**What:** The installer now only asks which disk to install to.
+On the first start a KDE assistant then greets you. There you choose language, keyboard
+and Wi-Fi and create your user account.
+**Why:** This feels like the setup assistant on a Mac: install first, then
+set things up in peace. Fedora KDE 44 does it the same way. So we use the official,
+maintained way.
 
-## D17 – Symbole im macOS-Stil (WhiteSur)
+---
 
-Die Breeze-Symbole sahen im Dock durcheinander aus: flache Ordner, runde Logos, dunkle Quadrate.
-Auf dem Mac haben alle App-Symbole dieselbe abgerundete Quadrat-Form. Deshalb nutzt Kestrel das
-freie Symbol-Set **WhiteSur** (Lizenz GPL-3.0). Entschieden mit dir.
+## D14 – Small fixes so system services run without errors
 
-- Es ist nicht in Fedora enthalten und wird beim Bauen von GitHub geholt.
-- **Sicherheit:** Die Version ist fest auf `2026-09-10` eingestellt, und der Build prüft den
-  genauen Stand (Commit `73d8040`). Weicht etwas ab, bricht der Build ab. Das Installations-
-  skript läuft nur in einem abgetrennten Bau-Container, nicht im fertigen System.
-- **Updates:** Eine neue Version kommt nur, wenn wir sie in `config.env` bewusst eintragen.
-- Die Alternative wäre Papirus aus Fedora gewesen: geprüft und einheitlich, aber flach und nicht
-  macOS-artig.
-- **Papierkorb und Launchpad im Dock:** Plasma zeigt Widgets in Leisten absichtlich als schlichte
-  Umriss-Symbole. Im großen Dock passte der Papierkorb so nicht zu den bunten App-Symbolen. Ein
-  kleines eigenes Symbol-Set „Kestrel“ übernimmt alles von WhiteSur und tauscht nur den Papierkorb
-  gegen die farbige Glas-Version. Der Launchpad-Knopf nutzt das farbige App-Raster.
-- **Symbole oben rechts (Lautstärke, Netzwerk usw.):** WhiteSur zeichnet diese kleinen
-  einfarbigen Symbole in festem Hellgrau, das Plasma nicht umfärben kann. Auf der hellen Top-Bar
-  waren sie kaum zu sehen. Kestrel nimmt dafür die sehr ähnlichen einfarbigen Symbole von Breeze.
-  Die richten sich nach dem Farbschema: dunkel auf hell, hell im Dunkelmodus. Die bunten
-  App-Symbole bleiben WhiteSur.
+- `systemd-remount-fs` no longer starts on atomic systems. There it tries to remount the
+  read-only system area, and that always fails. This error only affects a message,
+  not a function.
+- `mcelog` (reports CPU hardware errors) now only runs on real hardware. In VMs there is
+  nothing to report, and there the service only stops with an error.
+- The computer name is `kestrel` by default instead of `fedora`.
 
-## D18 – Animationen und Gesten
+**Why:** A clean system shows no red error messages. The automatic test checks
+that no system service fails.
 
-- **Fenster** zoomen beim Öffnen und Schließen sanft auf und zu, wie auf dem Mac. **Minimieren**
-  saugt das Fenster mit der „Wunderlampe“ ins Dock. **Maximieren** ist animiert.
-- **Touchpad:** Plasma nutzt **vier** Finger: nach oben für die Fensterübersicht, seitlich zum
-  Wechseln der Arbeitsfläche. Der Mac nutzt drei. Plasma bietet dafür keine Einstellung, und
-  KWin dafür umzubauen wäre genau die Art Änderung, die bei Updates kaputtgeht. Deshalb vier.
-- In der Test-VM gibt es keine 3D-Beschleunigung, dort sind alle Effekte aus. Ob alles flüssig
-  wirkt, steht deshalb in der Test-Liste für den Laptop.
+---
 
-## D19 – Eigenes Dock mit Vergrößerung („Kestrel Dock“)
+## D15 – A tidier macOS feel (design round 2)
 
-Auf dem Mac werden die Symbole im Dock größer, wenn die Maus darüberfährt. Plasmas eigenes Dock
-kann das nicht. Deshalb hat Kestrel ein eigenes Dock-Widget. Entschieden mit dir.
+At first look the desktop still felt like "KDE with a dock". Changed:
 
-- **Wie es gebaut ist:** reines QML (Plasmas Oberflächen-Sprache), kein kompilierter Code. Es nutzt
-  nur Plasmas offizielle Bausteine für die Liste der Apps. Kompilierte Zusätze wie Latte Dock
-  gehen bei Plasma-Updates kaputt, weil sie zur genauen Version passen müssen. QML hat das
-  Problem nicht.
-- **Warum Updates es nicht kaputtmachen:** Plasma-Updates kommen nur über das Kestrel-Image. Jedes
-  Image durchläuft den automatischen VM-Test, und der prüft, dass das Dock ohne Fehler lädt.
-  Bricht ein Update das Dock, fällt der Test durch, bevor das Update auf deinem Laptop landet.
-- **Das Dock enthält alles:** Launchpad, angeheftete und laufende Apps, Trennstrich, Papierkorb.
-  So wird alles gemeinsam größer, wie auf dem Mac.
-- **Platz für die Vergrößerung:** Das Dock ist unsichtbar höher und breiter als das sichtbare
-  Milchglas. Die Symbole und der App-Name wachsen in diesen leeren Rand. Klicks dort gehen ganz
-  normal an das Fenster oder den Desktop dahinter.
-- **Milchglas:** Das Dock zeichnet sein Glas selbst, damit es mit den Symbolen mitwachsen kann.
-  In Ruhe liegt es genau dort, wo Plasma den Hintergrund verschwimmen lässt. Nur die Ränder, die
-  beim Vergrößern kurz dazukommen, sind durchscheinend, aber nicht verschwommen.
-- **Nebeneffekt:** Das Dock weicht Fenstern aus. Weil Plasma den unsichtbaren Rand mitzählt,
-  weicht es schon aus, wenn ein Fenster bis etwa 100 Pixel über den unteren Bildschirmrand reicht.
-- **Launchpad:** Das Vogel-Symbol oben links und das Launchpad-Symbol im Dock öffnen beide das
-  Vollbild-App-Raster.
-- **Kleine Extras:** App-Name über dem vergrößerten Symbol, Hüpfen beim Starten einer App, Punkt unter
-  laufenden Apps, Rechtsklick-Menü (Neues Fenster, Im Dock behalten, Beenden), Dateien auf den
-  Papierkorb ziehen.
-- **Noch nicht drin:** Fenster-Vorschau beim Darüberfahren und Symbole per Ziehen umsortieren.
-- Alle Maße (Symbolgröße, Vergrößerung, Ränder) stehen an einer Stelle in
-  `image/artwork/plasma_theme.py` und gelten für Design, Widget und Layout gemeinsam.
+- **Window buttons as colored "traffic lights"** (red, yellow, green; symbols appear on hover),
+  a slim light title bar, rounded top corners, a soft shadow. This is **our own
+  window design** ("Aurorae" theme, created by `image/artwork/aurorae.py`).
+  *Why our own:* Ready-made solutions like "Klassy" are compiled programs that must match the exact
+  Plasma version. There are no packages for Fedora 44, and a Plasma update could
+  break the window frames. Aurorae designs are only graphics that KWin draws itself.
+  Updates cannot damage them.
+- **Dock:** bigger icons and only apps that are always installed (Files, Firefox, Steam,
+  Discover, Terminal, Settings). No more empty placeholders. The Launchpad button shows an
+  app grid.
+- **Top bar:** slimmer, with our own simple logo (a bird gliding) and the date in the style
+  „Di. 17. Nov.“ (Tue 17 Nov)
+- **No KDE welcome window** on the first login. The assistant (D13) already handles the setup.
+  Turning it off with a setting was not enough in the test, so the package
+  `plasma-welcome` is removed completely. Nothing else depends on it.
 
-## D20 – Dunkelmodus
+## D16 – Design round 3: dock and top bar like glass
 
-Der automatische Test schaltet jetzt auch in den Dunkelmodus und macht einen Screenshot. Dabei
-sind drei Fehler aufgefallen, die jetzt behoben sind:
+Next to macOS the dock still looked busy. Changed:
 
-- **Fensterrahmen blieben hell.** Das eigene Fensterdesign kann seine Farben nicht selbst
-  wechseln. Es gibt deshalb eine dunkle Variante („KestrelDark“): dunkle Titelleiste, helle
-  Schrift, feiner heller Rand, wie macOS im Dunkelmodus.
-- **Symbole waren dunkel auf dunkel** (in Apps und oben rechts). Plasma färbt einfarbige Symbole
-  nur um, wenn das Symbol-Set das ausdrücklich erlaubt. WhiteSur und unser Kestrel-Set hatten
-  diese Angabe nicht. Jetzt haben sie sie.
-- **Umschalten in einem Schritt:** Es gibt zwei globale Designs, **„Kestrel“** (hell) und
-  **„Kestrel Dunkel“**. Sie stehen in den Systemeinstellungen unter „Globales Design“ und in den
-  Schnelleinstellungen. Ein Klick wechselt Farben, Fensterrahmen und Hintergrundbild zusammen. Die
-  Einstellung „Automatisch“ (hell am Tag, dunkel am Abend) nutzt ebenfalls diese beiden.
-- Wer nur unter „Farben“ ein dunkles Farbschema wählt, bekommt dunkle Apps und Symbole, aber
-  helle Fensterrahmen. Dafür ist das globale Design da.
+- **Our own Plasma design "Kestrel"** (created by `image/artwork/plasma_theme.py`). It only replaces
+  the background of the dock and top bar and the marker for running apps. Everything else still
+  comes from Breeze, so it stays stable through Plasma updates.
+- **Dock:** see-through like frosted glass, strongly rounded corners, the icons fill the dock.
+  On real hardware the background behind it is blurred. The test VM lacks the
+  3D acceleration for that, so there it is only see-through.
+- **Running apps** get a small line under the icon instead of a blue box.
+- **Top bar:** flat and also see-through.
+- The colors come from the color scheme, so in dark mode everything turns dark automatically.
+- **Window shadow fixed:** Light gaps in the shadow were visible at the window corners.
 
-## D21 – Eigener Startbildschirm
+## D17 – Icons in macOS style (WhiteSur)
 
-Beim Einschalten zeigt Kestrel statt des Fedora-Logos einen schwarzen Bildschirm mit dem weißen
-Kestrel-Vogel in der Mitte und einem dünnen Fortschrittsbalken darunter, wie das Apple-Logo beim
-Mac-Start.
+The Breeze icons looked mixed up in the dock: flat folders, round logos, dark squares.
+On a Mac all app icons have the same rounded square shape. So Kestrel uses the
+free icon set **WhiteSur** (license GPL-3.0). Decided with you.
 
-- Gebaut mit Plymouth, dem Startbildschirm-Programm von Fedora, und dessen Modul „two-step“, das
-  schon im System ist. Es kommt kein neues Paket dazu.
-- Die Abfrage des Passworts für verschlüsselte Festplatten nutzt weiter die Grafiken von Fedora.
-- Kernel-Meldungen beim Start sind ausgeblendet (`rhgb quiet`). Wer sie sehen will, drückt beim
-  Start Esc.
-- Das Startmenü (GRUB) bleibt wie bei Fedora versteckt. Es erscheint nur nach einem
-  fehlgeschlagenen Start oder wenn man beim Einschalten Shift gedrückt hält. Auf dem Mac gibt es
-  ebenfalls keins.
-- Secure Boot bleibt unberührt: Es ändern sich nur Bilder und Einstellungen, keine signierten
-  Startprogramme.
+- It is not included in Fedora and is fetched from GitHub during the build.
+- **Security:** The version is pinned to `2026-09-10`, and the build checks the
+  exact state (commit `73d8040`). If anything differs, the build stops. The install
+  script only runs in a separate build container, not in the finished system.
+- **Updates:** A new version only comes when we deliberately enter it in `config.env`.
+- The alternative would have been Papirus from Fedora: reviewed and consistent, but flat and not
+  macOS-like.
+- **Trash and Launchpad in the dock:** Plasma deliberately shows widgets in panels as plain
+  outline icons. In the big dock the trash did not match the colorful app icons that way. A
+  small icon set of our own, "Kestrel", takes everything from WhiteSur and only swaps the trash
+  for the colored glass version. The Launchpad button uses the colored app grid.
+- **Icons at the top right (volume, network and so on):** WhiteSur draws these small
+  one-color icons in a fixed light gray that Plasma cannot recolor. On the light top bar
+  they were hard to see. For these, Kestrel uses the very similar one-color icons from Breeze.
+  They follow the color scheme: dark on light, light in dark mode. The colorful
+  app icons stay WhiteSur.
 
-## D22 – Live-USB-Stick: erst ausprobieren, dann installieren
+## D18 – Animations and gestures
 
-Das ISO startet jetzt ein vollständiges Kestrel OS direkt vom USB-Stick, ohne etwas auf der
-Festplatte zu ändern. Wer es behalten will, klickt im Dock auf **„Kestrel OS installieren“**.
-Entschieden mit dir.
+- **Windows** zoom in and out smoothly when they open and close, like on a Mac. **Minimize**
+  pulls the window into the dock with the "Magic Lamp" effect. **Maximize** is animated.
+- **Touchpad:** Plasma uses **four** fingers: up for the window overview, sideways to
+  switch workspaces. The Mac uses three. Plasma has no setting for this, and
+  rebuilding KWin for it would be exactly the kind of change that breaks with updates. So four.
+- The test VM has no 3D acceleration, so all effects are off there. Whether everything
+  feels smooth is therefore on the test list for the laptop.
 
-- **Startmenü des USB-Sticks** im Kestrel-Design: dunkler Hintergrund, weißer Vogel und Name,
-  deutsche Einträge („Kestrel OS starten“, „… (einfache Grafik)“ für schwierige Grafikkarten,
-  „USB-Stick prüfen …“, „Firmware-Einstellungen“). Es startet nach 10 Sekunden von selbst.
-  Alle Schrift im Menü ist als Bild gezeichnet: Mit Secure Boot lädt das Startprogramm aus
-  Sicherheitsgründen keine Schriftdateien, und seine eingebaute Schrift kennt keine Umlaute.
-  So sieht das Menü mit und ohne Secure Boot gleich aus.
-- **Live-System:** meldet sich automatisch als „liveuser“ an. Grafikkarten-Einrichtung,
-  Flatpak-Downloads und automatische Updates sind im Live-System aus, damit nichts im
-  Hintergrund passiert. Änderungen im Live-System sind nach dem Neustart weg.
-- **Installer:** Fedoras Installer (Anaconda) mit Kestrel-Farben und -Logo. Er fragt nur nach
-  Festplatte, Sprache und Tastatur. Das Benutzerkonto legt wie bisher der Einrichtungsassistent
-  beim ersten Start an (D13). Installiert wird das Kestrel-Image, das auf dem Stick liegt: Es
-  braucht kein Internet.
-- **Wie es gebaut ist:** Ein eigenes Live-Image auf Basis des Kestrel-Images bekommt die Teile
-  für den Live-Start und den Installer. Diese Teile landen nicht im installierten System. Die
-  Bauanleitung für das ISO stammt aus Titanoboa von Universal Blue (freie Lizenz Apache-2.0),
-  übernommen und angepasst, statt das Werkzeug fremd auszuführen.
-- **Secure Boot:** Das ISO nutzt die signierten Startprogramme aus dem System selbst. Der Test
-  startet es auch mit erzwungenem Secure Boot.
-- **Einschränkungen:** Das Live-ISO startet nur im UEFI-Modus (alle aktuellen Laptops; in
-  VirtualBox und VMware muss „EFI“ eingeschaltet sein). Für alte BIOS-Rechner gibt es weiter das
-  reine Installations-ISO (`build.sh installer-iso`). Der USB-Stick braucht mindestens 16 GB.
+## D19 – Our own dock with magnification ("Kestrel Dock")
 
-## D23 – Sperrbildschirm, Anmeldebildschirm und Einrichtung im Mac-Stil
+On a Mac the icons in the dock get bigger when the mouse moves over them. Plasma's own dock
+cannot do that. So Kestrel has its own dock widget. Decided with you.
 
-Der Sperrbildschirm sieht jetzt aus wie beim Mac: oben das Datum und eine große Uhr, unten das
-runde Benutzerbild, der Name und ein abgerundetes Passwortfeld mit Pfeil-Knopf. Ein falsches
-Passwort lässt das Feld kurz wackeln. Solange niemand tippt, steht dort nur „Zum Entsperren eine
-Taste drücken“; beim Tippen wird das Hintergrundbild weich gezeichnet.
+- **How it is built:** pure QML (Plasma's interface language), no compiled code. It only uses
+  Plasma's official building blocks for the list of apps. Compiled add-ons like Latte Dock
+  break with Plasma updates because they must match the exact version. QML does not have
+  this problem.
+- **Why updates do not break it:** Plasma updates only come through the Kestrel image. Every
+  image goes through the automatic VM test, and that test checks that the dock loads without errors.
+  If an update breaks the dock, the test fails before the update reaches your laptop.
+- **The dock holds everything:** Launchpad, pinned and running apps, divider, trash.
+  So everything grows together, like on a Mac.
+- **Room for the magnification:** The dock is invisibly taller and wider than the visible
+  frosted glass. The icons and the app name grow into this empty margin. Clicks there go
+  normally to the window or desktop behind it.
+- **Frosted glass:** The dock draws its glass itself so it can grow with the icons.
+  At rest it sits exactly where Plasma blurs the background. Only the edges that
+  briefly appear during magnification are see-through, but not blurred.
+- **Side effect:** The dock gets out of the way of windows. Because Plasma counts the invisible
+  margin too, it already moves away when a window reaches to about 100 pixels above the bottom edge of the screen.
+- **Launchpad:** The bird icon at the top left and the Launchpad icon in the dock both open the
+  full-screen app grid.
+- **Small extras:** app name above the magnified icon, bouncing when an app starts, a dot under
+  running apps, a right-click menu (New Window, Keep in Dock, Quit), dragging files onto the
+  trash.
+- **Not in yet:** window preview on hover and reordering icons by dragging.
+- All sizes (icon size, magnification, margins) are in one place in
+  `image/artwork/plasma_theme.py` and apply to the design, widget and layout together.
 
-- **Einstellungen:** Systemeinstellungen → Bildschirmsperre → „Erscheinungsbild einrichten …“.
-  - Uhr: groß, klein oder aus. Schriftstärke dünn bis fett. 12 oder 24 Stunden, Sekunden.
-  - Datum: an oder aus, lang („Mittwoch, 18. November“), kurz oder als Zahlen.
-  - Hintergrund: Hintergrundbild, weichgezeichnetes Bild oder eine Farbe. Stärke der
-    Weichzeichnung und Abdunkeln einstellbar.
-  - Widgets: Musik- und Videosteuerung („Wiedergabe“), Akku, Tastaturbelegung, eine eigene
-    Mitteilung (z. B. „Gefunden? Bitte melden unter …“). Auf Wunsch erst nach einem Tastendruck.
-  - Benutzer: Bild (normal oder groß), Name, Knöpfe für Ruhezustand und Benutzerwechsel.
-- **Wie es gebaut ist:** Nur das Aussehen ist neu. Die Logik zum Entsperren (Passwort, Fingerabdruck,
-  Ruhezustand) bleibt die von Plasma. Ist eine Datei kaputt, zeigt Plasma von selbst seinen
-  einfachen Ersatz-Sperrbildschirm, man kommt also immer wieder hinein. Der Image-Bau prüft, dass
-  Plasma-Updates nichts Grundlegendes geändert haben, sonst bricht der Bau ab.
-- **Anmeldebildschirm** und **Einrichtungsassistent** zeigen jetzt das Kestrel-Hintergrundbild
-  statt des Fedora-Bilds.
-- **Dunkler Modus im Einrichtungsassistenten:** Fedora hat den Schalter so geändert, dass er
-  Fedoras eigenes Design einschaltet. Dann hätte der neue Benutzer weder Kestrel-Dock noch
-  Kestrel-Design bekommen. Jetzt wird beim ersten Anmelden automatisch das passende Kestrel-Design
-  (hell oder dunkel) eingestellt. Spätere eigene Wahl bleibt unangetastet.
-- **Installer:** Der Hinweis „Senden Sie uns Feedback“ mit QR-Code zu Fedoras Forum ist weg, denn
-  Kestrel OS ist nicht Fedora.
+## D20 – Dark mode
+
+The automatic test now also switches to dark mode and takes a screenshot. This
+revealed three bugs, which are now fixed:
+
+- **Window frames stayed light.** Our own window design cannot switch its colors
+  by itself. So there is a dark variant ("KestrelDark"): dark title bar, light
+  text, a thin light border, like macOS in dark mode.
+- **Icons were dark on dark** (in apps and at the top right). Plasma only recolors one-color icons
+  if the icon set explicitly allows it. WhiteSur and our Kestrel set did not have
+  this setting. Now they do.
+- **Switching in one step:** There are two global designs, **"Kestrel"** (light) and
+  **„Kestrel Dunkel“** (Kestrel Dark). They are in the system settings under „Globales Design“
+  (Global Theme) and in the quick settings. One click switches colors, window frames and wallpaper
+  together. The setting „Automatisch“ (Automatic: light during the day, dark in the evening) also uses these two.
+- If you only pick a dark color scheme under „Farben“ (Colors), you get dark apps and icons, but
+  light window frames. That is what the global design is for.
+
+## D21 – Our own boot screen
+
+When you turn it on, Kestrel shows a black screen with the white Kestrel bird in the middle and a
+thin progress bar below it instead of the Fedora logo, like the Apple logo when a
+Mac starts.
+
+- Built with Plymouth, Fedora's boot screen program, and its "two-step" module, which is
+  already in the system. No new package is added.
+- The password prompt for encrypted disks still uses Fedora's graphics.
+- Kernel messages during boot are hidden (`rhgb quiet`). If you want to see them, press Esc
+  during boot.
+- The boot menu (GRUB) stays hidden, as in Fedora. It only appears after a
+  failed start or if you hold Shift while turning the computer on. The Mac does not
+  have one either.
+- Secure Boot stays untouched: only pictures and settings change, no signed
+  boot programs.
+
+## D22 – Live USB stick: try first, then install
+
+The ISO now starts a complete Kestrel OS directly from the USB stick, without changing anything on the
+disk. If you want to keep it, click **„Kestrel OS installieren“** (Install Kestrel OS) in the dock.
+Decided with you.
+
+- **Boot menu of the USB stick** in the Kestrel design: dark background, white bird and name,
+  German entries („Kestrel OS starten“, „… (einfache Grafik)“ for difficult graphics cards,
+  „USB-Stick prüfen …“, „Firmware-Einstellungen“). It starts by itself after 10 seconds.
+  All text in the menu is drawn as a picture: with Secure Boot the boot program does not load
+  font files for security reasons, and its built-in font does not know umlauts.
+  This way the menu looks the same with and without Secure Boot.
+- **Live system:** logs in automatically as "liveuser". Graphics card setup,
+  Flatpak downloads and automatic updates are off in the live system, so nothing happens in the
+  background. Changes in the live system are gone after a restart.
+- **Installer:** Fedora's installer (Anaconda) with Kestrel colors and logo. It only asks for
+  disk, language and keyboard. As before, the setup assistant creates the user account
+  on the first start (D13). It installs the Kestrel image that is on the stick, so it
+  does not need internet.
+- **How it is built:** A separate live image based on the Kestrel image gets the parts
+  for the live start and the installer. These parts do not end up in the installed system. The
+  build recipe for the ISO comes from Titanoboa by Universal Blue (free license Apache-2.0),
+  copied and adjusted, instead of running the outside tool.
+- **Secure Boot:** The ISO uses the signed boot programs from the system itself. The test
+  also starts it with Secure Boot enforced.
+- **Limits:** The live ISO only starts in UEFI mode (all current laptops; in
+  VirtualBox and VMware "EFI" must be switched on). For old BIOS computers there is still the
+  plain installer ISO (`build.sh installer-iso`). The USB stick needs at least 16 GB.
+
+## D23 – Lock screen, login screen and setup in Mac style
+
+The lock screen now looks like on a Mac: the date and a big clock at the top, and at the bottom the
+round user picture, the name and a rounded password field with an arrow button. A wrong
+password makes the field shake briefly. While nobody is typing, it only shows „Zum Entsperren eine
+Taste drücken“ (Press a key to unlock); when you type, the wallpaper is blurred.
+
+- **Settings:** Systemeinstellungen → Bildschirmsperre → „Erscheinungsbild einrichten …“ (System Settings → Screen Locking → Configure Appearance).
+  - Clock: big, small or off. Font weight from thin to bold. 12 or 24 hours, seconds.
+  - Date: on or off, long („Mittwoch, 18. November“), short or as numbers.
+  - Background: wallpaper, blurred picture or a color. Blur strength
+    and darkening can be set.
+  - Widgets: music and video controls („Wiedergabe“, Playback), battery, keyboard layout, a custom
+    message (for example „Gefunden? Bitte melden unter …“, "Found this? Please report to …"). Optionally only after a key press.
+  - User: picture (normal or big), name, buttons for sleep and switching users.
+- **How it is built:** Only the look is new. The unlock logic (password, fingerprint,
+  sleep) stays Plasma's. If a file is broken, Plasma shows its own
+  simple fallback lock screen, so you can always get back in. The image build checks that
+  Plasma updates have not changed anything basic, otherwise the build stops.
+- **Login screen** and **setup assistant** now show the Kestrel wallpaper
+  instead of the Fedora picture.
+- **Dark mode in the setup assistant:** Fedora changed the switch so that it turns on
+  Fedora's own design. Then the new user would have gotten neither the Kestrel dock nor the
+  Kestrel design. Now the matching Kestrel design (light or dark) is set automatically at the
+  first login. A later choice of your own stays untouched.
+- **Installer:** The note „Senden Sie uns Feedback“ (Send us feedback) with a QR code to Fedora's forum is gone, because
+  Kestrel OS is not Fedora.
+
+## D24 – Kestrel from login to desktop
+
+The last KDE and Fedora traces between logging in and the desktop are gone.
+
+- **Start screen after login:** instead of KDE's black "Plasma 30th Anniversary Edition"
+  screen, Kestrel shows the softly blurred wallpaper (light or dark, matching the colour
+  scheme), the white Kestrel mark and a thin progress bar, then fades into the desktop. The
+  login screen shows the same wallpaper, so nothing jumps.
+- **Setup wizard:** the welcome page says "Willkommen bei Kestrel OS" (Welcome to Kestrel OS)
+  instead of "Plasma Desktop", with the Kestrel mark instead of the Plasma logo. The last page
+  shows a Kestrel app-icon tile instead of KDE's dragon mascots. The welcome text is built into
+  the program, so the name is changed in its translation files. English keeps KDE's original
+  wording, because English is the program's own language and has no translation file.
+- **Login screen:** now uses dark colours: white text on a softly darkened wallpaper, like the
+  Mac. With light colours Plasma brightened the wallpaper to a washed-out pastel. The layout
+  itself is built into Plasma's login program and stays as it is. A choice made later in System
+  Settings > Login Screen is kept.
+- **Checks:** the image build stops if Plasma Setup's last page or translations change shape,
+  so an update can't silently bring the old look back.

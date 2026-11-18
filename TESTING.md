@@ -1,66 +1,66 @@
 # Tests
 
-## Automatisch in der VM (`test/vm-test.sh`)
+## Automatic in the VM (`test/vm-test.sh`)
 
-| Prüfung | Wie |
+| Check | How |
 |---|---|
-| ISO installiert sich | unbeaufsichtigte Installation in QEMU/KVM |
-| Secure Boot an | `mokutil --sb-state` in der VM (UEFI mit Microsoft-Schlüsseln) |
-| Desktop startet | `plasmashell` läuft, Sitzung ist Wayland, Screenshot `out/test/vm/desktop.png` |
-| Windows-Programm per Wine | selbst kompiliertes `winhello.exe`, Konsole und Fenster (`wine-gui.png`) |
-| Keine kaputten Dienste | `systemctl --failed` ist leer |
-| Kestrel Dock lädt | keine Fehler des Dock-Widgets im Systemprotokoll |
-| Startbildschirm | Kestrel-Design aktiv, grafischer Start (`rhgb`), Bilder `boot-1..3.png` |
-| Dunkelmodus | „Kestrel Dunkel“ lässt sich einschalten, Screenshot `dark.png` |
+| ISO installs | unattended installation in QEMU/KVM |
+| Secure Boot on | `mokutil --sb-state` in the VM (UEFI with Microsoft keys) |
+| Desktop starts | `plasmashell` is running, session is Wayland, screenshot `out/test/vm/desktop.png` |
+| Windows program via Wine | self-compiled `winhello.exe`, console and window (`wine-gui.png`) |
+| No broken services | `systemctl --failed` is empty |
+| Kestrel Dock loads | no errors from the dock widget in the system log |
+| Boot screen | Kestrel design active, graphical boot (`rhgb`), pictures `boot-1..3.png` |
+| Dark mode | „Kestrel Dunkel“ (Kestrel Dark) can be switched on, screenshot `dark.png` |
 
-## Live-USB-Stick in der VM (`test/live-test.sh`)
+## Live USB stick in the VM (`test/live-test.sh`)
 
-Bilder in `out/test/live/`: Startmenü und Startbildschirm (`boot-NN.png`), Live-Desktop
-(`desktop.png`), Installer aus dem Dock (`installer.png`), derselbe Start mit erzwungenem
-Secure Boot (`secure-NN.png`, `secure-boot.png`). Das Live-System hat kein SSH, deshalb
-schaut der Test nur; die Bilder bewerte ich.
+Pictures in `out/test/live/`: boot menu and boot screen (`boot-NN.png`), live desktop
+(`desktop.png`), installer from the dock (`installer.png`), the same start with Secure Boot
+enforced (`secure-NN.png`, `secure-boot.png`). The live system has no SSH, so
+the test only looks; I judge the pictures.
 
-## Auf echter Hardware (nur du kannst das prüfen)
+## On real hardware (only you can check this)
 
-Testgerät: Acer Aspire Lite 15 (AL15-45P): Ryzen 7 5825U, Radeon-Grafik, Realtek RTL8852BE WLAN.
-Bitte jeden Punkt abhaken und Probleme mit kurzer Beschreibung notieren.
+Test device: Acer Aspire Lite 15 (AL15-45P): Ryzen 7 5825U, Radeon graphics, Realtek RTL8852BE Wi-Fi.
+Please tick off each item and write down problems with a short description.
 
-### USB-Stick und Installation
-- [ ] ISO auf einen USB-Stick mit mindestens 16 GB schreiben (z. B. mit Fedora Media Writer oder Rufus im „DD-Modus“)
-- [ ] Vom USB-Stick booten **mit eingeschaltetem Secure Boot**: Kestrel-Startmenü erscheint
-- [ ] „Kestrel OS starten“: Live-Desktop kommt, WLAN, Ton und Touchpad gehen schon hier
-- [ ] Im Dock „Kestrel OS installieren“: Installation durchlaufen, ohne Internet
-- [ ] Neustart ohne Stick: Einrichtungsassistent legt das Benutzerkonto an, danach Desktop
+### USB stick and installation
+- [ ] Write the ISO to a USB stick with at least 16 GB (for example with Fedora Media Writer or Rufus in „DD-Modus“ (DD mode))
+- [ ] Boot from the USB stick **with Secure Boot switched on**: the Kestrel boot menu appears
+- [ ] „Kestrel OS starten“ (Start Kestrel OS): the live desktop comes up, Wi-Fi, sound and touchpad already work here
+- [ ] In the dock, „Kestrel OS installieren“ (Install Kestrel OS): the installation runs through, without internet
+- [ ] Restart without the stick: the setup assistant creates the user account, then the desktop appears
 
-### Alltag
-- [ ] WLAN verbinden. Danach 30 Minuten surfen ohne Abbrüche (Realtek-Chip: bitte besonders darauf achten)
-- [ ] Bluetooth: Kopfhörer oder Maus koppeln
-- [ ] Firefox: Seiten laden, YouTube-Video in 1080p läuft flüssig und mit Ton
-- [ ] Lokales Video (z. B. MP4) in VLC abspielen
-- [ ] LibreOffice: Dokument öffnen, speichern
-- [ ] Drucker (falls vorhanden) wird gefunden und druckt
-- [ ] **Standby:** Deckel zu, 5 Min warten, Deckel auf. Bild, WLAN, Ton und Touchpad gehen wieder
-- [ ] Standby 3× hintereinander
-- [ ] Akku: Laufzeit beim Surfen notieren (Einstellungen → Energieverwaltung)
-- [ ] Helligkeit- und Lautstärketasten funktionieren
-- [ ] Touchpad: Tippen = Klick, Zwei-Finger-Scrollen, 4-Finger-Wischen (Übersicht / Arbeitsfläche)
-- [ ] Meta+Leertaste öffnet die Suche (Spotlight)
-- [ ] Windows-Taste allein drücken: es passiert nichts (soll im Spiel nicht stören)
-- [ ] Animationen wirken flüssig: Fenster öffnen/schließen (Zoom), Minimieren ins Dock (Wunderlampe), Maximieren
-- [ ] Touchpad: 4 Finger nach oben = Fensterübersicht, 4 Finger seitlich = Arbeitsfläche wechseln
-- [ ] Dock und Top-Bar zeigen den verschwommenen Hintergrund (Milchglas)
+### Daily use
+- [ ] Connect to Wi-Fi. Then browse for 30 minutes without dropouts (Realtek chip: please watch this closely)
+- [ ] Bluetooth: pair headphones or a mouse
+- [ ] Firefox: pages load, a YouTube video in 1080p plays smoothly and with sound
+- [ ] Play a local video (for example MP4) in VLC
+- [ ] LibreOffice: open a document, save it
+- [ ] Printer (if you have one) is found and prints
+- [ ] **Standby:** close the lid, wait 5 min, open the lid. Screen, Wi-Fi, sound and touchpad work again
+- [ ] Standby 3× in a row
+- [ ] Battery: write down the runtime while browsing (Einstellungen → Energieverwaltung, Settings → Power Management)
+- [ ] Brightness and volume keys work
+- [ ] Touchpad: tap = click, two-finger scrolling, 4-finger swipe (overview / workspace)
+- [ ] Meta+Space opens the search (Spotlight)
+- [ ] Press the Windows key alone: nothing happens (it should not get in the way in games)
+- [ ] Animations feel smooth: opening/closing windows (zoom), minimizing into the dock (Magic Lamp), maximizing
+- [ ] Touchpad: 4 fingers up = window overview, 4 fingers sideways = switch workspace
+- [ ] Dock and top bar show the blurred background (frosted glass)
 
 ### Gaming
-- [ ] Steam startet, Anmeldung klappt
-- [ ] Heroic: Epic-Konto anmelden, Rocket League installieren
-- [ ] Rocket League startet mit Proton (in Heroic: Proton-GE über ProtonUp-Qt installieren und auswählen)
-- [ ] **Rocket League verbindet sich online** (Easy Anti-Cheat) und ein Online-Match funktioniert
-- [ ] FPS mit MangoHud anzeigen (in Heroic: „MangoHud aktivieren“). FPS über 10 Minuten notieren, Ruckler?
-- [ ] Im Spiel (Vollbild oder randloses Fenster) sind Dock und Top-Bar nicht zu sehen
-- [ ] Spiel läuft in voller Bildschirmauflösung, nicht unscharf hochskaliert
-- [ ] Controller (Xbox/PlayStation) wird in Steam und in Heroic erkannt
-- [ ] GameMode aktiv (in Heroic aktivieren; Prüfen: `gamemoded -s` im Terminal während das Spiel läuft)
+- [ ] Steam starts, login works
+- [ ] Heroic: log in to the Epic account, install Rocket League
+- [ ] Rocket League starts with Proton (in Heroic: install Proton-GE with ProtonUp-Qt and select it)
+- [ ] **Rocket League connects online** (Easy Anti-Cheat) and an online match works
+- [ ] Show FPS with MangoHud (in Heroic: „MangoHud aktivieren“ (Enable MangoHud)). Write down FPS over 10 minutes, any stutters?
+- [ ] In the game (full screen or borderless window) the dock and top bar are not visible
+- [ ] The game runs at full screen resolution, not blurry and upscaled
+- [ ] A controller (Xbox/PlayStation) is detected in Steam and in Heroic
+- [ ] GameMode active (turn it on in Heroic; to check: `gamemoded -s` in the terminal while the game is running)
 
-### Updates und Rollback
-- [ ] Später, sobald Updates veröffentlicht werden: Update installieren, neu starten, im Startmenü
-      die vorherige Version wählen. Das alte System startet wieder.
+### Updates and rollback
+- [ ] Later, once updates are published: install an update, restart, choose the previous version
+      in the boot menu. The old system starts again.
