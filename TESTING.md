@@ -9,15 +9,28 @@
 | Desktop startet | `plasmashell` läuft, Sitzung ist Wayland, Screenshot `out/test/vm/desktop.png` |
 | Windows-Programm per Wine | selbst kompiliertes `winhello.exe`, Konsole und Fenster (`wine-gui.png`) |
 | Keine kaputten Dienste | `systemctl --failed` ist leer |
+| Kestrel Dock lädt | keine Fehler des Dock-Widgets im Systemprotokoll |
+| Startbildschirm | Kestrel-Design aktiv, grafischer Start (`rhgb`), Bilder `boot-1..3.png` |
+| Dunkelmodus | „Kestrel Dunkel“ lässt sich einschalten, Screenshot `dark.png` |
+
+## Live-USB-Stick in der VM (`test/live-test.sh`)
+
+Bilder in `out/test/live/`: Startmenü und Startbildschirm (`boot-NN.png`), Live-Desktop
+(`desktop.png`), Installer aus dem Dock (`installer.png`), derselbe Start mit erzwungenem
+Secure Boot (`secure-NN.png`, `secure-boot.png`). Das Live-System hat kein SSH, deshalb
+schaut der Test nur; die Bilder bewerte ich.
 
 ## Auf echter Hardware (nur du kannst das prüfen)
 
 Testgerät: Acer Aspire Lite 15 (AL15-45P): Ryzen 7 5825U, Radeon-Grafik, Realtek RTL8852BE WLAN.
 Bitte jeden Punkt abhaken und Probleme mit kurzer Beschreibung notieren.
 
-### Installation
-- [ ] Vom USB-Stick booten **mit eingeschaltetem Secure Boot**
-- [ ] Installation durchlaufen, Benutzer anlegen, Neustart startet in den Desktop
+### USB-Stick und Installation
+- [ ] ISO auf einen USB-Stick mit mindestens 16 GB schreiben (z. B. mit Fedora Media Writer oder Rufus im „DD-Modus“)
+- [ ] Vom USB-Stick booten **mit eingeschaltetem Secure Boot**: Kestrel-Startmenü erscheint
+- [ ] „Kestrel OS starten“: Live-Desktop kommt, WLAN, Ton und Touchpad gehen schon hier
+- [ ] Im Dock „Kestrel OS installieren“: Installation durchlaufen, ohne Internet
+- [ ] Neustart ohne Stick: Einrichtungsassistent legt das Benutzerkonto an, danach Desktop
 
 ### Alltag
 - [ ] WLAN verbinden. Danach 30 Minuten surfen ohne Abbrüche (Realtek-Chip: bitte besonders darauf achten)

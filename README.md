@@ -12,6 +12,7 @@ geprüft werden muss, steht in [TESTING.md](TESTING.md).
 | Bereich | Stand |
 |---|---|
 | ISO bauen, in einer VM installieren, Desktop startet | läuft, wird bei jedem Build automatisch getestet |
+| Live-USB-Stick: ausprobieren, dann installieren | läuft in der VM, auch mit Secure Boot |
 | Windows-Programm über Wine | läuft, automatisch getestet |
 | Secure Boot | läuft, automatisch getestet (vollständiger Test) |
 | Design (Dock, Top-Bar, Fenster, Symbole) | Runde 3, wird weiter verfeinert |
@@ -62,10 +63,14 @@ image/build/            Bauschritte: install/ (Pakete, langsam, wird zwischenges
 image/packages/         Paketlisten (eine Zeile = ein Paket)
 image/artwork/          Hintergrundbild, Fensterrahmen und Dock-Design als Quellcode
 image/system_files/     Dateien, die 1:1 ins System kopiert werden
-iso/release.toml        Einstellungen für das Installations-ISO
+image/live/             Live-Schicht für den USB-Stick (Live-Start, Installer, Kestrel-Branding)
+iso/live/               baut das Live-ISO und das Kestrel-Startmenü
+iso/release.toml        Einstellungen für das reine Installations-ISO
 test/vm-test.sh         automatischer Test: installiert das ISO in einer VM und prüft alles
+test/live-test.sh       startet das Live-ISO in einer VM und macht Bilder
 test/vm-live.sh         Design schnell ausprobieren, ohne neu zu bauen
 sandbox/setup.sh        richtet die Build-Umgebung ein
+sandbox/watchdog.sh     Wächter für lange Builds (meldet Hänger)
 ```
 
 ## Bauen
@@ -99,7 +104,8 @@ autoMemoryReclaim=dropCache
 ```bash
 git clone /mnt/c/Users/<du>/Documents/OS ~/kestrel && cd ~/kestrel
 sudo sandbox/setup.sh
-sudo ./build.sh iso           # fertiges ISO landet in out/
+sudo ./build.sh iso            # Live-ISO (ausprobieren, dann installieren) in out/, nur UEFI
+sudo ./build.sh installer-iso  # reines Installations-ISO, startet auch auf alten BIOS-Rechnern
 ```
 
 Der erste Build dauert lange (etwa eine Stunde, alle Pakete werden geladen). Danach kommen die
@@ -111,6 +117,7 @@ Pakete aus dem Zwischenspeicher, und Design-Änderungen sind in wenigen Minuten 
 sudo ./build.sh test-iso      # ISO, das sich ohne Fragen selbst installiert
 test/vm-test.sh               # vollständiger Test inkl. Secure Boot (über eine Stunde)
 QUICK=1 test/vm-test.sh       # schneller Test für Design-Runden, ohne Secure-Boot-Start
+test/live-test.sh             # Live-ISO starten: Bilder von Menü, Desktop, Installer, Secure Boot
 ```
 
 Screenshots landen in `out/test/vm/`.
