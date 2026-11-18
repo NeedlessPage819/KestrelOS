@@ -4,6 +4,8 @@
 #   test/vm-live.sh theme [dark] install the current window decoration (light or dark) for the test user
 #   test/vm-live.sh plasma       install the current Plasma theme (dock, top bar) for the test user
 #   test/vm-live.sh dock         install the current Kestrel Dock widget and rebuild the dock with it
+#   test/vm-live.sh lock         install the current lock screen (until reboot) and lock the session
+#   test/vm-live.sh lockopt K V  change lock screen setting K to V
 #   test/vm-live.sh mouse X Y    move the pointer to screen position X, Y
 #   test/vm-live.sh click X Y    left click at screen position X, Y
 #   test/vm-live.sh run CMD...   run a command inside the desktop session
@@ -102,6 +104,18 @@ dock)
                 \"applications:org.kde.discover.desktop\", \"applications:org.kde.konsole.desktop\",
                 \"applications:systemsettings.desktop\"]);
         });'" >/dev/null ;;
+lock)
+    # The lock screen lives in /usr (read-only), so it goes onto a temporary writable layer
+    # that is gone after the next reboot. Then the session is locked.
+    lock=usr/share/plasma/shells/org.kde.plasma.desktop/contents
+    tar -C "image/system_files/$lock" -c lockscreen | remote "cat > /tmp/lockscreen.tar &&
+        echo '$TEST_PASSWORD' | sudo -S -p '' sh -c '
+            [ -w /usr ] || bootc usroverlay >/dev/null 2>&1
+            tar -C /$lock -xf /tmp/lockscreen.tar'"
+    in_session "loginctl lock-session" ;;
+lockopt)
+    # lockopt KEY VALUE: change a lock screen setting (config.xml) for the test user.
+    in_session "kwriteconfig6 --file kscreenlockerrc --group Greeter --group LnF --group General --key ${2:?key} ${3:?value}" ;;
 mouse)
     pointer_to "${2:?x}" "${3:?y}" ;;
 click)
@@ -115,5 +129,5 @@ shot)
 stop)
     monitor quit || true ;;
 *)
-    sed -n "2,10p" "$0"; exit 1 ;;
+    sed -n "2,12p" "$0"; exit 1 ;;
 esac

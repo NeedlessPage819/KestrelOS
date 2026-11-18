@@ -37,3 +37,9 @@
     --pf-t--global--color--brand--default: var(--brand-default-light);
     --pf-t--global--color--brand--hover: var(--brand-default);
 }
+
+/* The finish page asks for feedback on Fedora's forum with a QR code. Kestrel OS is not
+   Fedora, so feedback there would go to the wrong people (DECISIONS.md D23). */
+.feedback-section {
+    display: none !important;
+}

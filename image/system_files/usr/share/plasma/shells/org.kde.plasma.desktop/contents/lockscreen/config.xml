@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Settings of the Kestrel lock screen (DECISIONS.md D23). Stored in kscreenlockerrc,
+     group [Greeter][LnF][org.kde.plasma.desktop][General] (set in System Settings >
+     Screen Locking > Appearance, see config.qml). -->
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+
+  <group name="General">
+    <!-- Clock -->
+    <entry name="clockStyle" type="Int">
+      <label>Clock: 0 large, 1 small, 2 hidden.</label>
+      <default>0</default>
+    </entry>
+    <entry name="clockWeight" type="Int">
+      <label>Clock font weight: 0 light, 1 regular, 2 semibold, 3 bold.</label>
+      <default>2</default>
+    </entry>
+    <entry name="timeFormat" type="Int">
+      <label>Time format: 0 like the system, 1 24 hours, 2 12 hours.</label>
+      <default>0</default>
+    </entry>
+    <entry name="showSeconds" type="Bool">
+      <default>false</default>
+    </entry>
+    <entry name="showDate" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="dateFormat" type="Int">
+      <label>Date format: 0 long, 1 short, 2 numbers.</label>
+      <default>0</default>
+    </entry>
+
+    <!-- Background -->
+    <entry name="backgroundMode" type="Int">
+      <label>Background: 0 wallpaper, 1 blurred wallpaper, 2 colour.</label>
+      <default>0</default>
+    </entry>
+    <entry name="blurOnPrompt" type="Bool">
+      <label>Blur the wallpaper while the password prompt shows.</label>
+      <default>true</default>
+    </entry>
+    <entry name="blurStrength" type="Int">
+      <label>Blur strength in percent.</label>
+      <default>60</default>
+      <min>0</min>
+      <max>100</max>
+    </entry>
+    <entry name="dimming" type="Int">
+      <label>Darken the background, in percent.</label>
+      <default>8</default>
+      <min>0</min>
+      <max>80</max>
+    </entry>
+    <entry name="backgroundColor" type="String">
+      <default>#1c1c1e</default>
+    </entry>
+
+    <!-- Widgets -->
+    <entry name="showMediaControls" type="Bool">
+      <label>Show what is playing, with controls.</label>
+      <default>true</default>
+    </entry>
+    <entry name="showBattery" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="showKeyboardLayout" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="message" type="String">
+      <label>Message shown above the user, e.g. contact details.</label>
+      <default></default>
+    </entry>
+    <entry name="hideWhenIdle" type="Bool">
+      <label>Hide clock and widgets until a key is pressed.</label>
+      <default>false</default>
+    </entry>
+
+    <!-- User -->
+    <entry name="showAvatar" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="avatarSize" type="Int">
+      <label>User picture: 0 normal, 1 large.</label>
+      <default>0</default>
+    </entry>
+    <entry name="showUserName" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="showPowerButtons" type="Bool">
+      <label>Show sleep and switch user buttons under the password field.</label>
+      <default>true</default>
+    </entry>
+  </group>
+
+</kcfg>

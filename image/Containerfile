@@ -22,13 +22,20 @@ RUN dnf5 -y install git-core gtk-update-icon-cache findutils && \
 # it in a single layer (each layer on the 15 GB image costs minutes). Artwork is rendered
 # here from its sources, so the final image needs no artwork tooling.
 FROM registry.fedoraproject.org/fedora:${FEDORA_VERSION} AS files
-RUN dnf5 -y install librsvg2-tools python3
+RUN dnf5 -y install librsvg2-tools python3 libjxl-utils
 COPY artwork/ /src/
+# The 5120x2880 .jxl wallpapers are for Plasma Setup's welcome screen, which looks for exactly
+# wallpapers/Default/contents/images/5120x2880.jxl (Fedora's patch); Default points to Kestrel
+# (40-desktop.sh).
 RUN share=/rootfs/usr/share && \
     mkdir -p $share/wallpapers/Kestrel/contents/images $share/wallpapers/Kestrel/contents/images_dark \
              $share/aurorae/themes $share/plasma/desktoptheme && \
     rsvg-convert -w 3840 -h 2160 -o $share/wallpapers/Kestrel/contents/images/3840x2160.png /src/wallpaper-light.svg && \
     rsvg-convert -w 3840 -h 2160 -o $share/wallpapers/Kestrel/contents/images_dark/3840x2160.png /src/wallpaper-dark.svg && \
+    for v in light:images dark:images_dark; do \
+        rsvg-convert -w 5120 -h 2880 -o /tmp/w.png /src/wallpaper-${v%%:*}.svg && \
+        cjxl -q 92 -e 7 --quiet /tmp/w.png $share/wallpapers/Kestrel/contents/${v#*:}/5120x2880.jxl || exit 1; \
+    done && rm /tmp/w.png && \
     mkdir -p $share/plymouth/themes/kestrel && \
     rsvg-convert -w 112 -h 112 -o $share/plymouth/themes/kestrel/watermark.png /src/boot-logo.svg && \
     echo '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>' | \

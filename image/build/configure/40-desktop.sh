@@ -50,3 +50,25 @@ grep -q '^FollowsColorScheme=' "$icons/WhiteSur/index.theme" ||
     sed -i '/^\[Icon Theme\]$/a FollowsColorScheme=true' "$icons/WhiteSur/index.theme"
 grep -q '^FollowsColorScheme=true' "$icons/WhiteSur/index.theme" || die "could not mark WhiteSur as colour-scheme aware"
 gtk-update-icon-cache -qf "$icons/Kestrel" 2>/dev/null || true
+
+# Kestrel wallpaper wherever Plasma or Plasma Setup asks for the distribution default
+# (DECISIONS.md D23). Fedora's "Default" (and "Fedora") point to its own wallpaper.
+wallpapers=/usr/share/wallpapers
+[[ -f $wallpapers/Kestrel/contents/images/5120x2880.jxl ]] || die "Kestrel wallpaper for Plasma Setup missing"
+rm -f "$wallpapers/Default"
+ln -s Kestrel "$wallpapers/Default"
+[[ -f $wallpapers/Default/contents/images_dark/5120x2880.jxl ]] || die "Default wallpaper link broken"
+
+# Lock screen (DECISIONS.md D23): our files replace the look of Plasma's lock screen in the
+# desktop shell package; the unlocking logic is Plasma's. Check that the package still has
+# the shape our files expect, else a Plasma update could leave a broken lock screen.
+lock=/usr/share/plasma/shells/org.kde.plasma.desktop/contents/lockscreen
+for f in LockScreen.qml LockScreenUi.qml MainBlock.qml KestrelClock.qml KestrelBackground.qml \
+         KestrelMedia.qml KestrelActionButton.qml NoPasswordUnlock.qml LockOsd.qml PasswordSync.qml qmldir \
+         config.qml config.xml; do
+    [[ -f $lock/$f ]] || die "lock screen file $f missing"
+done
+grep -q 'LockScreenUi {' "$lock/LockScreen.qml" || die "Plasma's LockScreen.qml no longer loads LockScreenUi"
+grep -q 'Kestrel OS lock screen' "$lock/LockScreenUi.qml" || die "Kestrel lock screen not installed"
+grep -q '"X-Plasma-APIVersion": "2"' /usr/share/plasma/shells/org.kde.plasma.desktop/metadata.json ||
+    die "desktop shell package has a new lock screen API version; check the Kestrel lock screen"

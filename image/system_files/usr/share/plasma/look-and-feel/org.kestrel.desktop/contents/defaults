@@ -21,3 +21,6 @@ library=org.kde.kwin.aurorae
 theme=__aurorae__svg__Kestrel
 ButtonsOnLeft=XIA
 ButtonsOnRight=
+
+[Wallpaper]
+Image=Kestrel
