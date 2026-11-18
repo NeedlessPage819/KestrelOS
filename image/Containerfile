@@ -41,8 +41,7 @@ RUN share=/rootfs/usr/share && \
         /src/setup-finished.svg && \
     mkdir -p $share/plymouth/themes/kestrel && \
     rsvg-convert -w 112 -h 112 -o $share/plymouth/themes/kestrel/watermark.png /src/boot-logo.svg && \
-    echo '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>' | \
-        rsvg-convert -o $share/plymouth/themes/kestrel/throbber-0001.png && \
+    python3 /src/boot_progress.py $share/plymouth/themes/kestrel && \
     python3 /src/aurorae.py $share/aurorae/themes && \
     python3 /src/plasma_theme.py $share/plasma/desktoptheme \
         $share/plasma/plasmoids/org.kestrel.dock/contents/ui/geometry.js

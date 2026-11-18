@@ -2,7 +2,7 @@
 source /tmp/build/lib.sh
 
 theme=/usr/share/plymouth/themes/kestrel
-[[ -f $theme/watermark.png && -f $theme/throbber-0001.png ]] || die "boot screen images missing"
+[[ -f $theme/watermark.png && -f $theme/progress-0049.png ]] || die "boot screen images missing"
 # The password prompt for encrypted disks reuses Fedora's spinner theme graphics.
 for image in bullet entry lock capslock keyboard keymap-render; do
     cp -n /usr/share/plymouth/themes/spinner/$image.png "$theme/"
