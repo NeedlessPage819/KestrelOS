@@ -5,7 +5,7 @@
 #   boot-NN.png    the first 40 seconds, every 2 s: firmware, boot menu, boot screen
 #   desktop.png    the live desktop, logged in automatically
 #   installer.png  the installer, started from the dock
-#   secure-menu.png, secure-boot.png   the same ISO with Secure Boot enforced (software
+#   secure-NN.png, secure-boot.png   the same ISO with Secure Boot enforced (software
 #                  emulation, slow), proving the signed boot chain still works
 # The live session has no SSH, so this test only looks; judging the pictures is up to you.
 set -euo pipefail
@@ -76,7 +76,9 @@ stop_vm
 
 echo "=== Booting with Secure Boot enforced (software emulation, slow)"
 start_vm "-accel tcg,thread=multi -cpu max" secure
-sleep 60;  shot secure-menu
-sleep 240; shot secure-boot
+# Software emulation is slow and uneven: one picture every 10 s for 4 minutes catches the
+# boot menu (secure-NN.png); the last one should show the boot screen.
+for n in $(seq -w 10 10 240); do sleep 10; monitor "screendump $OUT/secure-$n.png -f png"; done
+sleep 60; shot secure-boot
 stop_vm
 echo "=== done; look at the screenshots in $OUT"
