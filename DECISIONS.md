@@ -430,3 +430,22 @@ The last KDE and Fedora traces between logging in and the desktop are gone.
   Settings > Login Screen is kept.
 - **Checks:** the image build stops if Plasma Setup's last page or translations change shape,
   so an update can't silently bring the old look back.
+
+## D25 – Live USB stick on Nvidia graphics
+
+**Problem:** On a PC with a GTX 1660 Ti the live session stayed black with only a mouse
+cursor. In the live session the official Nvidia driver is off (it is only switched on when
+installing, D5), so the card got the free "nouveau" driver, which often can't run Plasma on
+GTX 16xx and newer cards.
+
+**What:** The live stick no longer uses nouveau at all.
+- On GTX 16xx / RTX 20xx and newer, the official driver (nvidia-open) is loaded before the
+  desktop starts. With Secure Boot on, this can't work in the live session, because the
+  driver's signing key is only enrolled during installation (D5). Then the next point applies.
+- Otherwise the picture comes straight from the firmware ("simpledrm"). It is slower (the
+  processor draws everything), but it works on every card.
+- Intel and AMD graphics are not affected.
+- The installed system is unchanged: it picks the driver itself at the first start (D5).
+
+**What we accept:** On older Nvidia cards, and on new ones with Secure Boot on, the live
+session is slower than the installed system will be. That's fine for trying it out.

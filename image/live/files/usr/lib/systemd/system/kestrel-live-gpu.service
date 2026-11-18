@@ -1,0 +1,13 @@
+[Unit]
+Description=Kestrel OS live session: Nvidia driver for GTX 16xx and newer
+DefaultDependencies=no
+After=systemd-udev-settle.service systemd-modules-load.service local-fs.target
+Before=display-manager.service livesys.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/kestrel/live-gpu
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

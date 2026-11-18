@@ -8,6 +8,9 @@ dnf5 -y install livesys-scripts dracut-live anaconda-live \
 cp -a /tmp/live/files/. /
 sed -i 's/^livesys_session=.*/livesys_session=kde/' /etc/sysconfig/livesys
 systemctl enable livesys.service livesys-late.service
+# Nvidia GTX 16xx and newer get their real driver in the live session (DECISIONS.md D25).
+chmod 755 /usr/libexec/kestrel/live-gpu
+systemctl enable kestrel-live-gpu.service
 
 # Nothing in the live session may change hardware setup or download things in the
 # background: no GPU setup (it would blacklist drivers and reboot), no Flatpak downloads,

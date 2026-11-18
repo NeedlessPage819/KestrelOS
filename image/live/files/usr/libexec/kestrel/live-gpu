@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Graphics driver for the live session only (DECISIONS.md D25).
+#
+# The live boot menu keeps the free "nouveau" driver off (kernel arguments in
+# iso/live/build-iso.sh): on GTX 16xx and newer it often leaves Plasma on a black screen with
+# only a cursor. Instead the picture comes from the firmware (simpledrm, slow but works on
+# every card), and on GTX 16xx / RTX 20xx and newer this script loads the official driver
+# (nvidia-open) before the desktop starts. With Secure Boot on, the driver can't load in the
+# live session (its signing key is only enrolled when installing), so the firmware picture stays.
+# Nothing is written to disk; it all lives in the live session's memory.
+set -u
+
+FIRST_TURING_ID=$((0x1e00))   # device IDs from 0x1e00 upward are Turing or newer
+found=no
+for dev in /sys/bus/pci/devices/*; do
+    [[ $(<"$dev/vendor") == 0x10de && $(<"$dev/class") == 0x03* ]] || continue
+    (( $(<"$dev/device") >= FIRST_TURING_ID )) && found=yes
+done
+if [[ $found == no ]]; then
+    echo "kestrel-live-gpu: no Nvidia GTX 16xx or newer, nothing to do"
+    exit 0
+fi
+
+# Same file name as /usr/lib/modprobe.d/kestrel-gpu.conf, so its blacklist no longer applies.
+cat >/etc/modprobe.d/kestrel-gpu.conf <<'EOF'
+# Written by kestrel-live-gpu (live session): Nvidia GTX 16xx or newer, nvidia-open allowed.
+blacklist nouveau
+blacklist nova_core
+options nvidia-drm modeset=1 fbdev=1
+EOF
+if modprobe nvidia_drm; then
+    echo "kestrel-live-gpu: Nvidia driver loaded"
+    udevadm settle --timeout=10 || true
+else
+    echo "kestrel-live-gpu: Nvidia driver could not be loaded (Secure Boot?), using the firmware picture"
+fi
+exit 0
