@@ -74,8 +74,8 @@ build_live_iso() {
     local name=$1 payload=$OUT/live/payload
     podman build         --build-arg BASE_IMAGE="$TAG"         --build-arg FEDORA_VERSION="$FEDORA_VERSION"         --tag "$LIVE_TAG"         image/live/
     rm -rf "$payload" && mkdir -p "$OUT/live"
-    # Compressed layers keep the ISO small; gzip is what the installer reads for sure.
-    podman push --compression-format gzip --force-compression "$TAG" "oci:$payload"
+    # zstd layers keep the ISO small (smaller than gzip); bootc and the installer read them.
+    podman push --compression-format zstd --force-compression "$TAG" "oci:$payload"
     podman run --rm         --cap-add sys_admin --security-opt label=disable         --mount type=image,source="$LIVE_TAG",dst=/rootfs         -v "$PWD/$payload:/oci:ro"         -v "$PWD/iso/live:/src:ro"         -v "$PWD/$OUT:/output"         -e ISO_LABEL="Kestrel-${FEDORA_VERSION}" -e ISO_NAME="$name" -e OS_NAME="$OS_NAME"         "registry.fedoraproject.org/fedora:${FEDORA_VERSION}"         bash /src/build-iso.sh
     rm -rf "$payload"
 }
