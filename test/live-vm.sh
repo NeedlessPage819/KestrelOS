@@ -28,7 +28,8 @@ start)
     pgrep -f qemu-system-x86_64 >/dev/null && { echo "a VM is already running"; exit 1; }
     cp "$FW/OVMF_VARS.fd" "$OUT/vars.fd"
     qemu-img create -q -f qcow2 "$OUT/disk.qcow2" 64G
-    setsid qemu-system-x86_64 -machine q35 -accel kvm -cpu host -smp 4 -m 4096 \
+    # 2 cores: with 4, the live desktop (drawn by the CPU) starved WSL until it stopped answering.
+    setsid qemu-system-x86_64 -machine q35 -accel kvm -cpu host -smp 2 -m 4096 \
         -drive if=pflash,format=raw,unit=0,readonly=on,file="$FW/OVMF_CODE.fd" \
         -drive if=pflash,format=raw,unit=1,file="$OUT/vars.fd" \
         -drive if=virtio,format=qcow2,file="$OUT/disk.qcow2" \
