@@ -72,3 +72,53 @@ grep -q 'LockScreenUi {' "$lock/LockScreen.qml" || die "Plasma's LockScreen.qml 
 grep -q 'Kestrel OS lock screen' "$lock/LockScreenUi.qml" || die "Kestrel lock screen not installed"
 grep -q '"X-Plasma-APIVersion": "2"' /usr/share/plasma/shells/org.kde.plasma.desktop/metadata.json ||
     die "desktop shell package has a new lock screen API version; check the Kestrel lock screen"
+
+# Plasma Setup branding (DECISIONS.md D24). Its welcome text ("Welcome to Plasma Desktop") is
+# compiled into the program, but the text shown comes from the translation catalogues, so
+# the product name is replaced there (German and every other language that has it). The
+# icon next to it is "plasma-symbolic", which the Kestrel icon theme points at the Kestrel mark.
+python3 - "$OS_NAME" <<'PY' || die "could not rebrand Plasma Setup's translations"
+import glob, struct, sys
+name = sys.argv[1].encode()
+changed = 0
+for path in glob.glob("/usr/share/locale/*/LC_MESSAGES/org.kde.plasmasetup.mo"):
+    data = open(path, "rb").read()
+    magic, _, n, orig_off, trans_off = struct.unpack("<5I", data[:20])
+    assert magic == 0x950412de, path
+    entries = []
+    for i in range(n):
+        ol, oo = struct.unpack("<2I", data[orig_off + 8 * i:orig_off + 8 * i + 8])
+        tl, to = struct.unpack("<2I", data[trans_off + 8 * i:trans_off + 8 * i + 8])
+        orig, trans = data[oo:oo + ol], data[to:to + tl]
+        if b"Plasma Desktop" in orig:
+            trans = trans.replace(b"Plasma Desktop", name).replace(b"Plasma-Desktop", name)
+            changed += 1
+        entries.append((orig, trans))
+    # Rewrite without a hash table (gettext then searches the sorted list; keys are unchanged).
+    head = 28
+    otab, ttab = head, head + 8 * n
+    pos = ttab + 8 * n
+    blob, otable, ttable = b"", b"", b""
+    for orig, _ in entries:
+        otable += struct.pack("<2I", len(orig), pos + len(blob)); blob += orig + b"\0"
+    for _, trans in entries:
+        ttable += struct.pack("<2I", len(trans), pos + len(blob)); blob += trans + b"\0"
+    open(path, "wb").write(struct.pack("<7I", 0x950412de, 0, n, otab, ttab, 0, 0) + otable + ttable + blob)
+assert changed > 0, "no 'Plasma Desktop' text found in Plasma Setup's translations"
+print(f"Plasma Setup: product name replaced in {changed} translations")
+PY
+ln -sf ../../hicolor/scalable/apps/kestrel-logo-symbolic.svg "$icons/Kestrel/symbolic/plasma-symbolic.svg"
+[[ -e $icons/Kestrel/symbolic/plasma-symbolic.svg ]] || die "plasma-symbolic link broken"
+grep -q '"konqi-calling.png"' /usr/share/plasma/packages/org.kde.plasmasetup.finished/contents/ui/main.qml ||
+    die "Plasma Setup's last page no longer uses konqi-calling.png; update the Kestrel picture"
+
+# Dark colours for the login screen (DECISIONS.md D24, see tmpfiles.d/kestrel-plasmalogin.conf).
+# The colours themselves must be in kdeglobals; the scheme name alone is not enough.
+scheme=/usr/share/color-schemes/BreezeDark.colors
+[[ -f $scheme ]] || die "BreezeDark colour scheme missing"
+mkdir -p /usr/share/kestrel/plasmalogin
+{
+    sed -e '/^\[General\]/,/^\[/{/^\[General\]/!{/^\[/!d}}' "$scheme"
+    printf '\n[General]\nColorScheme=BreezeDark\n\n[KDE]\nLookAndFeelPackage=org.kestrel.desktop.dark\n'
+} > /usr/share/kestrel/plasmalogin/kdeglobals
+grep -q '^\[Colors:Window\]' /usr/share/kestrel/plasmalogin/kdeglobals || die "login screen colours not written"

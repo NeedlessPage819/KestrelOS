@@ -36,6 +36,9 @@ RUN share=/rootfs/usr/share && \
         rsvg-convert -w 5120 -h 2880 -o /tmp/w.png /src/wallpaper-${v%%:*}.svg && \
         cjxl -q 92 -e 7 --quiet /tmp/w.png $share/wallpapers/Kestrel/contents/${v#*:}/5120x2880.jxl || exit 1; \
     done && rm /tmp/w.png && \
+    mkdir -p $share/plasma/packages/org.kde.plasmasetup.finished/contents/ui && \
+    rsvg-convert -w 400 -h 400 -o $share/plasma/packages/org.kde.plasmasetup.finished/contents/ui/konqi-calling.png \
+        /src/setup-finished.svg && \
     mkdir -p $share/plymouth/themes/kestrel && \
     rsvg-convert -w 112 -h 112 -o $share/plymouth/themes/kestrel/watermark.png /src/boot-logo.svg && \
     echo '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>' | \
