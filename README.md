@@ -27,6 +27,7 @@ geprüft werden muss, steht in [TESTING.md](TESTING.md).
 - Symbole im macOS-Stil (WhiteSur), Schrift Inter
 - Suche wie Spotlight mit **Meta+Leertaste**, Launchpad-Knopf im Dock
 - Wischgesten auf dem Touchpad, Hell- und Dunkelmodus („Kestrel“ und „Kestrel Dunkel“, auch automatisch)
+- Sperrbildschirm wie auf dem Mac (große Uhr, rundes Benutzerbild, viele Einstellungen und Widgets), Anmeldung und Einrichtung mit Kestrel-Hintergrund
 
 **Gaming**
 - Steam, Wine, Proton, Heroic, Lutris, Bottles, ProtonUp-Qt
@@ -135,6 +136,7 @@ sandbox/watchdog.sh <systemd-unit> <build-log> [minuten-ohne-ausgabe]
 test/vm-live.sh start         # installierte Test-VM starten
 test/vm-live.sh theme         # Fensterrahmen aus image/artwork/ übernehmen
 test/vm-live.sh plasma        # Dock- und Top-Bar-Design übernehmen
+test/vm-live.sh lock          # Sperrbildschirm übernehmen und sperren (unlock entsperrt)
 test/vm-live.sh shot name     # Screenshot nach out/test/vm/name.png
 test/vm-live.sh stop
 ```

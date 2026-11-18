@@ -382,3 +382,31 @@ Entschieden mit dir.
 - **Einschränkungen:** Das Live-ISO startet nur im UEFI-Modus (alle aktuellen Laptops; in
   VirtualBox und VMware muss „EFI“ eingeschaltet sein). Für alte BIOS-Rechner gibt es weiter das
   reine Installations-ISO (`build.sh installer-iso`). Der USB-Stick braucht mindestens 16 GB.
+
+## D23 – Sperrbildschirm, Anmeldebildschirm und Einrichtung im Mac-Stil
+
+Der Sperrbildschirm sieht jetzt aus wie beim Mac: oben das Datum und eine große Uhr, unten das
+runde Benutzerbild, der Name und ein abgerundetes Passwortfeld mit Pfeil-Knopf. Ein falsches
+Passwort lässt das Feld kurz wackeln. Solange niemand tippt, steht dort nur „Zum Entsperren eine
+Taste drücken“; beim Tippen wird das Hintergrundbild weich gezeichnet.
+
+- **Einstellungen:** Systemeinstellungen → Bildschirmsperre → „Erscheinungsbild einrichten …“.
+  - Uhr: groß, klein oder aus. Schriftstärke dünn bis fett. 12 oder 24 Stunden, Sekunden.
+  - Datum: an oder aus, lang („Mittwoch, 18. November“), kurz oder als Zahlen.
+  - Hintergrund: Hintergrundbild, weichgezeichnetes Bild oder eine Farbe. Stärke der
+    Weichzeichnung und Abdunkeln einstellbar.
+  - Widgets: Musik- und Videosteuerung („Wiedergabe“), Akku, Tastaturbelegung, eine eigene
+    Mitteilung (z. B. „Gefunden? Bitte melden unter …“). Auf Wunsch erst nach einem Tastendruck.
+  - Benutzer: Bild (normal oder groß), Name, Knöpfe für Ruhezustand und Benutzerwechsel.
+- **Wie es gebaut ist:** Nur das Aussehen ist neu. Die Logik zum Entsperren (Passwort, Fingerabdruck,
+  Ruhezustand) bleibt die von Plasma. Ist eine Datei kaputt, zeigt Plasma von selbst seinen
+  einfachen Ersatz-Sperrbildschirm, man kommt also immer wieder hinein. Der Image-Bau prüft, dass
+  Plasma-Updates nichts Grundlegendes geändert haben, sonst bricht der Bau ab.
+- **Anmeldebildschirm** und **Einrichtungsassistent** zeigen jetzt das Kestrel-Hintergrundbild
+  statt des Fedora-Bilds.
+- **Dunkler Modus im Einrichtungsassistenten:** Fedora hat den Schalter so geändert, dass er
+  Fedoras eigenes Design einschaltet. Dann hätte der neue Benutzer weder Kestrel-Dock noch
+  Kestrel-Design bekommen. Jetzt wird beim ersten Anmelden automatisch das passende Kestrel-Design
+  (hell oder dunkel) eingestellt. Spätere eigene Wahl bleibt unangetastet.
+- **Installer:** Der Hinweis „Senden Sie uns Feedback“ mit QR-Code zu Fedoras Forum ist weg, denn
+  Kestrel OS ist nicht Fedora.
