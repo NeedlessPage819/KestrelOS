@@ -32,6 +32,9 @@ All screenshots are from the automatic and manual tests in a VM.
 | ![Lock screen, wrong password](docs/screenshots/lock-screen-password.png) Lock screen after a wrong password | ![Lock screen variant](docs/screenshots/lock-screen-variant.png) One of many lock screen styles: small thin clock, blurred wallpaper, a message |
 | ![Lock screen settings](docs/screenshots/lock-screen-settings.png) Lock screen settings | ![Setup wizard](docs/screenshots/setup-dark-mode.png) First-start setup with dark mode switched on |
 | ![Installer](docs/screenshots/installer.png) Installer from the live USB stick | ![Installer finished](docs/screenshots/installer-done.png) Installation finished |
+| ![Boot menu](docs/screenshots/boot-menu.png) Boot menu of the live USB stick (same with Secure Boot) | ![Boot screen](docs/screenshots/boot-screen.png) Boot screen |
+| ![Setup welcome](docs/screenshots/setup-welcome.png) First-start setup | ![Setup finished](docs/screenshots/setup-finished.png) End of the setup |
+| ![Login screen](docs/screenshots/login-screen.png) Login screen | ![Start screen](docs/screenshots/start-screen.png) Start screen after logging in, fades into the desktop |
 
 The system language in the screenshots is German; every language Fedora supports works.
 
