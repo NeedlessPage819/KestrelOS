@@ -48,6 +48,8 @@ The system language in the screenshots is German; every language Fedora supports
 - macOS-style icons (WhiteSur), Inter font
 - Spotlight-like search with **Meta+Space**, Launchpad button in the dock
 - Touchpad swipe gestures, light and dark mode ("Kestrel" and "Kestrel Dark", also automatic)
+- Dock settings in System Settings (size, magnification, when it hides); a clock that is as big as the menus; sensible scaling on 4K TVs and monitors
+- A clean dark terminal design; Windows programs (.exe) open with Wine by double click
 - Mac-style lock screen: large clock, round user picture, lots of settings and widgets
   (now playing, battery, keyboard layout, your own message)
 - Kestrel boot screen, boot menu, login screen, setup wizard and installer
@@ -87,6 +89,7 @@ image/build/            build steps: install/ (packages, slow, cached),
 image/packages/         package lists (one line = one package)
 image/artwork/          wallpaper, dock design and other artwork as source code
 image/decoration/       the Kestrel window frame (C++, built against the image's KDE libraries)
+image/dock-settings/    System Settings > Dock (C++ and QML, built the same way)
 image/system_files/     files copied into the system 1:1 (incl. dock widget and lock screen)
 image/live/             live layer for the USB stick (live start, installer, Kestrel branding)
 iso/live/               builds the live ISO and the Kestrel boot menu

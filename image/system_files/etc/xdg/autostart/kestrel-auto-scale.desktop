@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Kestrel auto scaling
+Comment=Sets a sensible scale for 4K screens that Plasma leaves at 100 % (DECISIONS.md D27)
+Exec=/usr/libexec/kestrel/auto-scale
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=1

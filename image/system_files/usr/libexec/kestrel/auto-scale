@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Sensible scaling for large, high-resolution screens (DECISIONS.md D27).
+
+Plasma picks the scale from the screen's pixel density. A 4K TV is physically huge, so its
+density looks low and Plasma stays at 100 %: everything is tiny. The Mac would show such a
+screen as "looks like 1920x1080". So, once per screen and only while it is still at 100 %:
+  - 3200 pixels wide or more and wider than 70 cm (TV-sized): 200 %
+  - 3200 pixels wide or more, desk monitor: 150 %
+A scale the user sets later is never touched again: each screen is handled only once
+(remembered in ~/.local/state/kestrel/auto-scale).
+"""
+import json
+import os
+import subprocess
+from pathlib import Path
+
+state = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "kestrel" / "auto-scale"
+
+
+def main():
+    try:
+        data = json.loads(subprocess.run(["kscreen-doctor", "-j"], capture_output=True, text=True, timeout=20).stdout)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return
+    done = set(state.read_text().split()) if state.exists() else set()
+    changes, seen = [], []
+    for out in data.get("outputs", []):
+        if not out.get("enabled"):
+            continue
+        mode = next((m for m in out.get("modes", []) if m.get("id") == out.get("currentModeId")), None)
+        if not mode:
+            continue
+        # One key per physical screen: connector name plus its size, so another screen on
+        # the same port is treated as new.
+        mm = out.get("sizeMM") or {}
+        key = f'{out["name"]}:{mode["size"]["width"]}x{mode["size"]["height"]}:{mm.get("width", 0)}mm'
+        seen.append(key)
+        if key in done or abs(float(out.get("scale", 1)) - 1) > 0.01:
+            continue
+        if mode["size"]["width"] < 3200:
+            continue
+        scale = 2 if mm.get("width", 0) > 700 else 1.5
+        changes.append(f'output.{out["name"]}.scale.{scale}')
+    if changes:
+        subprocess.run(["kscreen-doctor", *changes], timeout=30)
+    state.parent.mkdir(parents=True, exist_ok=True)
+    state.write_text("\n".join(sorted(done | set(seen))) + "\n")
+
+
+if __name__ == "__main__":
+    main()

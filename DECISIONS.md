@@ -484,3 +484,36 @@ programs. Ours is small and uses only KDE's official interface for window frames
 image build against the very KDE libraries of that image. The build checks the versions match,
 and the automatic VM test checks that KWin really loaded it (otherwise KWin would quietly fall
 back to Breeze). So a Plasma update can't break it on users' computers; at worst the build stops.
+
+## D27 – Feedback from the 4K TV test: dock settings, clock, scaling, terminal, .exe files
+
+Tested on a PC with a 4K TV. What was wrong and what changed:
+
+- **Everything was tiny.** Plasma picks the scale from the screen's pixel density, and a big
+  TV looks like a low-density screen, so it stayed at 100 %. Now, once per screen and only
+  while it is still at 100 %, a screen 3200 pixels wide or more gets 200 % if it is TV-sized
+  (wider than 70 cm) and 150 % otherwise (`/usr/libexec/kestrel/auto-scale`). A scale you set
+  yourself is never touched again.
+- **The clock was even smaller than the rest.** Plasma's clock converts its fixed font size
+  with the screen's physical density (unlike the rest of Plasma). The top bar now has its own
+  small "Kestrel Clock" widget: "Do. 19. Nov.  19:40" in exactly the menus' font size; a click
+  opens Plasma's calendar.
+- **Dock settings.** New page in System Settings > Appearance & Style > Dock, also reachable
+  with right-click > "Dock-Einstellungen …" on the Launchpad or Trash icon:
+  - size (32–72 px), magnification on/off and strength, dots under open apps;
+  - when it hides: "only for full-screen apps" (new default, like the Mac), "when a window
+    touches it" (the old behaviour, which hid it as soon as an app was used), "always hide
+    automatically", or "never, windows may go underneath".
+
+  Changes apply at once. The panel theme leaves room for the largest size and magnification,
+  so the dock's panel is taller than the visible glass. *What we accept:* with "only for
+  full-screen apps", maximized windows end a bit above the glass (the room for magnified icons).
+- **Window top corners were not really round.** KWin cuts only the window content round;
+  the title bar belongs to the window frame, which now draws its top corners with the same
+  radius.
+- **Terminal.** A clean design of our own, not a Mac copy: calm dark grey with soft colours and
+  the Kestrel accent, JetBrains Mono with room around the text, no toolbars and no scroll bar,
+  tabs only when there are several, the title bar in the same colour as the terminal (a window
+  rule), and a short prompt: the folder name and "›".
+- **.exe files asked which app to use.** Fedora's Wine launcher claims no file types. Windows
+  programs (.exe, .msi, .lnk) now open with Wine by double click. Steam games keep using Proton.

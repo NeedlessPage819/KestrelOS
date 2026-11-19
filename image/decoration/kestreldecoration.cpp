@@ -305,8 +305,27 @@ void Decoration::paint(QPainter *painter, const QRectF &repaintArea)
         return;
     }
 
-    // KWin rounds the corners (setBorderRadius), so a plain rectangle is enough here.
-    painter->fillRect(bar, titleBarColor());
+    // KWin cuts only the window content round (setBorderRadius); the title bar belongs to
+    // the decoration, so its top corners are rounded here, with the same radius.
+    const qreal radius = borderRadius().topLeft();
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(titleBarColor());
+    if (radius > 0) {
+        QPainterPath path;
+        path.moveTo(bar.left(), bar.bottom());
+        path.lineTo(bar.left(), bar.top() + radius);
+        path.arcTo(QRectF(bar.left(), bar.top(), 2 * radius, 2 * radius), 180, -90);
+        path.lineTo(bar.right() - radius, bar.top());
+        path.arcTo(QRectF(bar.right() - 2 * radius, bar.top(), 2 * radius, 2 * radius), 90, -90);
+        path.lineTo(bar.right(), bar.bottom());
+        path.closeSubpath();
+        painter->drawPath(path);
+    } else {
+        painter->drawRect(bar);
+    }
+    painter->restore();
 
     // Title, centred over the whole window like on macOS; moved aside only if it would
     // run into the buttons.

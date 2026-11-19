@@ -190,6 +190,8 @@ check "Kestrel Dock loads without errors" remote     '! journalctl --user -b --n
 # Our window decoration is compiled code; if KWin can't load it, it silently falls back to Breeze.
 check "Kestrel window decoration loaded" in_session \
     'dbus-send --session --print-reply --dest=org.kde.KWin /KWin org.kde.KWin.supportInformation | grep -qx "Plugin: org.kestrel.decoration"'
+check "Windows programs open with Wine" in_session \
+    'xdg-mime query default application/x-msdownload | grep -qx kestrel-wine.desktop'
 check "GPU setup ran" remote 'test -f /var/lib/kestrel/gpu-setup.done'
 check "kestrel command works" remote 'kestrel help | grep -q rollback'
 check "ntsync device available" remote 'test -c /dev/ntsync'

@@ -35,6 +35,10 @@ PlasmoidItem {
     }
     function quote(s) { return "'" + String(s).replace(/'/g, "'\\''") + "'" }
 
+    // "Dock settings" in the context menus opens the Dock page in System Settings (D27).
+    readonly property var settingsEntry: ({ text: tr("Dock-Einstellungen …", "Dock Settings…"), icon: "configure",
+                                            action: () => shell.run("systemsettings kcm_kestreldock") })
+
     TaskManager.VirtualDesktopInfo { id: virtualDesktopInfo }
     TaskManager.ActivityInfo { id: activityInfo }
 
@@ -70,11 +74,16 @@ PlasmoidItem {
     fullRepresentation: Item {
         id: dock
 
+        // Size and magnification from the dock settings (System Settings > Dock, D27).
+        readonly property real icon: Plasmoid.configuration.iconSize
+        readonly property real zoomMax: Plasmoid.configuration.magnify ? Plasmoid.configuration.zoom : 1.0
+        readonly property bool showDots: Plasmoid.configuration.showIndicators
+
         // Items: launchpad, the tasks, a separator, the trash.
         readonly property int taskCount: tasksModel.count
         readonly property int itemCount: taskCount + 2
         readonly property real sepWidth: 1 + G.spacing
-        readonly property real restRowWidth: itemCount * G.icon + (itemCount - 1) * G.spacing + sepWidth
+        readonly property real restRowWidth: itemCount * dock.icon + (itemCount - 1) * G.spacing + sepWidth
 
         // Plasma adds some spacing of its own around the widget (measured below); taking it
         // off keeps the padding around the icons as tight as designed.
@@ -153,15 +162,15 @@ PlasmoidItem {
 
         function restLeft(k) {
             const start = mask.x + (mask.width - restRowWidth) / 2
-            return start + k * (G.icon + G.spacing) + (k === itemCount - 1 ? sepWidth : 0)
+            return start + k * (dock.icon + G.spacing) + (k === itemCount - 1 ? sepWidth : 0)
         }
 
         // Scale of item k: a cosine bump around the pointer, 2.5 icons wide each side.
         function scaleOf(k) {
-            const d = Math.abs(mx - (restLeft(k) + G.icon / 2))
-            const reach = G.icon * 2.5
+            const d = Math.abs(mx - (restLeft(k) + dock.icon / 2))
+            const reach = dock.icon * 2.5
             const f = d < reach ? (1 + Math.cos(Math.PI * d / reach)) / 2 : 0
-            return 1 + (G.zoom - 1) * f * h
+            return 1 + (dock.zoomMax - 1) * f * h
         }
 
         // Grown items push their neighbours apart. The growth left of the pointer is
@@ -171,13 +180,13 @@ PlasmoidItem {
             let anchor = 0
             for (let k = 0; k < n; k++) {
                 s.push(scaleOf(k))
-                const extra = G.icon * (s[k] - 1)
-                anchor += extra * Math.max(0, Math.min(1, (mx - restLeft(k)) / G.icon))
+                const extra = dock.icon * (s[k] - 1)
+                anchor += extra * Math.max(0, Math.min(1, (mx - restLeft(k)) / dock.icon))
             }
             let cum = 0
             for (let k = 0; k < n; k++) {
                 x.push(restLeft(k) + cum - anchor)
-                cum += G.icon * (s[k] - 1)
+                cum += dock.icon * (s[k] - 1)
             }
             return { scale: s, x: x }
         }
@@ -189,7 +198,7 @@ PlasmoidItem {
         Rectangle {
             readonly property real leftEdge: Math.min(dock.mask.x, dock.layout.x[0] - G.pad)
             readonly property real rightEdge: Math.max(dock.mask.x + dock.mask.width,
-                dock.layout.x[dock.itemCount - 1] + G.icon * dock.layout.scale[dock.itemCount - 1] + G.pad)
+                dock.layout.x[dock.itemCount - 1] + dock.icon * dock.layout.scale[dock.itemCount - 1] + G.pad)
             x: leftEdge
             width: rightEdge - leftEdge
             y: dock.mask.y
@@ -207,6 +216,7 @@ PlasmoidItem {
             label: root.tr("Launchpad", "Launchpad")
             onActivated: shell.run("dbus-send --session --type=method_call --dest=org.kde.plasmashell "
                                    + "/PlasmaShell org.kde.PlasmaShell.activateLauncherMenu")
+            menuEntries: [root.settingsEntry]
         }
 
         Repeater {
@@ -251,12 +261,12 @@ PlasmoidItem {
 
         // Thin separator before the trash, like macOS.
         Rectangle {
-            readonly property real leftEdge: dock.layout.x[dock.itemCount - 2] + G.icon * dock.layout.scale[dock.itemCount - 2]
+            readonly property real leftEdge: dock.layout.x[dock.itemCount - 2] + dock.icon * dock.layout.scale[dock.itemCount - 2]
             x: leftEdge + (dock.layout.x[dock.itemCount - 1] - leftEdge - width) / 2
             width: 1
-            height: G.icon * 0.7
+            height: dock.icon * 0.7
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: G.bottom + (G.icon - height) / 2
+            anchors.bottomMargin: G.bottom + (dock.icon - height) / 2
             color: Kirigami.Theme.textColor
             opacity: 0.25
         }
@@ -274,6 +284,7 @@ PlasmoidItem {
                   action: () => Qt.openUrlExternally("trash:/") },
                 { text: root.tr("Papierkorb leeren", "Empty Trash"), icon: "trash-empty",
                   enabled: full, action: () => shell.run("ktrash6 --empty") },
+                root.settingsEntry,
             ]
         }
     }

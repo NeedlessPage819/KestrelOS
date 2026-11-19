@@ -15,18 +15,8 @@ topBar.addWidget("org.kde.plasma.appmenu");
 topBar.addWidget("org.kde.plasma.panelspacer");
 topBar.addWidget("org.kde.plasma.systemtray");
 
-var clock = topBar.addWidget("org.kde.plasma.digitalclock");
-clock.currentConfigGroup = ["Appearance"];
-clock.writeConfig("showDate", true);
-clock.writeConfig("dateDisplayFormat", "BesideTime");
-clock.writeConfig("dateFormat", "custom");
-clock.writeConfig("customDateFormat", "ddd d. MMM");
-// Same size and weight as the rest of the top bar, like the macOS menu bar clock. By
-// default Plasma scales the clock to the bar's height, which made it larger than the menus.
-clock.writeConfig("autoFontAndSize", false);
-clock.writeConfig("fontFamily", "Inter");
-clock.writeConfig("fontSize", 10);
-clock.writeConfig("fontWeight", 400);
+// Date and time like the macOS menu bar clock, in the menus' font size (DECISIONS.md D27).
+topBar.addWidget("org.kestrel.clock");
 
 // The Kestrel Dock widget holds Launchpad, apps and trash. The panel is taller than the
 // visible glass: icons magnify into the empty band above it. The height is filled in at
@@ -37,7 +27,8 @@ dock.height = @DOCK_HEIGHT@;
 dock.alignment = "center";
 dock.lengthMode = "fit";
 dock.floating = true;
-dock.hiding = "dodgewindows";
+// Like the Mac: always visible, only full-screen apps cover it. System Settings > Dock (D27).
+dock.hiding = "none";
 
 var apps = dock.addWidget("org.kestrel.dock");
 // Only apps that are part of the image: Flatpaks arrive later and would show as blank icons.

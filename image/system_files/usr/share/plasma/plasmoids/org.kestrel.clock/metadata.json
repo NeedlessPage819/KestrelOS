@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "Kestrel OS" }],
+        "Category": "Date and Time",
+        "Description": "Date and time in the top bar, in the same size as the menus, like the Mac",
+        "Description[de]": "Datum und Uhrzeit in der Top-Bar, so groß wie die Menüs, wie beim Mac",
+        "Icon": "preferences-system-time",
+        "Id": "org.kestrel.clock",
+        "License": "GPL-2.0-or-later",
+        "Name": "Kestrel Clock",
+        "Name[de]": "Kestrel-Uhr",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -130,3 +130,10 @@ deco=/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.kestrel.decoration.so
 built=$(cat /usr/share/kestrel/decoration-built-against)
 shipped=$(rpm -q --qf '%{VERSION}-%{RELEASE}' kdecoration)
 [[ $built == "$shipped" ]] || die "window decoration built against kdecoration $built, image has $shipped"
+[[ -f /usr/lib64/qt6/plugins/plasma/kcms/systemsettings/kcm_kestreldock.so ]] || die "System Settings > Dock missing"
+[[ -x /usr/libexec/kestrel/auto-scale ]] || die "auto-scale helper missing or not executable"
+# Konsole's toolbars are hidden by our copies of its menu files (D27); check they still match
+# the version Konsole ships, else ours would be ignored (harmless) or outdated.
+for rc in konsoleui sessionui; do
+    grep -q "hidden=\"true\"" /usr/share/kxmlgui5/konsole/$rc.rc || die "Konsole $rc.rc override broken"
+done

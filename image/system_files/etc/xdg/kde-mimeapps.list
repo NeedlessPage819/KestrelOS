@@ -1,0 +1,15 @@
+# Kestrel OS default apps (DECISIONS.md D27). System-wide defaults for Plasma; users can
+# change them in System Settings > Default Applications or with "Open with".
+[Added Associations]
+application/x-msdownload=kestrel-wine.desktop;
+application/x-ms-dos-executable=kestrel-wine.desktop;
+application/vnd.microsoft.portable-executable=kestrel-wine.desktop;
+application/x-msi=kestrel-wine.desktop;
+application/x-ms-shortcut=kestrel-wine.desktop;
+
+[Default Applications]
+application/x-msdownload=kestrel-wine.desktop
+application/x-ms-dos-executable=kestrel-wine.desktop
+application/vnd.microsoft.portable-executable=kestrel-wine.desktop
+application/x-msi=kestrel-wine.desktop
+application/x-ms-shortcut=kestrel-wine.desktop

@@ -9,5 +9,23 @@
     <entry name="launchers" type="StringList">
       <default></default>
     </entry>
+    <!-- Set in System Settings > Dock (image/dock-settings, DECISIONS.md D27). The limits
+         match the room the panel theme leaves for magnification (plasma_theme.py). -->
+    <entry name="iconSize" type="Int">
+      <default>48</default>
+      <min>32</min>
+      <max>72</max>
+    </entry>
+    <entry name="magnify" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="zoom" type="Double">
+      <default>1.6</default>
+      <min>1.2</min>
+      <max>1.8</max>
+    </entry>
+    <entry name="showIndicators" type="Bool">
+      <default>true</default>
+    </entry>
   </group>
 </kcfg>

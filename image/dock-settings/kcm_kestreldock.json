@@ -1,0 +1,13 @@
+{
+    "KPlugin": {
+        "Description": "Size, magnification and behaviour of the dock",
+        "Description[de]": "Größe, Vergrößerung und Verhalten des Docks",
+        "Icon": "preferences-desktop-panel",
+        "Name": "Dock",
+        "Name[de]": "Dock"
+    },
+    "X-KDE-Keywords": "dock,taskbar,magnification,icons,size,hide",
+    "X-KDE-Keywords[de]": "Dock,Taskleiste,Vergrößerung,Symbole,Größe,ausblenden",
+    "X-KDE-System-Settings-Parent-Category": "appearance",
+    "X-KDE-Weight": 15
+}

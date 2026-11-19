@@ -1,0 +1,14 @@
+[Desktop Entry]
+# Kestrel OS (DECISIONS.md D27): a double click on a Windows program starts it with Wine.
+# Fedora's wine.desktop claims no file types, so Plasma asked which app to use.
+Type=Application
+Name=Windows Program (Wine)
+Name[de]=Windows-Programm (Wine)
+Comment=Run Windows programs
+Comment[de]=Windows-Programme ausführen
+Icon=wine
+Exec=wine start /unix %f
+MimeType=application/x-msdownload;application/x-ms-dos-executable;application/vnd.microsoft.portable-executable;application/x-msi;application/x-ms-shortcut;application/x-wine-extension-msp;
+NoDisplay=true
+StartupNotify=true
+Categories=Wine;

@@ -18,16 +18,22 @@ RUN dnf5 -y install git-core gtk-update-icon-cache findutils && \
     mkdir -p /out && cd /src && ./install.sh -d /out && \
     test -f /out/WhiteSur/index.theme
 
-# Kestrel window decoration (DECISIONS.md D26): compiled against the base image's own
-# KDecoration/Qt, so it always matches the Plasma version it runs on. The version is recorded
-# and checked again in build/configure/40-desktop.sh.
+# Kestrel's compiled parts: the window decoration (DECISIONS.md D26) and System Settings >
+# Dock (D27). Compiled against the base image's own KDE libraries and Qt, so they always match
+# the Plasma version they run on. The decoration's version is recorded and checked again in
+# build/configure/40-desktop.sh.
 FROM ${BASE_IMAGE}:${FEDORA_VERSION} AS decoration
-COPY decoration/ /src/
+COPY decoration/ /src/decoration/
+COPY dock-settings/ /src/dock-settings/
 RUN --mount=type=cache,dst=/var/cache/libdnf5 \
-    dnf5 -y install gcc-c++ cmake kdecoration-devel qt6-qtbase-devel kf6-kcoreaddons-devel && \
-    cmake -S /src -B /build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && \
-    cmake --build /build -j"$(nproc)" && \
-    DESTDIR=/out cmake --install /build && \
+    dnf5 -y install gcc-c++ cmake extra-cmake-modules kdecoration-devel qt6-qtbase-devel \
+        qt6-qtdeclarative-devel kf6-kcoreaddons-devel kf6-kcmutils-devel && \
+    for part in decoration dock-settings; do \
+        cmake -S /src/$part -B /build/$part -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && \
+        cmake --build /build/$part -j"$(nproc)" && \
+        DESTDIR=/out cmake --install /build/$part || exit 1; \
+    done && \
+    test -f /out/usr/lib64/qt6/plugins/plasma/kcms/systemsettings/kcm_kestreldock.so && \
     mkdir -p /out/usr/share/kestrel && \
     rpm -q --qf '%{VERSION}-%{RELEASE}\n' kdecoration > /out/usr/share/kestrel/decoration-built-against && \
     test -f /out/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.kestrel.decoration.so

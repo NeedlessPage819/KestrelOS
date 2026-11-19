@@ -21,21 +21,25 @@ Item {
     signal newInstance()
     signal urlsDropped(var urls)
 
+    // Size, magnification and dots come from the dock (its settings, DECISIONS.md D27).
+    readonly property real icon: parent && parent.icon ? parent.icon : G.icon
+    readonly property real zoomMax: parent && parent.zoomMax ? parent.zoomMax : G.zoom
+    readonly property bool showDots: parent ? parent.showDots !== false : true
     readonly property var lay: parent && parent.layout ? parent.layout : null
     readonly property real zoom: lay && lay.scale[itemIndex] !== undefined ? lay.scale[itemIndex] : 1
 
     x: lay && lay.x[itemIndex] !== undefined ? lay.x[itemIndex] : 0
-    width: G.icon * zoom
+    width: item.icon * zoom
     height: parent ? parent.height : 0
 
     // Rendered once at full magnified size and scaled down: sharp at every size and cheap
     // to animate, since the icon is not re-rendered on every frame.
     Kirigami.Icon {
-        width: G.icon * G.zoom
+        width: item.icon * item.zoomMax
         height: width
         source: item.iconSource
         smooth: true
-        scale: item.zoom / G.zoom
+        scale: item.zoom / item.zoomMax
         transformOrigin: Item.Bottom
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
@@ -48,13 +52,13 @@ Item {
     SequentialAnimation {
         running: item.starting
         loops: Animation.Infinite
-        NumberAnimation { target: bounce; property: "offset"; to: G.icon * 0.3; duration: 280; easing.type: Easing.OutQuad }
+        NumberAnimation { target: bounce; property: "offset"; to: item.icon * 0.3; duration: 280; easing.type: Easing.OutQuad }
         NumberAnimation { target: bounce; property: "offset"; to: 0; duration: 280; easing.type: Easing.InQuad }
         onRunningChanged: if (!running) bounce.offset = 0
     }
 
     Rectangle {
-        visible: item.running
+        visible: item.running && item.showDots
         width: 4
         height: 4
         radius: 2
@@ -72,7 +76,7 @@ Item {
         id: hit
         x: -G.spacing / 2
         width: parent.width + G.spacing
-        height: G.icon * item.zoom + G.bottom
+        height: item.icon * item.zoom + G.bottom
         anchors.bottom: parent.bottom
 
         // Tells the dock where the pointer is, in dock coordinates, for the magnification.
@@ -112,7 +116,7 @@ Item {
     z: pointer.hovered ? 1 : 0
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: parent.height - G.bottom - G.icon * item.zoom - height - 6
+        y: parent.height - G.bottom - item.icon * item.zoom - height - 6
         width: name.implicitWidth + 18
         height: name.implicitHeight + 8
         radius: height / 2
