@@ -511,9 +511,12 @@ Tested on a PC with a 4K TV. What was wrong and what changed:
 - **Window top corners were not really round.** KWin cuts only the window content round;
   the title bar belongs to the window frame, which now draws its top corners with the same
   radius.
-- **Terminal.** A clean design of our own, not a Mac copy: calm dark grey with soft colours and
-  the Kestrel accent, JetBrains Mono with room around the text, no toolbars and no scroll bar,
-  tabs only when there are several, the title bar in the same colour as the terminal (a window
-  rule), and a short prompt: the folder name and "›".
+- **Terminal.** A clean design of our own, not a Mac copy, in two versions: "Kestrel Light" (a
+  light "paper" terminal, designed with a Fable 5.2 agent) and "Kestrel Dark" (calm dark grey).
+  Konsole switches between them by itself when Plasma changes between light and dark mode.
+  The background is the title bar colour of each mode, so title bar and terminal are one
+  surface. JetBrains Mono with room around the text, no toolbars and no scroll bar, tabs only
+  when there are several. The prompt is short: the folder in bold, the git branch in grey
+  inside a project, and "›", which turns red after a failed command.
 - **.exe files asked which app to use.** Fedora's Wine launcher claims no file types. Windows
   programs (.exe, .msi, .lnk) now open with Wine by double click. Steam games keep using Proton.

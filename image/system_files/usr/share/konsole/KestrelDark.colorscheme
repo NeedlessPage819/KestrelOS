@@ -1,8 +1,9 @@
 [General]
-Description=Kestrel
-# Kestrel OS terminal colours (DECISIONS.md D27): a calm dark grey background, soft text and
-# calm colours with the Kestrel accent (#8d9af6). The background is the dark title bar colour
-# of the Kestrel window frame, so title bar and terminal are one surface (kwinrulesrc).
+Description=Kestrel Dark
+# Kestrel OS terminal colours for dark mode (DECISIONS.md D27): calm dark grey with soft text and
+# the Kestrel accent (#8d9af6). The background is the dark title bar colour of the Kestrel window
+# frame (#2c2b30), so title bar and terminal are one surface. In light mode
+# KestrelLight.colorscheme is used instead (Konsole switches by itself, see /etc/xdg/konsolerc).
 Opacity=1
 Blur=false
 Wallpaper=
@@ -31,7 +32,7 @@ Color=160,160,176
 [Color0]
 Color=64,63,72
 [Color0Intense]
-Color=92,92,112
+Color=132,131,144
 [Color0Faint]
 Color=40,40,52
 

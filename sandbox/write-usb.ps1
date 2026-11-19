@@ -1,4 +1,4 @@
-# Usage (PowerShell as administrator): sandboxwrite-usb.ps1 -Iso <path to kestrel-*.iso> [-ExpectName "<USB stick name from Get-Disk>"]
+# Usage (PowerShell as administrator): .\sandbox\write-usb.ps1 -Iso <path to kestrel-*.iso> [-ExpectName "<USB stick name from Get-Disk>"]
 # Writes the Kestrel ISO to the USB stick in 256 MB pieces. Each piece is written, flushed,
 # read back and compared before the next one; between pieces there is a short pause. If the
 # stick drops off the USB bus (this one resets after long writes), the script waits for it

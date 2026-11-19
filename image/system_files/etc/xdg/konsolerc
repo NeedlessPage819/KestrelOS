@@ -1,7 +1,8 @@
-# Kestrel OS terminal (DECISIONS.md D27): the Kestrel profile; tabs only when there is more than one.
+# Kestrel OS terminal (DECISIONS.md D27): "Kestrel Light" in light mode, "Kestrel Dark" in dark
+# mode (Konsole switches by itself, see [LightDarkTheme]); tabs only when there is more than one.
 # The toolbars are hidden in /usr/share/kxmlgui5/konsole/*.rc (everything is in the top bar menu).
 [Desktop Entry]
-DefaultProfile=Kestrel.profile
+DefaultProfile=KestrelLight.profile
 
 # Kept from Fedora's konsolerc, which this file replaces.
 [MainWindow]
@@ -24,3 +25,10 @@ CloseTabOnMiddleMouseButton=true
 RememberWindowSize=true
 # The window title is the tab title (the folder name), not what the shell sets.
 ShowWindowTitleOnTitleBar=false
+
+# Light and dark terminal: Konsole itself switches open terminals to the matching profile when
+# Plasma changes between light and dark mode.
+[LightDarkTheme]
+SyncProfileWithSystemTheme=true
+LightThemeProfile=Kestrel Light
+DarkThemeProfile=Kestrel Dark

@@ -49,7 +49,7 @@ The system language in the screenshots is German; every language Fedora supports
 - Spotlight-like search with **Meta+Space**, Launchpad button in the dock
 - Touchpad swipe gestures, light and dark mode ("Kestrel" and "Kestrel Dark", also automatic)
 - Dock settings in System Settings (size, magnification, when it hides); a clock that is as big as the menus; sensible scaling on 4K TVs and monitors
-- A clean dark terminal design; Windows programs (.exe) open with Wine by double click
+- A clean terminal design, light and dark with the system; Windows programs (.exe) open with Wine by double click
 - Mac-style lock screen: large clock, round user picture, lots of settings and widgets
   (now playing, battery, keyboard layout, your own message)
 - Kestrel boot screen, boot menu, login screen, setup wizard and installer
