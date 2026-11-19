@@ -28,6 +28,7 @@ All screenshots are from the automatic and manual tests in a VM.
 | | |
 |---|---|
 | ![Light mode](docs/screenshots/desktop-light.png) Light mode | ![Dark mode](docs/screenshots/desktop-dark.png) Dark mode ("Kestrel Dark") |
+| ![Window frame](docs/screenshots/window-light.png) Window frame with real rounded corners: the window content is cut round too | |
 | ![Dock](docs/screenshots/dock-magnification.png) Dock with magnification and labels | ![Lock screen](docs/screenshots/lock-screen.png) Lock screen |
 | ![Lock screen, wrong password](docs/screenshots/lock-screen-password.png) Lock screen after a wrong password | ![Lock screen variant](docs/screenshots/lock-screen-variant.png) One of many lock screen styles: small thin clock, blurred wallpaper, a message |
 | ![Lock screen settings](docs/screenshots/lock-screen-settings.png) Lock screen settings | ![Setup wizard](docs/screenshots/setup-dark-mode.png) First-start setup with dark mode switched on |
