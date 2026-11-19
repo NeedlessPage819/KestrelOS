@@ -99,17 +99,34 @@ PlasmoidItem {
         // window with a floating margin, and the widget inside the background with
         // Plasma's spacing; both are measured from the window rather than assumed.
         property rect mask: Qt.rect(G.side, G.overflow, width - 2 * G.side, height - G.overflow)
+        // panelExtra feeds back into the dock's own width (Layout.preferredWidth above). It must
+        // never follow every measurement: the panel answers a width change late, or rounds by a
+        // pixel with fractional scaling, and the dock would then resize itself forever, shifting
+        // sideways (seen on a real PC at 125 %). So a value is only taken when two measurements
+        // two seconds apart agree, and after the first minute it stays fixed.
         property real panelExtra: 0
-        function measure() {
+        property real extraSample: -1
+        property bool extraFrozen: false
+        function panelBackground() {
             const win = dock.Window.window
-            if (!win || width <= 0 || height <= 0) return
+            if (!win || width <= 0 || height <= 0) return null
             const p = dock.mapToItem(null, 0, 0)
             const float = (win.height - (height + 2)) / 2   // panel = widget + 1 px margins
-            const bgLeft = float - p.x, bgRight = win.width - float - p.x
-            const bgTop = float - p.y, bgBottom = win.height - float - p.y
-            mask = Qt.rect(bgLeft + G.side, bgTop + G.overflow,
-                           bgRight - bgLeft - 2 * G.side, bgBottom - bgTop - G.overflow)
-            panelExtra = Math.max(0, bgRight - bgLeft - width)
+            return { left: float - p.x, right: win.width - float - p.x,
+                     top: float - p.y, bottom: win.height - float - p.y }
+        }
+        function measure() {
+            const bg = panelBackground()
+            if (!bg) return
+            mask = Qt.rect(bg.left + G.side, bg.top + G.overflow,
+                           bg.right - bg.left - 2 * G.side, bg.bottom - bg.top - G.overflow)
+        }
+        function sampleExtra() {
+            const bg = panelBackground()
+            if (!bg || extraFrozen) return
+            const extra = Math.max(0, Math.round(bg.right - bg.left - width))
+            if (extra === extraSample && Math.abs(extra - panelExtra) >= 1) panelExtra = extra
+            extraSample = extra
         }
         onWidthChanged: Qt.callLater(measure)
         onHeightChanged: Qt.callLater(measure)
@@ -126,7 +143,12 @@ PlasmoidItem {
             interval: 2000
             repeat: true
             running: runs < 30
-            onTriggered: { runs++; dock.measure() }
+            onTriggered: {
+                runs++
+                dock.measure()
+                dock.sampleExtra()
+                if (runs >= 30) dock.extraFrozen = true
+            }
         }
 
         function restLeft(k) {
