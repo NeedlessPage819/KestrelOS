@@ -43,7 +43,7 @@ The system language in the screenshots is German; every language Fedora supports
 **A desktop like the Mac**
 - Dock at the bottom (frosted glass, magnifies under the mouse, small line under running
   apps), slim translucent top bar
-- Traffic-light window buttons top left, soft shadows, rounded corners
+- Traffic-light window buttons top left, soft shadows, real rounded window corners (own window frame)
 - macOS-style icons (WhiteSur), Inter font
 - Spotlight-like search with **Meta+Space**, Launchpad button in the dock
 - Touchpad swipe gestures, light and dark mode ("Kestrel" and "Kestrel Dark", also automatic)
@@ -84,7 +84,8 @@ image/Containerfile     the system as a container image
 image/build/            build steps: install/ (packages, slow, cached),
                         configure/ (settings, fast)
 image/packages/         package lists (one line = one package)
-image/artwork/          wallpaper, window frames, dock design and other artwork as source code
+image/artwork/          wallpaper, dock design and other artwork as source code
+image/decoration/       the Kestrel window frame (C++, built against the image's KDE libraries)
 image/system_files/     files copied into the system 1:1 (incl. dock widget and lock screen)
 image/live/             live layer for the USB stick (live start, installer, Kestrel branding)
 iso/live/               builds the live ISO and the Kestrel boot menu
@@ -157,7 +158,7 @@ sandbox/watchdog.sh <systemd-unit> <build-log> [minutes-without-output]
 
 ```bash
 test/vm-live.sh start         # start the installed test VM
-test/vm-live.sh theme         # apply the window frames from image/artwork/
+test/vm-live.sh deco          # compile and apply the window frame (image/decoration/)
 test/vm-live.sh plasma        # apply the dock and top bar design
 test/vm-live.sh dock          # apply the Kestrel Dock widget
 test/vm-live.sh lock          # apply the lock screen and lock (unlock unlocks again)

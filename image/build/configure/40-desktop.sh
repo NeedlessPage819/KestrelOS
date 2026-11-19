@@ -122,3 +122,11 @@ mkdir -p /usr/share/kestrel/plasmalogin
     printf '\n[General]\nColorScheme=BreezeDark\n\n[KDE]\nLookAndFeelPackage=org.kestrel.desktop.dark\n'
 } > /usr/share/kestrel/plasmalogin/kdeglobals
 grep -q '^\[Colors:Window\]' /usr/share/kestrel/plasmalogin/kdeglobals || die "login screen colours not written"
+
+# Kestrel window decoration (DECISIONS.md D26): compiled in its own build stage; it must match
+# the KDecoration library that ships, or KWin would refuse it and fall back to Breeze.
+deco=/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.kestrel.decoration.so
+[[ -f $deco ]] || die "Kestrel window decoration missing"
+built=$(cat /usr/share/kestrel/decoration-built-against)
+shipped=$(rpm -q --qf '%{VERSION}-%{RELEASE}' kdecoration)
+[[ $built == "$shipped" ]] || die "window decoration built against kdecoration $built, image has $shipped"

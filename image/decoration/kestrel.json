@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Id": "org.kestrel.decoration",
+        "Name": "Kestrel",
+        "Description": "Kestrel OS window decoration: traffic-light buttons, soft shadow, real rounded corners",
+        "Description[de]": "Kestrel-OS-Fensterrahmen: Ampel-Knöpfe, weicher Schatten, echte abgerundete Ecken",
+        "EnabledByDefault": true,
+        "License": "GPL-2.0-or-later"
+    },
+    "org.kde.kdecoration3": {
+        "blur": false,
+        "recommendedBorderSize": "None"
+    }
+}

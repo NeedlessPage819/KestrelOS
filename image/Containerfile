@@ -18,6 +18,20 @@ RUN dnf5 -y install git-core gtk-update-icon-cache findutils && \
     mkdir -p /out && cd /src && ./install.sh -d /out && \
     test -f /out/WhiteSur/index.theme
 
+# Kestrel window decoration (DECISIONS.md D26): compiled against the base image's own
+# KDecoration/Qt, so it always matches the Plasma version it runs on. The version is recorded
+# and checked again in build/configure/40-desktop.sh.
+FROM ${BASE_IMAGE}:${FEDORA_VERSION} AS decoration
+COPY decoration/ /src/
+RUN --mount=type=cache,dst=/var/cache/libdnf5 \
+    dnf5 -y install gcc-c++ cmake kdecoration-devel qt6-qtbase-devel kf6-kcoreaddons-devel && \
+    cmake -S /src -B /build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && \
+    cmake --build /build -j"$(nproc)" && \
+    DESTDIR=/out cmake --install /build && \
+    mkdir -p /out/usr/share/kestrel && \
+    rpm -q --qf '%{VERSION}-%{RELEASE}\n' kdecoration > /out/usr/share/kestrel/decoration-built-against && \
+    test -f /out/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.kestrel.decoration.so
+
 # Everything phase 2 adds to the image, assembled into one tree so the final image takes
 # it in a single layer (each layer on the 15 GB image costs minutes). Artwork is rendered
 # here from its sources, so the final image needs no artwork tooling.
@@ -29,7 +43,7 @@ COPY artwork/ /src/
 # (40-desktop.sh).
 RUN share=/rootfs/usr/share && \
     mkdir -p $share/wallpapers/Kestrel/contents/images $share/wallpapers/Kestrel/contents/images_dark \
-             $share/aurorae/themes $share/plasma/desktoptheme && \
+             $share/plasma/desktoptheme && \
     rsvg-convert -w 3840 -h 2160 -o $share/wallpapers/Kestrel/contents/images/3840x2160.png /src/wallpaper-light.svg && \
     rsvg-convert -w 3840 -h 2160 -o $share/wallpapers/Kestrel/contents/images_dark/3840x2160.png /src/wallpaper-dark.svg && \
     for v in light:images dark:images_dark; do \
@@ -42,10 +56,10 @@ RUN share=/rootfs/usr/share && \
     mkdir -p $share/plymouth/themes/kestrel && \
     rsvg-convert -w 112 -h 112 -o $share/plymouth/themes/kestrel/watermark.png /src/boot-logo.svg && \
     python3 /src/boot_progress.py $share/plymouth/themes/kestrel && \
-    python3 /src/aurorae.py $share/aurorae/themes && \
     python3 /src/plasma_theme.py $share/plasma/desktoptheme \
         $share/plasma/plasmoids/org.kestrel.dock/contents/ui/geometry.js
 COPY --from=icons /out/ /rootfs/usr/share/icons/
+COPY --from=decoration /out/ /rootfs/
 COPY system_files/ /rootfs/
 # The dock height comes from the same generator as the theme and the dock widget.
 RUN layout=/rootfs/usr/share/plasma/look-and-feel/org.kestrel.desktop/contents/layouts/org.kde.plasma.desktop-layout.js && \

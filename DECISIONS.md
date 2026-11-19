@@ -226,7 +226,8 @@ At first look the desktop still felt like "KDE with a dock". Changed:
 
 - **Window buttons as colored "traffic lights"** (red, yellow, green; symbols appear on hover),
   a slim light title bar, rounded top corners, a soft shadow. This is **our own
-  window design** ("Aurorae" theme, created by `image/artwork/aurorae.py`).
+  window design** ("Aurorae" theme, created by `image/artwork/aurorae.py`; replaced by our own
+  window frame plugin in D26).
   *Why our own:* Ready-made solutions like "Klassy" are compiled programs that must match the exact
   Plasma version. There are no packages for Fedora 44, and a Plasma update could
   break the window frames. Aurorae designs are only graphics that KWin draws itself.
@@ -449,3 +450,37 @@ GTX 16xx and newer cards.
 
 **What we accept:** On older Nvidia cards, and on new ones with Secure Boot on, the live
 session is slower than the installed system will be. That's fine for trying it out.
+
+## D26 – Real rounded window corners, and a steady dock
+
+Two problems found on a real PC:
+
+**1. The dock shifted sideways the whole time.** To keep its glass tight, the dock measured
+the panel around it and adjusted its own width to the result. On some screens (125 % scaling
+in the test) the panel answers a moment late or rounds by a pixel, so the dock kept resizing
+itself and never stopped. Now a measurement is only used when two of them, two seconds
+apart, agree, and after the first minute it stays fixed. Tested in the VM at 125 %: the dock
+no longer moves, at rest or magnified.
+
+**2. The rounded corners were fake.** The Aurorae theme (D15) could only draw rounded shapes
+on the title bar; the window content below stayed square. Aurorae has no setting for real
+corners. KWin can round windows itself, cutting the application's content too, but only for
+window frames that are programs and ask for it.
+
+**What:** Kestrel now has its own small window frame program ("Kestrel", in
+`image/decoration/`, about 450 lines of C++). It asks KWin for rounded corners (10 px), so every
+window is cut round at all four corners, content included. It also draws:
+- the title bar and the centred title,
+- the traffic lights, sharp at any scaling, with the symbols on hover like the Mac,
+- a soft two-layer shadow, and a hairline outline (dark on light windows, light on dark ones).
+
+Light or dark follows the colour scheme by itself, so one frame serves "Kestrel" and "Kestrel
+Dark". Maximized windows and windows snapped to a screen edge get square corners.
+
+**Why our own and not "Klassy" or a rounded-corners add-on:** those are larger third-party
+programs. Ours is small and uses only KDE's official interface for window frames.
+
+**Updates:** a compiled frame must match the Plasma version exactly. It is built during the
+image build against the very KDE libraries of that image. The build checks the versions match,
+and the automatic VM test checks that KWin really loaded it (otherwise KWin would quietly fall
+back to Breeze). So a Plasma update can't break it on users' computers; at worst the build stops.

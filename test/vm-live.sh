@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fast design loop on the VM installed by test/vm-test.sh (WSL/Linux with KVM only).
 #   test/vm-live.sh start        boot the installed test disk in the background
-#   test/vm-live.sh theme [dark] install the current window decoration (light or dark) for the test user
+#   test/vm-live.sh deco         compile the window decoration and install it in the VM (until reboot)
 #   test/vm-live.sh plasma       install the current Plasma theme (dock, top bar) for the test user
 #   test/vm-live.sh dock         install the current Kestrel Dock widget and rebuild the dock with it
 #   test/vm-live.sh lock         install the current lock screen (until reboot) and lock the session
@@ -61,17 +61,20 @@ start)
         sleep 5
     done
     echo "desktop did not come up"; exit 1 ;;
-theme)
-    # KWin caches decorations by name, so every push gets a fresh name.
+deco)
+    # Compile the window decoration (image/decoration) in the base image, as the image build
+    # does, and put it into the VM's /usr on a temporary writable layer (gone after reboot).
+    # KWin keeps a loaded plugin in memory: log out and back in to see a changed one.
+    base=$(sed -n 's/^BASE_IMAGE=//p' config.env | tr -d '"'):$(sed -n 's/^FEDORA_VERSION=//p' config.env | tr -d '"')
     tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
-    python3 image/artwork/aurorae.py "$tmp"
-    variant=Kestrel; [[ ${2:-} == dark ]] && variant=KestrelDark
-    name=KestrelDev$(date +%s)
-    mv "$tmp/$variant" "$tmp/$name" && mv "$tmp/$name/${variant}rc" "$tmp/$name/${name}rc"
-    sed -i "s/=$variant\$/=$name/" "$tmp/$name/metadata.desktop"
-    tar -C "$tmp" -c "$name" | remote 'rm -rf ~/.local/share/aurorae/themes/KestrelDev*; mkdir -p ~/.local/share/aurorae/themes;
-        tar -C ~/.local/share/aurorae/themes -x'
-    in_session "kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme __aurorae__svg__$name &&
+    sudo podman run --rm -v "$PWD/image/decoration:/src:ro,Z" -v "$tmp:/out:Z" "$base" bash -c '
+        dnf5 -y -q install gcc-c++ cmake kdecoration-devel qt6-qtbase-devel kf6-kcoreaddons-devel >/dev/null &&
+        cmake -S /src -B /b -DCMAKE_BUILD_TYPE=Release >/dev/null && cmake --build /b -j"$(nproc)" &&
+        cp /b/org.kestrel.decoration.so /out/'
+    deco=/usr/lib64/qt6/plugins/org.kde.kdecoration3/org.kestrel.decoration.so
+    remote "cat > /tmp/deco.so && echo '$TEST_PASSWORD' | sudo -S -p '' sh -c '
+        [ -w /usr ] || bootc usroverlay >/dev/null 2>&1; cp /tmp/deco.so $deco'" < "$tmp/org.kestrel.decoration.so"
+    in_session "kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key library org.kestrel.decoration &&
         dbus-send --session --type=signal /KWin org.kde.KWin.reloadConfig" ;;
 plasma)
     # Plasma also caches themes by name: install under a fresh name each time.

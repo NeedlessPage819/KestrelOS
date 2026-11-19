@@ -9,8 +9,7 @@ squashEnabled=false
 maximizeEnabled=true
 
 [org.kde.kdecoration2]
-library=org.kde.kwin.aurorae
-theme=__aurorae__svg__Kestrel
+library=org.kestrel.decoration
 ButtonsOnLeft=XIA
 ButtonsOnRight=
 
