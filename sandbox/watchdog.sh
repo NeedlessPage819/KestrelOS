@@ -6,7 +6,7 @@
 #   WATCHDOG: Windows has only N MB RAM free       memory pressure, a freeze may follow
 #   WATCHDOG: build finished: <last result line>   the build job ended
 # Usage: sandbox/watchdog.sh UNIT LOG [STALL_MINUTES]
-#   UNIT  systemd user unit the build runs in (e.g. klive, kbuild)
+#   UNIT  systemd unit the build runs in, user or system (e.g. klive, kbuild)
 #   LOG   build log inside WSL (e.g. /home/<user>/live-iso.log)
 set -uo pipefail
 unit=${1:?unit} log=${2:?log} stall_min=${3:-25}
@@ -17,7 +17,7 @@ unresponsive=0 last_stall_report=0 last_ram_report=0
 while true; do
     # One short query; if WSL hangs, timeout gives up instead of hanging the watchdog.
     out=$(timeout 60 wsl.exe -d "$distro" -- bash -c "
-        echo active=\$(systemctl --user is-active $unit)
+        echo active=\$(systemctl --user is-active $unit | grep -x active || systemctl is-active $unit)
         echo age=\$(( \$(date +%s) - \$(stat -c %Y $log 2>/dev/null || date +%s) ))
         echo last=\$(tail -c 300 $log 2>/dev/null | tr '\r' '\n' | grep -v '^\s*\$' | tail -1 | cut -c1-120)
     " 2>/dev/null | tr -d '\0')
