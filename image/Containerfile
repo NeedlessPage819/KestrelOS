@@ -62,6 +62,7 @@ RUN share=/rootfs/usr/share && \
     mkdir -p $share/plymouth/themes/kestrel && \
     rsvg-convert -w 112 -h 112 -o $share/plymouth/themes/kestrel/watermark.png /src/boot-logo.svg && \
     python3 /src/boot_progress.py $share/plymouth/themes/kestrel && \
+    python3 /src/kestrel_icons.py --install $share/icons/Kestrel && \
     python3 /src/plasma_theme.py $share/plasma/desktoptheme \
         $share/plasma/plasmoids/org.kestrel.dock/contents/ui/geometry.js
 COPY --from=icons /out/ /rootfs/usr/share/icons/

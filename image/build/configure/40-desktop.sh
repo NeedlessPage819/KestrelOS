@@ -30,26 +30,42 @@ sed -i \
 # Its KDED module ignores config switches on first login, so remove the package.
 dnf5 -y remove plasma-welcome
 
-# Icon theme overrides (see /usr/share/icons/Kestrel/index.theme).
+# Icon themes (DECISIONS.md D28): "Kestrel" (default, Kestrel's own drawings) and "WhiteSur"
+# (Kestrel-WhiteSur). Both get the same overrides; see their index.theme files.
 icons=/usr/share/icons
-mkdir -p "$icons/Kestrel/places/scalable"
-for name in user-trash user-trash-full; do
-    [[ -f $icons/WhiteSur/places/scalable/$name.svg ]] || die "WhiteSur icon $name missing"
-    ln -sf "../../../WhiteSur/places/scalable/$name.svg" "$icons/Kestrel/places/scalable/$name-symbolic.svg"
+[[ -f $icons/Kestrel/places/kestrel/folder.svg ]] || die "Kestrel icon drawings missing"
+for theme in Kestrel Kestrel-WhiteSur; do
+    mkdir -p "$icons/$theme/places/scalable" "$icons/$theme/symbolic"
+    for name in user-trash user-trash-full; do
+        # The dock asks for the "-symbolic" trash; it should be the theme's full-colour trash.
+        if [[ $theme == Kestrel ]]; then
+            target="../kestrel/$name.svg"
+        else
+            [[ -f $icons/WhiteSur/places/scalable/$name.svg ]] || die "WhiteSur icon $name missing"
+            target="../../../WhiteSur/places/scalable/$name.svg"
+        fi
+        ln -sf "$target" "$icons/$theme/places/scalable/$name-symbolic.svg"
+        [[ -e $icons/$theme/places/scalable/$name-symbolic.svg ]] || die "$theme: $name link broken"
+    done
+    for icon in "$icons"/breeze/*/22/*-symbolic.svg; do
+        [[ ${icon##*/} == user-trash* ]] && continue    # the dock trash stays colourful (above)
+        link=$icons/$theme/symbolic/${icon##*/}
+        [[ -e $link ]] || ln -s "../../${icon#"$icons"/}" "$link"
+    done
+    [[ -e $icons/$theme/symbolic/audio-volume-high-symbolic.svg ]] || die "$theme: Breeze symbolic icons not linked"
 done
-mkdir -p "$icons/Kestrel/symbolic"
-for icon in "$icons"/breeze/*/22/*-symbolic.svg; do
-    [[ ${icon##*/} == user-trash* ]] && continue    # the dock trash stays colourful (above)
-    link=$icons/Kestrel/symbolic/${icon##*/}
-    [[ -e $link ]] || ln -s "../../${icon#"$icons"/}" "$link"
+# The plain WhiteSur themes stay installed (both themes above build on them) but are hidden in
+# the icon settings: choosing them directly would lose the fixes above.
+for theme in "$icons"/WhiteSur "$icons"/WhiteSur-*; do
+    [[ -f $theme/index.theme ]] || continue
+    grep -q '^Hidden=' "$theme/index.theme" || sed -i '/^\[Icon Theme\]$/a Hidden=true' "$theme/index.theme"
 done
-[[ -e $icons/Kestrel/symbolic/audio-volume-high-symbolic.svg ]] || die "Breeze symbolic icons not linked"
 # WhiteSur's one-colour icons carry Plasma's colour-scheme markup but the theme does not
 # declare it, so Plasma never recolours them: dark icons on dark backgrounds in dark mode.
 grep -q '^FollowsColorScheme=' "$icons/WhiteSur/index.theme" ||
     sed -i '/^\[Icon Theme\]$/a FollowsColorScheme=true' "$icons/WhiteSur/index.theme"
 grep -q '^FollowsColorScheme=true' "$icons/WhiteSur/index.theme" || die "could not mark WhiteSur as colour-scheme aware"
-gtk-update-icon-cache -qf "$icons/Kestrel" 2>/dev/null || true
+for theme in Kestrel Kestrel-WhiteSur; do gtk-update-icon-cache -qf "$icons/$theme" 2>/dev/null || true; done
 
 # Kestrel wallpaper wherever Plasma or Plasma Setup asks for the distribution default
 # (DECISIONS.md D23). Fedora's "Default" (and "Fedora") point to its own wallpaper.
@@ -107,8 +123,10 @@ for path in glob.glob("/usr/share/locale/*/LC_MESSAGES/org.kde.plasmasetup.mo"):
 assert changed > 0, "no 'Plasma Desktop' text found in Plasma Setup's translations"
 print(f"Plasma Setup: product name replaced in {changed} translations")
 PY
-ln -sf ../../hicolor/scalable/apps/kestrel-logo-symbolic.svg "$icons/Kestrel/symbolic/plasma-symbolic.svg"
-[[ -e $icons/Kestrel/symbolic/plasma-symbolic.svg ]] || die "plasma-symbolic link broken"
+for theme in Kestrel Kestrel-WhiteSur; do
+    ln -sf ../../hicolor/scalable/apps/kestrel-logo-symbolic.svg "$icons/$theme/symbolic/plasma-symbolic.svg"
+    [[ -e $icons/$theme/symbolic/plasma-symbolic.svg ]] || die "$theme: plasma-symbolic link broken"
+done
 grep -q '"konqi-calling.png"' /usr/share/plasma/packages/org.kde.plasmasetup.finished/contents/ui/main.qml ||
     die "Plasma Setup's last page no longer uses konqi-calling.png; update the Kestrel picture"
 

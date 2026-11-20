@@ -1,17 +1,42 @@
-# Kestrel icons: WhiteSur plus a few overrides (DECISIONS.md D17), all links made at build time
-# by image/build/configure/40-desktop.sh:
-# - places/scalable: panel applets ask for "-symbolic" icons, meant for the slim top bar; in
-#   the large dock the trash should look like the other app icons.
-# - symbolic: the small one-colour "-symbolic" icons (tray, menus) come from Breeze. WhiteSur's
-#   are drawn in a fixed light grey that Plasma cannot recolour, so on the light top bar they
-#   were nearly invisible. Breeze's follow the colour scheme: dark on light, light in dark mode.
+# Kestrel icons (DECISIONS.md D28): Kestrel's own drawings, WhiteSur for everything not drawn yet.
+# - apps|places|mimetypes/kestrel: the Kestrel drawings (image/artwork/kestrel_icons.py), from
+#   24 px up. Smaller sizes (sidebars, menus) use WhiteSur's simple versions.
+# - places/scalable, symbolic: links made by image/build/configure/40-desktop.sh, shared with the
+#   "WhiteSur" choice (/usr/share/icons/Kestrel-WhiteSur):
+#   - panel applets ask for "-symbolic" icons; in the large dock the trash should look like the
+#     other app icons, so user-trash-symbolic points to the full-colour trash.
+#   - the small one-colour "-symbolic" icons (tray, menus) come from Breeze. WhiteSur's are
+#     drawn in a fixed light grey that Plasma cannot recolour, so on the light top bar they
+#     were nearly invisible. Breeze's follow the colour scheme.
 [Icon Theme]
 Name=Kestrel
+Comment=Kestrel OS icons
 # Lets Plasma recolour one-colour icons to the colour scheme (dark on light, light on dark).
 FollowsColorScheme=true
-Comment=WhiteSur with dock-sized trash icons
 Inherits=WhiteSur,breeze,hicolor
-Directories=places/scalable,symbolic
+Directories=apps/kestrel,places/kestrel,mimetypes/kestrel,places/scalable,symbolic
+Example=folder
+
+[apps/kestrel]
+Size=128
+Context=Applications
+MinSize=24
+MaxSize=512
+Type=Scalable
+
+[places/kestrel]
+Size=128
+Context=Places
+MinSize=24
+MaxSize=512
+Type=Scalable
+
+[mimetypes/kestrel]
+Size=128
+Context=MimeTypes
+MinSize=24
+MaxSize=512
+Type=Scalable
 
 [places/scalable]
 Size=64

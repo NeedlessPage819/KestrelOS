@@ -520,3 +520,22 @@ Tested on a PC with a 4K TV. What was wrong and what changed:
   inside a project, and "›", which turns red after a failed command.
 - **.exe files asked which app to use.** Fedora's Wine launcher claims no file types. Windows
   programs (.exe, .msi, .lnk) now open with Wine by double click. Steam games keep using Proton.
+
+## D28 – Kestrel's own icons, WhiteSur as a choice
+
+**What:** Kestrel now has its own icon set and uses it by default. It stays close to WhiteSur's
+look (D17), but in Kestrel's colours and with the Kestrel bird where it fits:
+- app icons on rounded tiles with depth: Files, Terminal, Settings, Store, Launchpad, Text
+  Editor, Images, Calculator, Screenshot, Music, Videos, Archiver;
+- the trash (empty and full);
+- light Kestrel-blue folders with the kind of folder pressed into the front;
+- file pages, coloured by type for PDF, archives, audio, video and Windows programs.
+
+All drawings come from one script (`image/artwork/kestrel_icons.py`), so they share one style
+and can be changed together. Everything not drawn yet (most third-party apps) still comes from
+WhiteSur, which the Kestrel icons build on. At very small sizes (sidebars, menus) WhiteSur's simple
+versions are used. Firefox, Steam and other brand icons stay as their makers drew them.
+
+**Choosing:** System Settings > Colours & Themes > Icons offers "Kestrel" (default) and
+"WhiteSur". Both carry the same fixes (full-colour trash in the dock, readable one-colour icons
+in the top bar). The plain WhiteSur entries are hidden there, because they would lose those fixes.

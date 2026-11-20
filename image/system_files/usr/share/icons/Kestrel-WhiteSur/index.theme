@@ -1,0 +1,25 @@
+# WhiteSur, as the second choice next to the Kestrel icons (DECISIONS.md D28). It carries the
+# same fixes as the Kestrel theme (links made by image/build/configure/40-desktop.sh): the
+# full-colour trash in the dock and Breeze's one-colour icons in the top bar. The plain WhiteSur
+# entries are hidden in the icon settings, because choosing them would lose these fixes.
+[Icon Theme]
+Name=WhiteSur
+Comment=macOS-style icons by vinceliuice
+FollowsColorScheme=true
+Inherits=WhiteSur,breeze,hicolor
+Directories=places/scalable,symbolic
+Example=folder
+
+[places/scalable]
+Size=64
+Context=Places
+MinSize=8
+MaxSize=512
+Type=Scalable
+
+[symbolic]
+Size=22
+Context=Status
+MinSize=8
+MaxSize=512
+Type=Scalable
