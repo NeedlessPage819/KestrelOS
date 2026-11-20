@@ -15,7 +15,7 @@ checked on real hardware is in [TESTING.md](TESTING.md).
 |---|---|
 | Build the ISO, install it in a VM, desktop starts | works, tested automatically on every build |
 | Live USB stick: try it, then install | works in the VM, also with Secure Boot |
-| Windows program through Wine | works, tested automatically |
+| Windows program through Wine | works, 64- and 32-bit, tested automatically |
 | Secure Boot | works, tested automatically (full test) |
 | Design (dock, top bar, windows, icons, lock screen) | round 4, still being refined |
 | Real hardware (laptop, Rocket League online) | still open, see [TESTING.md](TESTING.md) |

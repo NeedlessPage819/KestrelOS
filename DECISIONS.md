@@ -541,3 +541,33 @@ versions into the Kestrel theme itself (`40-desktop.sh`). Firefox, Steam and oth
 **Choosing:** System Settings > Colours & Themes > Icons offers "Kestrel" (default) and
 "WhiteSur". Both carry the same fixes (full-colour trash in the dock, readable one-colour icons
 in the top bar). The plain WhiteSur entries are hidden there, because they would lose those fixes.
+
+## D29 – Wine: 32-bit programs, built-in .NET/HTML engines, WebView2 on request
+
+**32-bit Windows programs:** they crashed at their first instruction (most installers are
+32-bit, so this hit many programs). Fedora 44's Wine keeps its Windows DLLs under
+`/usr/lib*/wine-wow64`, which Fedora's SELinux policy does not know, so they get the plain
+library type. Wine has to patch the code of these DLLs when it loads them. On a classic install
+the user's own rights allow that. On the image's composefs root the kernel also checks the
+rights of whoever mounted it (the boot process), and those don't allow it. A small policy
+module (`build/configure/45-wine.sh`) gives these files the type Fedora uses for Wine
+everywhere else (`textrel_shlib_t`). The VM test now also runs a 32-bit program; the earlier
+test used only a 64-bit one, which is why this went unnoticed.
+
+**wine-mono and wine-gecko** are now in the image. The build skips weak dependencies, so Wine
+came without them and asked to download them the first time a Windows program ran.
+
+**WebView2** (Microsoft's web view that some Windows apps use for their windows or sign-in):
+`kestrel webview2` downloads Microsoft's installer from Microsoft and installs it into the
+user's Wine setup, with the two Wine settings from winetricks' `webview2` step (Fedora's
+winetricks is older than that step). It is not in the image: Microsoft's installer fetches the
+current runtime itself, and only users who need it should get its ~1.3 GB.
+
+Tested in the VM with `test/webview2test.c`: the runtime installs, starts, loads the page and
+runs JavaScript, but **the window stays white**. Wine cannot yet show what WebView2 draws in its
+separate process; tried with Wine's X11 and Wayland drivers, Windows 7 and 10 mode and the usual
+Chromium flags (`--disable-gpu`, `--disable-gpu-compositing`, `--disable-direct-composition`).
+Others report the same, and Microsoft does not support WebView2 on Wine. So for now WebView2
+helps apps that only need it to be present, or use it in the background; apps that show their
+main window through it stay blank. To check again on real graphics hardware and with newer Wine
+versions.
