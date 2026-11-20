@@ -7,9 +7,13 @@
 source /tmp/build/lib.sh
 
 cil=$(mktemp -d)/kestrel-wine.cil
+# Paths written out in full: SELinux uses the most specific matching rule, and a pattern like
+# /usr/lib(64)? counts as less specific than the general /usr/lib rules, so it would lose.
 cat > "$cil" <<'EOF'
-(filecon "/usr/lib(64)?/wine-wow64/wine/[^/]+-windows/.+" file (system_u object_r textrel_shlib_t ((s0) (s0))))
-(filecon "/usr/lib(64)?/wine-wow64/wine/[^/]+-unix/.+\.so" file (system_u object_r textrel_shlib_t ((s0) (s0))))
+(filecon "/usr/lib/wine-wow64/wine/[^/]+-windows/.+" file (system_u object_r textrel_shlib_t ((s0) (s0))))
+(filecon "/usr/lib/wine-wow64/wine/[^/]+-unix/.+\.so" file (system_u object_r textrel_shlib_t ((s0) (s0))))
+(filecon "/usr/lib64/wine-wow64/wine/[^/]+-windows/.+" file (system_u object_r textrel_shlib_t ((s0) (s0))))
+(filecon "/usr/lib64/wine-wow64/wine/[^/]+-unix/.+\.so" file (system_u object_r textrel_shlib_t ((s0) (s0))))
 EOF
 semodule -i "$cil" || die "could not install the Kestrel Wine SELinux module"
 rm -rf "${cil%/*}"
