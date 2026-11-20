@@ -533,8 +533,10 @@ look (D17), but in Kestrel's colours and with the Kestrel bird where it fits:
 
 All drawings come from one script (`image/artwork/kestrel_icons.py`), so they share one style
 and can be changed together. Everything not drawn yet (most third-party apps) still comes from
-WhiteSur, which the Kestrel icons build on. At very small sizes (sidebars, menus) WhiteSur's simple
-versions are used. Firefox, Steam and other brand icons stay as their makers drew them.
+WhiteSur, which the Kestrel icons build on. At very small sizes (16 and 22 px: sidebars, menus,
+file lists) WhiteSur's simple line versions are used, as in macOS. Plasma takes any size the
+chosen theme has before it looks at the themes it builds on, so the build links these small
+versions into the Kestrel theme itself (`40-desktop.sh`). Firefox, Steam and other brand icons stay as their makers drew them.
 
 **Choosing:** System Settings > Colours & Themes > Icons offers "Kestrel" (default) and
 "WhiteSur". Both carry the same fixes (full-colour trash in the dock, readable one-colour icons

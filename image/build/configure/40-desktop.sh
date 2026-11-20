@@ -65,6 +65,48 @@ done
 grep -q '^FollowsColorScheme=' "$icons/WhiteSur/index.theme" ||
     sed -i '/^\[Icon Theme\]$/a FollowsColorScheme=true' "$icons/WhiteSur/index.theme"
 grep -q '^FollowsColorScheme=true' "$icons/WhiteSur/index.theme" || die "could not mark WhiteSur as colour-scheme aware"
+# Small sizes (sidebars, menus: 16 and 22 px) of the icons Kestrel draws come from WhiteSur's
+# simple line versions, as in macOS. Plasma takes any size a theme has before looking at the
+# themes it inherits from, so these sizes must be in the Kestrel theme itself: link WhiteSur's
+# files and copy its matching directory entries into Kestrel's index.theme.
+python3 - "$icons" <<'PY' || die "could not add WhiteSur's small icons to the Kestrel theme"
+import configparser, os, re, sys
+icons = sys.argv[1]
+ours, ws_dir = f"{icons}/Kestrel", f"{icons}/WhiteSur"
+ws = configparser.ConfigParser(interpolation=None, strict=False)
+ws.optionxform = str
+ws.read(f"{ws_dir}/index.theme")
+drawn = {ctx: [f[:-4] for f in os.listdir(f"{ours}/{ctx}/kestrel") if f.endswith(".svg")]
+         for ctx in ("apps", "places", "mimetypes")}
+head = ws["Icon Theme"]
+added, sections, links = [], "", 0
+for d in (head.get("Directories", "") + "," + head.get("ScaledDirectories", "")).split(","):
+    d = d.strip()
+    parts = ["mimetypes" if p == "mimes" else p for p in re.split(r"[/@]", d)]   # WhiteSur says "mimes"
+    ctx = next((c for c in drawn if c in parts), None)
+    if not d or d not in ws or ctx is None or int(ws[d].get("Size", "0")) > 22 or d in added:
+        continue
+    names = [n for n in drawn[ctx] if os.path.exists(f"{ws_dir}/{d}/{n}.svg")]
+    if not names:
+        continue
+    os.makedirs(f"{ours}/{d}", exist_ok=True)
+    for n in names:
+        link = f"{ours}/{d}/{n}.svg"
+        if os.path.lexists(link):
+            os.remove(link)
+        os.symlink(os.path.relpath(f"{ws_dir}/{d}/{n}.svg", os.path.dirname(link)), link)
+        links += 1
+    added.append(d)
+    sections += f"\n[{d}]\n" + "".join(f"{k}={v}\n" for k, v in ws[d].items())
+assert links > 0, "WhiteSur has no small versions of the Kestrel icons"
+path = f"{ours}/index.theme"
+text = open(path).read()
+text, n = re.subn(r"^(Directories=.*)$", lambda m: m.group(1) + "," + ",".join(added), text, count=1, flags=re.M)
+assert n == 1, "Kestrel index.theme has no Directories line"
+open(path, "w").write(text + sections)
+print(f"Kestrel icons: {links} small WhiteSur versions linked in {len(added)} directories")
+PY
+[[ -e $icons/Kestrel/places/16/folder-pictures.svg ]] || die "Kestrel theme: small folder icons missing"
 for theme in Kestrel Kestrel-WhiteSur; do gtk-update-icon-cache -qf "$icons/$theme" 2>/dev/null || true; done
 
 # Kestrel wallpaper wherever Plasma or Plasma Setup asks for the distribution default
