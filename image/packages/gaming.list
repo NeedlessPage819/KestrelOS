@@ -1,5 +1,10 @@
 # Gaming stack (see DECISIONS.md D6). Steam: build/install/25-steam.sh. Heroic, Bottles, ProtonUp-Qt come as Flatpaks.
 wine
+# Wine's .NET and HTML engines (weak dependencies of wine, which the build does not pull in).
+# Without them Wine asks to download them on its first start.
+wine-mono
+mingw32-wine-gecko
+mingw64-wine-gecko
 winetricks
 lutris
 gamemode.x86_64
