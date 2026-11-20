@@ -13,5 +13,5 @@ cat > "$cil" <<'EOF'
 EOF
 semodule -i "$cil" || die "could not install the Kestrel Wine SELinux module"
 rm -rf "${cil%/*}"
-dll=$(rpm -ql wine-core.i686 | grep -m1 '/i386-windows/ntdll\.dll$') || die "32-bit Wine not installed"
+dll=$(grep -m1 '/i386-windows/ntdll\.dll$' < <(rpm -ql wine-core.i686)) || die "32-bit Wine not installed"
 [[ $(matchpathcon -n "$dll") == *:textrel_shlib_t:* ]] || die "Wine DLLs would not get the textrel_shlib_t label"
