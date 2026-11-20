@@ -26,7 +26,11 @@ public static class RawDisk2 {
     }
 }
 '@
-function Log($m) { $line = "$(Get-Date -Format HH:mm:ss) $m"; Write-Output $line; Add-Content -Path $Log -Value $line }
+function Log($m) {
+    $line = "$(Get-Date -Format HH:mm:ss) $m"; Write-Output $line
+    # Someone reading the log (a progress monitor) can hold it for a moment: retry, never abort.
+    for ($i = 0; $i -lt 20; $i++) { try { Add-Content -Path $Log -Value $line -ErrorAction Stop; return } catch { Start-Sleep -Milliseconds 250 } }
+}
 
 function Find-Stick {
     $d = Get-Disk | Where-Object { $_.FriendlyName -eq $ExpectName -and $_.BusType -eq 'USB' -and -not $_.IsBoot -and -not $_.IsSystem }
