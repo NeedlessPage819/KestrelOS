@@ -9,6 +9,7 @@ Kestrel OS – Hilfsbefehl
   kestrel update     System und Apps aktualisieren (System-Update gilt ab dem nächsten Neustart)
   kestrel rollback   Beim nächsten Neustart wieder die vorherige Systemversion starten
   kestrel status     Aktuelle und vorherige Systemversion anzeigen
+  kestrel webview2   Microsoft WebView2 für Windows-Programme (Wine) installieren
   kestrel help       Diese Hilfe
 EOF
 }
@@ -38,10 +39,58 @@ cmd_status() {
     as_root bootc status
 }
 
+# Microsoft Edge WebView2 for Windows programs under Wine (DECISIONS.md D29). Microsoft's own
+# installer, downloaded from Microsoft when the user asks for it (it cannot be shipped in the
+# image: it fetches the current runtime itself). The two Wine settings follow winetricks'
+# "webview2" step, which Fedora's winetricks does not have yet.
+cmd_webview2() {
+    (( EUID != 0 )) || { echo "Bitte als normaler Benutzer ausführen, nicht mit sudo." >&2; exit 1; }
+    local prefix=${WINEPREFIX:-$HOME/.wine}
+    local edge="$prefix/drive_c/Program Files (x86)/Microsoft/EdgeWebView/Application"
+    if compgen -G "$edge/*/msedgewebview2.exe" >/dev/null; then
+        echo "WebView2 ist in $prefix schon installiert."
+        return
+    fi
+    export WINEPREFIX=$prefix WINEDEBUG=-all
+    local tmp setup
+    tmp=$(mktemp -d)
+    trap 'rm -rf "$tmp"' EXIT
+    setup="$tmp/MicrosoftEdgeWebview2Setup.exe"
+    echo "==> WebView2 wird von Microsoft heruntergeladen …"
+    curl -fsSL --proto '=https' --tlsv1.2 -o "$setup" 'https://go.microsoft.com/fwlink/p/?LinkId=2124703'
+    [[ $(head -c 2 "$setup") == MZ ]] || { echo "Download ist kein Windows-Programm, Abbruch." >&2; exit 1; }
+    echo "==> Wine wird vorbereitet …"
+    wineboot -u >/dev/null 2>&1
+    echo "==> WebView2 wird installiert (lädt die aktuelle Version, kann einige Minuten dauern) …"
+    wine "$setup" /silent /install >/dev/null 2>&1 || true
+    local i
+    for (( i = 0; i < 120; i++ )); do
+        compgen -G "$edge/*/msedgewebview2.exe" >/dev/null && break
+        sleep 5
+    done
+    # Wine bug 53925: Edge's update service would keep running in every Wine session.
+    wine reg add 'HKLM\System\CurrentControlSet\Services\edgeupdate' /v Start /t REG_DWORD /d 3 /f >/dev/null 2>&1
+    # Wine bug 58921: the WebView2 process only draws in Windows 7 mode.
+    wine reg add 'HKCU\Software\Wine\AppDefaults\msedgewebview2.exe' /v Version /d win7 /f >/dev/null 2>&1
+    sleep 5
+    pkill -KILL -f 'MicrosoftEdgeUpdate.exe /c' 2>/dev/null || true
+    timeout 60 wineserver -w || wineserver -k
+    if compgen -G "$edge/*/msedgewebview2.exe" >/dev/null; then
+        echo
+        echo "Fertig: WebView2 ist installiert. Windows-Programme, die es brauchen, starten jetzt."
+        echo "Hinweis: Microsoft unterstützt WebView2 unter Wine nicht offiziell; manche Programme"
+        echo "zeigen trotzdem ein leeres Fenster."
+    else
+        echo "WebView2 konnte nicht installiert werden." >&2
+        exit 1
+    fi
+}
+
 case "${1:-help}" in
     update)   cmd_update ;;
     rollback) cmd_rollback ;;
     status)   cmd_status ;;
+    webview2) cmd_webview2 ;;
     help|-h|--help) usage ;;
     *) usage >&2; exit 2 ;;
 esac

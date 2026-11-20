@@ -160,6 +160,8 @@ else
 fi
 qemu-img create -q -f qcow2 "$WORK/disk-$main_fw.qcow2" 64G
 x86_64-w64-mingw32-gcc -O2 -o "$WORK/winhello.exe" test/winhello.c
+# Most Windows installers and many older programs are 32-bit; Wine runs those differently.
+i686-w64-mingw32-gcc -O2 -o "$WORK/winhello32.exe" test/winhello.c
 
 log "Installing (unattended, VM powers off when done)"
 start_vm "$BACKEND" "$main_fw" install "$iso"
@@ -204,10 +206,13 @@ remote 'systemctl --failed --no-legend --plain' || true
 
 sshpass -p "$TEST_PASSWORD" scp -q -P "$SSH_PORT" \
     -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-    "$WORK/winhello.exe" "$TEST_USER@127.0.0.1:winhello.exe"
+    "$WORK/winhello.exe" "$WORK/winhello32.exe" "$TEST_USER@127.0.0.1:"
 check "Windows program runs via Wine" \
     in_session "WINEDEBUG=-all timeout $((600 * slow)) wine ~/winhello.exe </dev/null >~/wine.out 2>&1;
         wineserver -k; cat ~/wine.out >&2; grep -q KESTREL-WINE-OK ~/wine.out"
+check "32-bit Windows program runs via Wine" \
+    in_session "WINEDEBUG=-all timeout $((600 * slow)) wine ~/winhello32.exe </dev/null >~/wine32.out 2>&1;
+        wineserver -k; cat ~/wine32.out >&2; grep -q KESTREL-WINE-OK ~/wine32.out"
 # setsid and closed stdin: otherwise ssh waits for the window to close.
 in_session 'WINEDEBUG=-all setsid -f wine ~/winhello.exe --gui </dev/null >/dev/null 2>&1'
 sleep $((20 * slow))
