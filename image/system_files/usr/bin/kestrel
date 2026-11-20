@@ -54,7 +54,7 @@ cmd_webview2() {
     export WINEPREFIX=$prefix WINEDEBUG=-all
     local tmp setup
     tmp=$(mktemp -d)
-    trap 'rm -rf "$tmp"' EXIT
+    trap "rm -rf '$tmp'" EXIT
     setup="$tmp/MicrosoftEdgeWebview2Setup.exe"
     echo "==> WebView2 wird von Microsoft heruntergeladen …"
     curl -fsSL --proto '=https' --tlsv1.2 -o "$setup" 'https://go.microsoft.com/fwlink/p/?LinkId=2124703'
