@@ -62,11 +62,14 @@ try {
     $buf = New-Object byte[] $piece
     $back = New-Object byte[] $piece
     $isoFile = [IO.File]::OpenRead($Iso)
-    [long]$offset = 0
     $pieces = [math]::Ceiling($size / $piece)
-    $k = 0
-    while ($offset -lt $size) {
-        $k++
+    # The first piece holds the partition table. Written first, Windows would find the stick's
+    # partitions at once, mount them and then refuse raw writes to them ("Incorrect function").
+    # So it goes last: until then the stick looks empty to Windows.
+    $order = @(2..$pieces) + 1
+    if ($pieces -eq 1) { $order = @(1) }
+    foreach ($k in $order) {
+        [long]$offset = ($k - 1) * $piece
         $isoFile.Position = $offset
         $n = $isoFile.Read($buf, 0, $piece)
         $len = $n
@@ -99,7 +102,6 @@ try {
                 Start-Sleep -Seconds 10
             }
         }
-        $offset += $n
         Log "piece $k of $pieces ok"
         Start-Sleep -Seconds 2
     }
