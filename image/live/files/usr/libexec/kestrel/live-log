@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Writes the live session's logs to the stick itself (DECISIONS.md D30), so a machine that
+# stays on a black screen can still be diagnosed: switch it off, plug the stick into another
+# computer, and read the "KESTRELLOG" drive. Each boot gets its own folder (the newest 5 are
+# kept). The logs are refreshed every 15 seconds for the first 10 minutes, so whatever stage
+# the boot hangs at is in them. They contain only system logs and hardware details.
+set -u
+
+dev=/dev/disk/by-label/KESTRELLOG
+for (( i = 0; i < 60; i++ )); do [[ -e $dev ]] && break; sleep 1; done
+[[ -e $dev ]] || { echo "kestrel-live-log: no KESTRELLOG partition (ISO burnt to a DVD?), nothing to do"; exit 0; }
+
+mnt=/run/kestrel-log
+mkdir -p "$mnt"
+mount -t vfat -o umask=022,flush "$dev" "$mnt" || { echo "kestrel-live-log: could not mount $dev"; exit 0; }
+trap 'sync; umount "$mnt"' EXIT
+trap 'exit 0' TERM INT   # shutdown: still run the EXIT trap, so the logs are complete
+
+model=$(tr -c 'A-Za-z0-9.-' '_' </sys/class/dmi/id/product_name 2>/dev/null | cut -c1-32)
+dir=$mnt/$(date +%Y%m%d-%H%M%S)-${model:-pc}
+mkdir -p "$dir"
+# Keep the newest five boots.
+ls -1d "$mnt"/*/ 2>/dev/null | sort | head -n -5 | xargs -r rm -rf
+
+# Writes a command's output to the log folder; a hanging command is cut off after 20 s.
+save() { local name=$1; shift; timeout 20 "$@" >"$dir/$name.tmp" 2>&1; mv -f "$dir/$name.tmp" "$dir/$name.txt"; }
+
+save hardware bash -c 'cat /sys/class/dmi/id/{sys_vendor,product_name,bios_version} 2>/dev/null; uname -a;
+    cat /proc/cmdline; echo; lspci -nnk; echo; lsusb; echo; free -m; echo; lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL'
+for (( round = 0; round < 40; round++ )); do
+    save journal journalctl -b --no-pager -o short-monotonic
+    save errors journalctl -b --no-pager -p warning -o short-monotonic
+    save kernel dmesg -T
+    save units bash -c 'systemctl --failed --no-pager; echo; systemctl list-jobs --no-pager; echo;
+        systemctl status --no-pager display-manager.service plasmalogin.service livesys.service livesys-late.service 2>&1'
+    save session bash -c 'loginctl list-sessions --no-pager; echo; ps -eo pid,etimes,stat,user,args --forest;
+        echo; coredumpctl list --no-pager 2>&1 | tail -20'
+    save graphics bash -c 'for c in /sys/class/drm/card*-*; do echo "$c: $(cat $c/status 2>/dev/null) $(head -1 $c/modes 2>/dev/null)"; done;
+        echo; ls -l /dev/dri; echo; cat /proc/fb'
+    sync
+    sleep 15
+done
+echo "kestrel-live-log: done, logs in $dir"

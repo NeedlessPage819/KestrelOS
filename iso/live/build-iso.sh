@@ -92,6 +92,13 @@ truncate -s 100M "$work/uefi.img"
 mkfs.fat -F32 "$work/uefi.img" >/dev/null
 mcopy -i "$work/uefi.img" -s "$work/EFI" ::
 
+# Writable FAT partition for the live session's logs (DECISIONS.md D30, image/live:
+# kestrel-live-log). On a USB stick Windows shows it as the drive "KESTRELLOG".
+truncate -s 64M "$work/log.img"
+mkfs.fat -F32 -n KESTRELLOG "$work/log.img" >/dev/null
+echo "Kestrel OS live logs: one folder per boot, written by the live session." >"$work/README.txt"
+mcopy -i "$work/log.img" "$work/README.txt" ::
+
 # The installer payload is grafted in from /oci instead of copied (it is several GB).
 xorriso -as mkisofs \
     -R -J -joliet-long \
@@ -99,6 +106,7 @@ xorriso -as mkisofs \
     -partition_offset 16 \
     -appended_part_as_gpt \
     -append_partition 2 C12A7328-F81F-11D2-BA4B-00A0C93EC93B "$work/uefi.img" \
+    -append_partition 3 EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 "$work/log.img" \
     -iso_mbr_part_type EBD0A0A2-B9E5-4433-87C0-68B6B72699C7 \
     -e --interval:appended_partition_2:all:: \
     -no-emul-boot \

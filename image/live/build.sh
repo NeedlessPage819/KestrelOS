@@ -11,6 +11,9 @@ systemctl enable livesys.service livesys-late.service
 # Nvidia GTX 16xx and newer get their real driver in the live session (DECISIONS.md D25).
 chmod 755 /usr/libexec/kestrel/live-gpu
 systemctl enable kestrel-live-gpu.service
+# Logs on the stick, for machines that stay black (DECISIONS.md D30).
+chmod 755 /usr/libexec/kestrel/live-log
+systemctl enable kestrel-live-log.service
 
 # Nothing in the live session may change hardware setup or download things in the
 # background: no GPU setup (it would blacklist drivers and reboot), no Flatpak downloads,

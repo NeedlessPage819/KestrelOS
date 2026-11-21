@@ -1,0 +1,16 @@
+[Unit]
+Description=Kestrel OS live session: write logs to the stick's KESTRELLOG partition
+# Starts as early as possible and independent of the desktop, so it also records boots that
+# never reach the desktop.
+DefaultDependencies=no
+After=systemd-journald.service systemd-udevd.service
+Before=shutdown.target
+Conflicts=shutdown.target
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/kestrel/live-log
+TimeoutStopSec=15
+
+[Install]
+WantedBy=sysinit.target
