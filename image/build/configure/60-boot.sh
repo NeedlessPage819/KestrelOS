@@ -16,7 +16,7 @@ kver=$(ls /usr/lib/modules)
 mkdir -p /var/roothome
 dracut --no-hostonly --kver "$kver" --reproducible --zstd --add "ostree kestrel-quirks" -f "/usr/lib/modules/$kver/initramfs.img"
 # Per-model driver settings (DECISIONS.md D31) must run before the first driver loads.
-lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep -q 'pre-udev/10-kestrel-quirks.sh' || die "kestrel-quirks missing in initramfs"
+grep -q 'pre-udev/10-kestrel-quirks.sh' < <(lsinitrd "/usr/lib/modules/$kver/initramfs.img") || die "kestrel-quirks missing in initramfs"
 rmdir /var/roothome
 lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep 'plymouth/themes/kestrel/watermark.png' >/dev/null ||
     die "Kestrel boot screen not in the initramfs"
