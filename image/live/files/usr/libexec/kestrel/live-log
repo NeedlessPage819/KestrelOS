@@ -28,6 +28,16 @@ save() { local name=$1; shift; timeout 20 "$@" >"$dir/$name.tmp" 2>&1; mv -f "$d
 save hardware bash -c 'cat /sys/class/dmi/id/{sys_vendor,product_name,bios_version} 2>/dev/null; uname -a;
     cat /proc/cmdline; echo; lspci -nnk; echo; lsusb; echo; free -m; echo; lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL'
 for (( round = 0; round < 40; round++ )); do
+    # Firmware (ACPI) event counters: shows an event flooding the system.
+    save acpi-events bash -c 'cd /sys/firmware/acpi/interrupts && for f in *; do echo "$f $(cat $f)"; done | sort -k2 -nr | head -40'
+    # Call stacks of everything stuck in an uninterruptible wait, at about 45 s, 2 min and 5 min:
+    # shows which firmware routine or driver a hang is waiting on.
+    if (( round == 3 || round == 8 || round == 20 )); then
+        echo w >/proc/sysrq-trigger 2>/dev/null
+        save "blocked-$round" bash -c 'for p in /proc/[0-9]*; do
+            [[ $(awk "{print \$3}" $p/stat 2>/dev/null) == D ]] || continue
+            echo "== ${p#/proc/} $(cat $p/comm 2>/dev/null)"; cat $p/stack 2>/dev/null; done | head -3000'
+    fi
     save journal journalctl -b --no-pager -o short-monotonic
     save errors journalctl -b --no-pager -p warning -o short-monotonic
     save kernel dmesg -T
