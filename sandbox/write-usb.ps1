@@ -33,6 +33,8 @@ function Log($m) {
 }
 
 function Find-Stick {
+    # A running PowerShell keeps its old disk list; refresh it, or a replugged stick is never seen.
+    Update-HostStorageCache -ErrorAction SilentlyContinue
     $d = Get-Disk | Where-Object { $_.FriendlyName -eq $ExpectName -and $_.BusType -eq 'USB' -and -not $_.IsBoot -and -not $_.IsSystem }
     if (@($d).Count -eq 1) { return $d.Number }
     return $null
