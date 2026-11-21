@@ -19,14 +19,14 @@ trap 'exit 0' TERM INT   # shutdown: still run the EXIT trap, so the logs are co
 model=$(tr -c 'A-Za-z0-9.-' '_' </sys/class/dmi/id/product_name 2>/dev/null | cut -c1-32)
 dir=$mnt/$(date +%Y%m%d-%H%M%S)-${model:-pc}
 mkdir -p "$dir"
-# Keep the newest five boots.
-ls -1d "$mnt"/*/ 2>/dev/null | sort | head -n -5 | xargs -r rm -rf
+# Keep the newest three boots (debug logs are large; the partition has 64 MB).
+ls -1d "$mnt"/*/ 2>/dev/null | sort | head -n -3 | xargs -r rm -rf
 
 # Writes a command's output to the log folder; a hanging command is cut off after 20 s.
 save() { local name=$1; shift; timeout 20 "$@" >"$dir/$name.tmp" 2>&1; mv -f "$dir/$name.tmp" "$dir/$name.txt"; }
 
 save hardware bash -c 'cat /sys/class/dmi/id/{sys_vendor,product_name,bios_version} 2>/dev/null; uname -a;
-    cat /proc/cmdline; echo; lspci -nnk; echo; lsusb; echo; free -m; echo; lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL'
+    cat /proc/cmdline; echo; lspci -nnk; echo; lsusb; echo; free -m; echo; lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL; echo; cat /run/modprobe.d/*.conf 2>/dev/null'
 for (( round = 0; round < 40; round++ )); do
     # Firmware (ACPI) event counters: shows an event flooding the system.
     save acpi-events bash -c 'cd /sys/firmware/acpi/interrupts && for f in *; do echo "$f $(cat $f)"; done | sort -k2 -nr | head -40'
@@ -38,12 +38,12 @@ for (( round = 0; round < 40; round++ )); do
             [[ $(awk "{print \$3}" $p/stat 2>/dev/null) == D ]] || continue
             echo "== ${p#/proc/} $(cat $p/comm 2>/dev/null)"; cat $p/stack 2>/dev/null; done | head -3000'
     fi
-    save journal journalctl -b --no-pager -o short-monotonic
+    save journal bash -c 'journalctl -b --no-pager -o short-monotonic | tail -c 16000000'
     save errors journalctl -b --no-pager -p warning -o short-monotonic
-    save kernel dmesg -T
+    save kernel bash -c 'dmesg -T | tail -c 8000000'
     save units bash -c 'systemctl --failed --no-pager; echo; systemctl list-jobs --no-pager; echo;
         systemctl status --no-pager display-manager.service plasmalogin.service livesys.service livesys-late.service 2>&1'
-    save session bash -c 'loginctl list-sessions --no-pager; echo; ps -eo pid,etimes,stat,user,args --forest;
+    save session bash -c 'loginctl list-sessions --no-pager; echo; ps -eo pid,etimes,stat,wchan:32,user,args --forest;
         echo; coredumpctl list --no-pager 2>&1 | tail -20'
     save graphics bash -c 'for c in /sys/class/drm/card*-*; do echo "$c: $(cat $c/status 2>/dev/null) $(head -1 $c/modes 2>/dev/null)"; done;
         echo; ls -l /dev/dri; echo; cat /proc/fb'

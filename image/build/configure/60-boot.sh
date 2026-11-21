@@ -14,7 +14,9 @@ kver=$(ls /usr/lib/modules)
 [[ $(wc -w <<<"$kver") -eq 1 ]] || die "expected exactly one kernel, found: $kver"
 # /root links to /var/roothome, which only exists on an installed system; dracut follows it.
 mkdir -p /var/roothome
-dracut --no-hostonly --kver "$kver" --reproducible --zstd --add ostree -f "/usr/lib/modules/$kver/initramfs.img"
+dracut --no-hostonly --kver "$kver" --reproducible --zstd --add "ostree kestrel-quirks" -f "/usr/lib/modules/$kver/initramfs.img"
+# Per-model driver settings (DECISIONS.md D31) must run before the first driver loads.
+lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep -q 'pre-udev/10-kestrel-quirks.sh' || die "kestrel-quirks missing in initramfs"
 rmdir /var/roothome
 lsinitrd "/usr/lib/modules/$kver/initramfs.img" | grep 'plymouth/themes/kestrel/watermark.png' >/dev/null ||
     die "Kestrel boot screen not in the initramfs"
