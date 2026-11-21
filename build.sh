@@ -11,6 +11,17 @@ set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
 source config.env
 
+# Every build downloads packages. Without working name lookups it would fail only after many
+# minutes with pages of "Could not resolve host"; check first, also inside a container (a VPN
+# on the host broke exactly that while the host itself still resolved names).
+net_ok() { getent hosts mirrors.fedoraproject.org >/dev/null &&
+    podman run --rm registry.fedoraproject.org/fedora:"${FEDORA_VERSION}" \
+        getent hosts mirrors.fedoraproject.org >/dev/null 2>&1; }
+if [[ ${1:-} =~ ^(image|iso|installer-iso|test-iso)$ ]] && ! net_ok; then
+    echo "ERROR: Fedora's servers can't be reached (name lookup failed). Is a VPN on, or the internet down?" >&2
+    exit 1
+fi
+
 readonly OUT=out
 readonly TAG="localhost/${IMAGE_NAME}:${FEDORA_VERSION}"
 readonly LIVE_TAG="localhost/${IMAGE_NAME}-live:${FEDORA_VERSION}"
