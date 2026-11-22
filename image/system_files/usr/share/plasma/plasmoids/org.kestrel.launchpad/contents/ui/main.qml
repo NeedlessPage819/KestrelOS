@@ -4,8 +4,8 @@
 // Pure QML. The app list is Plasma's own (AppsModel from the kicker components, the same that
 // KDE's Application Dashboard uses), so new apps and Flatpaks appear by themselves. The window
 // is Plasma's DashboardWindow: full screen on the screen of the button, blurred behind.
-// It provides "org.kde.plasma.launchermenu", so the dock's Launchpad icon and the Meta key
-// open it too (PlasmaShell.activateLauncherMenu).
+// The bird in the top bar opens the Kestrel menu (SystemMenu.qml). The Launchpad opens from the
+// dock and the Meta key: this widget provides "org.kde.plasma.launchermenu" (activateLauncherMenu).
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
@@ -13,6 +13,8 @@ import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.private.kicker as Kicker
+import org.kde.plasma.extras as PlasmaExtras
+import org.kde.plasma.plasma5support as P5Support
 
 PlasmoidItem {
     id: root
@@ -20,7 +22,7 @@ PlasmoidItem {
     preferredRepresentation: fullRepresentation
     readonly property string buttonIcon: Plasmoid.configuration.icon || "kestrel-logo-symbolic"
     Plasmoid.icon: buttonIcon
-    toolTipMainText: "Launchpad"
+    toolTipMainText: "Kestrel OS"
     toolTipSubText: ""
 
     readonly property bool german: Qt.locale().name.startsWith("de")
@@ -53,12 +55,22 @@ PlasmoidItem {
         hoverEnabled: true
         Layout.minimumWidth: Kirigami.Units.iconSizes.small
         Layout.preferredWidth: height      // square, as tall as the top bar
-        onClicked: root.toggle()
+        onClicked: systemMenu.openRelative()
         Kirigami.Icon {
             anchors.fill: parent
             source: root.buttonIcon
-            active: button.containsMouse || root.open
+            active: button.containsMouse
         }
+        SystemMenu { id: systemMenu; visualParent: button }
+    }
+
+    // Runs the system menu's commands (fixed strings, no user input).
+    P5Support.DataSource {
+        id: shell
+        engine: "executable"
+        connectedSources: []
+        onNewData: (source, data) => disconnectSource(source)
+        function run(cmd) { connectSource(cmd) }
     }
 
     // ---- Apps ---------------------------------------------------------------------------
@@ -224,6 +236,10 @@ PlasmoidItem {
                     orientation: ListView.Horizontal
                     snapMode: ListView.SnapOneItem
                     highlightRangeMode: ListView.StrictlyEnforceRange
+                    // The current page fills the view: without these two lines the page number
+                    // (and its dot) changed, but the view did not move to that page.
+                    preferredHighlightBegin: 0
+                    preferredHighlightEnd: width
                     highlightMoveDuration: 280
                     boundsBehavior: Flickable.StopAtBounds
                     clip: true          // the next page stays hidden until you switch
