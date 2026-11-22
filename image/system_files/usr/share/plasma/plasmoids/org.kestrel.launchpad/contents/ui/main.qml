@@ -31,7 +31,7 @@ PlasmoidItem {
         if (open) return
         open = true
         view.reset()
-        dash.visible = true
+        dash.showFullScreen()      // covers the whole screen, top bar and dock included
         view.searchField.forceActiveFocus()
         openAnimation.restart()
     }
@@ -50,6 +50,8 @@ PlasmoidItem {
     compactRepresentation: MouseArea {
         id: button
         hoverEnabled: true
+        Layout.minimumWidth: Kirigami.Units.iconSizes.small
+        Layout.preferredWidth: height      // square, as tall as the top bar
         onClicked: root.toggle()
         Kirigami.Icon {
             anchors.fill: parent
@@ -67,10 +69,10 @@ PlasmoidItem {
         showSeparators: false
         showTopLevelItems: true
         paginate: false
-        autoPopulate: true
+        autoPopulate: false        // filled below, once "flat" is set (else it lists categories)
         appNameFormat: 0           // just the name, "Firefox", not "Firefox (Web Browser)"
         onCountChanged: root.refresh()
-        Component.onCompleted: root.refresh()
+        Component.onCompleted: { refresh(); root.refresh() }
     }
 
     // Plain list of {name, icon, row}; the grid pages and the search work on this.
