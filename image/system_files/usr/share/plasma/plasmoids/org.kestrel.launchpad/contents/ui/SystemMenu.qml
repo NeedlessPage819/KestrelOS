@@ -10,7 +10,7 @@ PlasmaExtras.Menu {
     placement: PlasmaExtras.Menu.BottomPosedLeftAlignedPopup
 
     readonly property string prompt: "dbus-send --session --type=method_call --dest=org.kde.LogoutPrompt /LogoutPrompt org.kde.LogoutPrompt."
-    KCoreAddons.KUser { id: user }
+    readonly property QtObject user: KCoreAddons.KUser {}      // for "Log Out <name>…"
 
     PlasmaExtras.MenuItem {
         text: root.tr("Über Kestrel OS", "About Kestrel OS")
@@ -51,7 +51,7 @@ PlasmaExtras.Menu {
         onClicked: shell.run("dbus-send --session --type=method_call --dest=org.freedesktop.ScreenSaver /ScreenSaver org.freedesktop.ScreenSaver.Lock")
     }
     PlasmaExtras.MenuItem {
-        text: root.tr("%1 abmelden …", "Log Out %1…").arg(user.fullName || user.loginName)
+        text: root.tr("%1 abmelden …", "Log Out %1…").arg(menu.user.fullName || menu.user.loginName)
         icon: "system-log-out"
         onClicked: shell.run(menu.prompt + "promptLogout")
     }
