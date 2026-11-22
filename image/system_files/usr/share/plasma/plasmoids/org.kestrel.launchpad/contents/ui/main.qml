@@ -223,7 +223,7 @@ PlasmoidItem {
                     highlightRangeMode: ListView.StrictlyEnforceRange
                     highlightMoveDuration: 280
                     boundsBehavior: Flickable.StopAtBounds
-                    clip: false
+                    clip: true          // the next page stays hidden until you switch
                     model: Math.max(1, Math.ceil(root.shownApps.length / content.perPage))
 
                     property real wheelAcc: 0
