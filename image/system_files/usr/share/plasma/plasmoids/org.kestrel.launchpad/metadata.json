@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [{ "Name": "Kestrel OS" }],
+        "Category": "Application Launchers",
+        "Description": "All apps in a full-screen grid over the blurred desktop, with search and pages, like the Mac",
+        "Description[de]": "Alle Apps in einem Vollbild-Raster über dem unscharfen Schreibtisch, mit Suche und Seiten, wie beim Mac",
+        "Icon": "view-app-grid",
+        "Id": "org.kestrel.launchpad",
+        "License": "GPL-2.0-or-later",
+        "Name": "Kestrel Launchpad",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-Provides": ["org.kde.plasma.launchermenu"]
+}

@@ -5,9 +5,9 @@ topBar.location = "top";
 topBar.height = Math.round(gridUnit * 1.5);
 topBar.floating = false;
 
-// The bird opens the full-screen app grid (Launchpad). The dock's Launchpad icon opens the
-// same grid: it asks Plasma for "the launcher", which is this widget (DECISIONS.md D19).
-var launcher = topBar.addWidget("org.kde.plasma.kickerdash");
+// The bird opens Kestrel's Launchpad (DECISIONS.md D32). The dock's Launchpad icon opens the
+// same: it asks Plasma for "the launcher", which is this widget (DECISIONS.md D19).
+var launcher = topBar.addWidget("org.kestrel.launchpad");
 launcher.currentConfigGroup = ["General"];
 launcher.writeConfig("icon", "kestrel-logo-symbolic");
 

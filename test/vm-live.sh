@@ -4,6 +4,7 @@
 #   test/vm-live.sh deco         compile the window decoration and install it in the VM (until reboot)
 #   test/vm-live.sh plasma       install the current Plasma theme (dock, top bar) for the test user
 #   test/vm-live.sh dock         install the current Kestrel Dock widget and rebuild the dock with it
+#   test/vm-live.sh launchpad    install the current Kestrel Launchpad in the top bar and open it
 #   test/vm-live.sh lock         install the current lock screen (until reboot) and lock the session
 #   test/vm-live.sh unlock       unlock the session
 #   test/vm-live.sh lockopt K V  change lock screen setting K to V
@@ -108,6 +109,25 @@ dock)
                 \"applications:org.kde.discover.desktop\", \"applications:org.kde.konsole.desktop\",
                 \"applications:systemsettings.desktop\"]);
         });'" >/dev/null ;;
+launchpad)
+    # Installs the current Kestrel Launchpad for the test user, puts it into the top bar in place
+    # of the old launcher, and opens it.
+    tar -C image/system_files/usr/share/plasma/plasmoids -c org.kestrel.launchpad | remote 'rm -rf ~/.local/share/plasma/plasmoids/org.kestrel.launchpad;
+        mkdir -p ~/.local/share/plasma/plasmoids; tar -C ~/.local/share/plasma/plasmoids -x'
+    in_session "systemctl --user restart plasma-plasmashell"
+    sleep 25
+    in_session "dbus-send --session --print-reply --dest=org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript string:'
+        panels().forEach(function (p) {
+            if (p.location !== \"top\") return;
+            p.widgets().forEach(function (w) {
+                if (w.type !== \"org.kde.plasma.kickerdash\" && w.type !== \"org.kestrel.launchpad\") return;
+                w.remove();
+                var l = p.addWidget(\"org.kestrel.launchpad\");
+                l.index = 0;
+            });
+        });'" >/dev/null
+    sleep 5
+    in_session "dbus-send --session --type=method_call --dest=org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.activateLauncherMenu" ;;
 lock)
     # The lock screen lives in /usr (read-only), so it goes onto a temporary writable layer
     # that is gone after the next reboot. Then the session is locked.
