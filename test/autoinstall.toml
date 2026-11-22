@@ -6,9 +6,9 @@ enable = ["org.fedoraproject.Anaconda.Modules.Localization"]
 [customizations.installer.kickstart]
 contents = """
 text --non-interactive
-lang de_DE.UTF-8
-keyboard de
-timezone Europe/Berlin --utc
+lang en_US.UTF-8
+keyboard us
+timezone UTC --utc
 zerombr
 clearpart --all --initlabel --disklabel=gpt
 autopart --noswap --type=btrfs

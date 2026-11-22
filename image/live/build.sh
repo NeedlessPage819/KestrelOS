@@ -62,20 +62,19 @@ cp -a /usr/lib/efi/*/*/EFI /boot/efi/
 cp /boot/efi/EFI/fedora/gcdx64.efi /boot/efi/EFI/BOOT/grubx64.efi
 [[ -f /boot/efi/EFI/BOOT/BOOTX64.EFI ]] || die "shim missing in /boot/efi/EFI/BOOT"
 
-# The live session starts in German with a German keyboard and Berlin time; the installer
-# takes these as its defaults (they can be changed on its first page).
-echo 'LANG=de_DE.UTF-8' >/etc/locale.conf
-echo 'KEYMAP=de-nodeadkeys' >/etc/vconsole.conf
+# The live session starts in English with a US keyboard and UTC; the installer takes these as
+# its defaults, and language, keyboard and time zone are chosen on its first page.
+echo 'LANG=en_US.UTF-8' >/etc/locale.conf
+echo 'KEYMAP=us' >/etc/vconsole.conf
 mkdir -p /etc/X11/xorg.conf.d
 cat >/etc/X11/xorg.conf.d/00-keyboard.conf <<'KBD'
 Section "InputClass"
     Identifier "system-keyboard"
     MatchIsKeyboard "on"
-    Option "XkbLayout" "de"
-    Option "XkbVariant" "nodeadkeys"
+    Option "XkbLayout" "us"
 EndSection
 KBD
-ln -sf ../usr/share/zoneinfo/Europe/Berlin /etc/localtime
+ln -sf ../usr/share/zoneinfo/UTC /etc/localtime
 
 dnf5 clean all
 rm -rf /tmp/live /var/log/dnf5.log*

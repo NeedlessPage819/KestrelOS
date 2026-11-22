@@ -131,13 +131,24 @@ grep -q 'Kestrel OS lock screen' "$lock/LockScreenUi.qml" || die "Kestrel lock s
 grep -q '"X-Plasma-APIVersion": "2"' /usr/share/plasma/shells/org.kde.plasma.desktop/metadata.json ||
     die "desktop shell package has a new lock screen API version; check the Kestrel lock screen"
 
-# Plasma Setup branding (DECISIONS.md D24). Its welcome text ("Welcome to Plasma Desktop") is
-# compiled into the program, but the text shown comes from the translation catalogues, so
-# the product name is replaced there (German and every other language that has it). The
-# icon next to it is "plasma-symbolic", which the Kestrel icon theme points at the Kestrel mark.
-python3 - "$OS_NAME" <<'PY' || die "could not rebrand Plasma Setup's translations"
+# Plasma Setup branding (DECISIONS.md D24). Its welcome text "Welcome to<br/><b>Plasma
+# Desktop</b>" is compiled into the program. KDE never translates US English, so the text in
+# the program itself is replaced by a same-length one ("Kestrel OS" plus spaces, which rich
+# text does not show). That text is also the key the translations are looked up by, so the
+# catalogues get the new key and the product name in their translation (German and every
+# other language that has it). The icon next to it is "plasma-symbolic", which the Kestrel
+# icon theme points at the Kestrel mark.
+python3 - "$OS_NAME" <<'PY' || die "could not rebrand Plasma Setup"
 import glob, struct, sys
-name = sys.argv[1].encode()
+name = sys.argv[1]
+old = "Welcome to<br/><b>Plasma Desktop</b>"
+new = f"Welcome to<br/><b>{name}</b>"
+assert len(new) <= len(old), "OS name too long for the welcome text"
+new = new.ljust(len(old))
+binary = "/usr/libexec/plasma-setup"
+data = open(binary, "rb").read()
+assert data.count(old.encode("utf-16-le")) == 1, "welcome text not found once in plasma-setup"
+open(binary, "wb").write(data.replace(old.encode("utf-16-le"), new.encode("utf-16-le")))
 changed = 0
 for path in glob.glob("/usr/share/locale/*/LC_MESSAGES/org.kde.plasmasetup.mo"):
     data = open(path, "rb").read()
@@ -149,10 +160,12 @@ for path in glob.glob("/usr/share/locale/*/LC_MESSAGES/org.kde.plasmasetup.mo"):
         tl, to = struct.unpack("<2I", data[trans_off + 8 * i:trans_off + 8 * i + 8])
         orig, trans = data[oo:oo + ol], data[to:to + tl]
         if b"Plasma Desktop" in orig:
-            trans = trans.replace(b"Plasma Desktop", name).replace(b"Plasma-Desktop", name)
+            trans = trans.replace(b"Plasma Desktop", name.encode()).replace(b"Plasma-Desktop", name.encode())
+            orig = orig.replace(old.encode(), new.encode())
             changed += 1
         entries.append((orig, trans))
-    # Rewrite without a hash table (gettext then searches the sorted list; keys are unchanged).
+    # Rewrite without a hash table; gettext then binary-searches the keys, so keep them sorted.
+    entries.sort(key=lambda e: e[0])
     head = 28
     otab, ttab = head, head + 8 * n
     pos = ttab + 8 * n
@@ -163,7 +176,7 @@ for path in glob.glob("/usr/share/locale/*/LC_MESSAGES/org.kde.plasmasetup.mo"):
         ttable += struct.pack("<2I", len(trans), pos + len(blob)); blob += trans + b"\0"
     open(path, "wb").write(struct.pack("<7I", 0x950412de, 0, n, otab, ttab, 0, 0) + otable + ttable + blob)
 assert changed > 0, "no 'Plasma Desktop' text found in Plasma Setup's translations"
-print(f"Plasma Setup: product name replaced in {changed} translations")
+print(f"Plasma Setup: welcome text rebranded in the program and {changed} translations")
 PY
 for theme in Kestrel Kestrel-WhiteSur; do
     ln -sf ../../hicolor/scalable/apps/kestrel-logo-symbolic.svg "$icons/$theme/symbolic/plasma-symbolic.svg"

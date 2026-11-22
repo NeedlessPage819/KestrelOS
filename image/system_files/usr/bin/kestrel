@@ -4,13 +4,13 @@ set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Kestrel OS – Hilfsbefehl
+Kestrel OS helper
 
-  kestrel update     System und Apps aktualisieren (System-Update gilt ab dem nächsten Neustart)
-  kestrel rollback   Beim nächsten Neustart wieder die vorherige Systemversion starten
-  kestrel status     Aktuelle und vorherige Systemversion anzeigen
-  kestrel webview2   Microsoft WebView2 für Windows-Programme (Wine) installieren
-  kestrel help       Diese Hilfe
+  kestrel update     Update the system and apps (the system update applies after the next restart)
+  kestrel rollback   Start the previous system version at the next restart
+  kestrel status     Show the current and previous system version
+  kestrel webview2   Install Microsoft WebView2 for Windows programs (Wine)
+  kestrel help       This help
 EOF
 }
 
@@ -19,20 +19,20 @@ as_root() {
 }
 
 cmd_update() {
-    echo "==> System-Update wird heruntergeladen und vorbereitet …"
+    echo "==> Downloading and preparing the system update…"
     as_root bootc upgrade
-    echo "==> Apps (Flatpak) werden aktualisiert …"
+    echo "==> Updating apps (Flatpak)…"
     flatpak update --system --noninteractive
     flatpak update --user --noninteractive 2>/dev/null || true
     echo
-    echo "Fertig. Das neue System ist ab dem nächsten Neustart aktiv."
-    echo "Falls danach etwas nicht stimmt: 'kestrel rollback' und neu starten."
+    echo "Done. The new system is active after the next restart."
+    echo "If something is wrong afterwards: run 'kestrel rollback' and restart."
 }
 
 cmd_rollback() {
     as_root bootc rollback
     echo
-    echo "Beim nächsten Neustart startet die vorherige Systemversion."
+    echo "The previous system version starts at the next restart."
 }
 
 cmd_status() {
@@ -44,11 +44,11 @@ cmd_status() {
 # image: it fetches the current runtime itself). The two Wine settings follow winetricks'
 # "webview2" step, which Fedora's winetricks does not have yet.
 cmd_webview2() {
-    (( EUID != 0 )) || { echo "Bitte als normaler Benutzer ausführen, nicht mit sudo." >&2; exit 1; }
+    (( EUID != 0 )) || { echo "Please run this as a normal user, not with sudo." >&2; exit 1; }
     local prefix=${WINEPREFIX:-$HOME/.wine}
     local edge="$prefix/drive_c/Program Files (x86)/Microsoft/EdgeWebView/Application"
     if compgen -G "$edge/*/msedgewebview2.exe" >/dev/null; then
-        echo "WebView2 ist in $prefix schon installiert."
+        echo "WebView2 is already installed in $prefix."
         return
     fi
     export WINEPREFIX=$prefix WINEDEBUG=-all
@@ -56,12 +56,12 @@ cmd_webview2() {
     tmp=$(mktemp -d)
     trap "rm -rf '$tmp'" EXIT
     setup="$tmp/MicrosoftEdgeWebview2Setup.exe"
-    echo "==> WebView2 wird von Microsoft heruntergeladen …"
+    echo "==> Downloading WebView2 from Microsoft…"
     curl -fsSL --proto '=https' --tlsv1.2 -o "$setup" 'https://go.microsoft.com/fwlink/p/?LinkId=2124703'
-    [[ $(head -c 2 "$setup") == MZ ]] || { echo "Download ist kein Windows-Programm, Abbruch." >&2; exit 1; }
-    echo "==> Wine wird vorbereitet …"
+    [[ $(head -c 2 "$setup") == MZ ]] || { echo "The download is not a Windows program; stopping." >&2; exit 1; }
+    echo "==> Preparing Wine…"
     wineboot -u >/dev/null 2>&1
-    echo "==> WebView2 wird installiert (lädt die aktuelle Version, kann einige Minuten dauern) …"
+    echo "==> Installing WebView2 (downloads the current version, can take a few minutes)…"
     wine "$setup" /silent /install >/dev/null 2>&1 || true
     local i
     for (( i = 0; i < 120; i++ )); do
@@ -77,11 +77,11 @@ cmd_webview2() {
     timeout 60 wineserver -w || wineserver -k
     if compgen -G "$edge/*/msedgewebview2.exe" >/dev/null; then
         echo
-        echo "Fertig: WebView2 ist installiert. Windows-Programme, die es brauchen, starten jetzt."
-        echo "Hinweis: Microsoft unterstützt WebView2 unter Wine nicht offiziell; manche Programme"
-        echo "zeigen trotzdem ein leeres Fenster."
+        echo "Done: WebView2 is installed. Windows programs that need it start now."
+        echo "Note: Microsoft does not officially support WebView2 under Wine; some programs"
+        echo "still show an empty window."
     else
-        echo "WebView2 konnte nicht installiert werden." >&2
+        echo "WebView2 could not be installed." >&2
         exit 1
     fi
 }

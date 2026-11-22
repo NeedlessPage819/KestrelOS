@@ -41,7 +41,7 @@ EOF
     if secure_boot_enabled && [[ -f $MOK_KEY ]] && ! mokutil --test-key "$MOK_KEY" | grep -q 'already enrolled'; then
         log "Secure Boot is on: requesting enrollment of the Nvidia module key (password: $MOK_PASSWORD)"
         printf '%s\n%s\n' "$MOK_PASSWORD" "$MOK_PASSWORD" | mokutil --import "$MOK_KEY"
-        plymouth display-message --text="Nvidia: Beim Neustart 'Enroll MOK' wählen, Passwort: $MOK_PASSWORD" || true
+        plymouth display-message --text="Nvidia: after the restart choose 'Enroll MOK', password: $MOK_PASSWORD" || true
         sleep 10
     fi
 }

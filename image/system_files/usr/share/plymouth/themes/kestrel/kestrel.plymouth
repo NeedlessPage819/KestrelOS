@@ -43,26 +43,26 @@ UseEndAnimation=false
 SuppressMessages=true
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
-Title=Updates werden installiert …
-SubTitle=Bitte den Computer nicht ausschalten
+Title=Installing updates…
+SubTitle=Please do not turn off your computer
 
 [system-upgrade]
 SuppressMessages=true
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
-Title=System wird aktualisiert …
-SubTitle=Bitte den Computer nicht ausschalten
+Title=Upgrading the system…
+SubTitle=Please do not turn off your computer
 
 [firmware-upgrade]
 SuppressMessages=true
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
-Title=Firmware wird aktualisiert …
-SubTitle=Bitte den Computer nicht ausschalten
+Title=Updating firmware…
+SubTitle=Please do not turn off your computer
 
 [system-reset]
 SuppressMessages=true
 ProgressBarShowPercentComplete=true
 UseProgressBar=true
-Title=System wird zurückgesetzt …
-SubTitle=Bitte den Computer nicht ausschalten
+Title=Resetting the system…
+SubTitle=Please do not turn off your computer

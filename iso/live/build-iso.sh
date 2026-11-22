@@ -9,7 +9,7 @@
 #
 # Adapted from Titanoboa's build_iso.sh (https://github.com/ublue-os/titanoboa, Apache-2.0,
 # commit 5c457c3d0518bd17e754be0fd98a60d29d26abb4). Kestrel additions: the boot menu theme,
-# German menu entries drawn as images, the installer payload next to the squashfs, and a media checksum.
+# menu entries drawn as images, the installer payload next to the squashfs, and a media checksum.
 set -euo pipefail
 : "${ISO_LABEL:?}" "${ISO_NAME:?}" "${OS_NAME:?}"
 
@@ -64,20 +64,20 @@ insmod part_gpt
 
 # Entry labels are pictures (the class icons from grub_theme.py): GRUB cannot load fonts
 # under Secure Boot. The titles are drawn transparent by the theme; they only show if the
-# theme fails to load, so they avoid umlauts (GRUB's built-in font has none).
-menuentry '$OS_NAME starten' --class start --id start {
+# theme fails to load.
+menuentry 'Start $OS_NAME' --class start --id start {
   linux /images/pxeboot/vmlinuz $kernel_args
   initrd /images/pxeboot/initrd.img
 }
-menuentry '$OS_NAME starten (einfache Grafik)' --class basic --id basic {
+menuentry 'Start $OS_NAME (basic graphics)' --class basic --id basic {
   linux /images/pxeboot/vmlinuz $kernel_args nomodeset
   initrd /images/pxeboot/initrd.img
 }
-menuentry 'USB-Stick pruefen und starten' --class check --id check {
+menuentry 'Check USB stick and start' --class check --id check {
   linux /images/pxeboot/vmlinuz $kernel_args rd.live.check
   initrd /images/pxeboot/initrd.img
 }
-menuentry 'UEFI-Firmware-Einstellungen' --class firmware --id firmware {
+menuentry 'UEFI firmware settings' --class firmware --id firmware {
   fwsetup
 }
 EOF

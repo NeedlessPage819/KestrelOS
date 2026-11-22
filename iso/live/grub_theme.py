@@ -25,10 +25,10 @@ LABEL_W, LABEL_H = 460, 48               # entry label images (pixels, not scale
 
 # Menu entries: GRUB class (used by iso/live/build-iso.sh) and the label shown.
 ENTRIES = {
-    "start": "{os} starten",
-    "basic": "{os} starten (einfache Grafik)",
-    "check": "USB-Stick prüfen und starten",
-    "firmware": "UEFI-Firmware-Einstellungen",
+    "start": "Start {os}",
+    "basic": "Start {os} (basic graphics)",
+    "check": "Check USB stick and start",
+    "firmware": "UEFI firmware settings",
 }
 
 
