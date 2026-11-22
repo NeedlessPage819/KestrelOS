@@ -18,7 +18,8 @@ PlasmoidItem {
     id: root
 
     preferredRepresentation: compactRepresentation
-    Plasmoid.icon: Plasmoid.configuration.icon
+    readonly property string buttonIcon: Plasmoid.configuration.icon || "kestrel-logo-symbolic"
+    Plasmoid.icon: buttonIcon
     toolTipMainText: "Launchpad"
     toolTipSubText: ""
 
@@ -55,7 +56,7 @@ PlasmoidItem {
         onClicked: root.toggle()
         Kirigami.Icon {
             anchors.fill: parent
-            source: Plasmoid.configuration.icon
+            source: root.buttonIcon
             active: button.containsMouse || root.open
         }
     }
