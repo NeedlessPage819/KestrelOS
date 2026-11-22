@@ -195,7 +195,14 @@ def metadata():
             "Authors": [{"Name": "Kestrel OS"}],
         },
         "X-Plasma-API-Minimum-Version": "6.0",
+        # Without this Plasma treats the theme as outdated, and the logout screen (Restart,
+        # Shut Down) drew its names and buttons almost invisible (DECISIONS.md D32).
+        "X-Plasma-API": "5.0",
     }, indent=4) + "\n"
+
+
+# Same as Breeze ("default"): panels and popups turn opaque when a window is maximised.
+PLASMARC = "[AdaptiveTransparency]\nenabled=true\n"
 
 
 def dock_geometry_js():
@@ -219,6 +226,7 @@ def main():
     out = Path(sys.argv[1]) / NAME
     (out / "widgets").mkdir(parents=True, exist_ok=True)
     (out / "metadata.json").write_text(metadata())
+    (out / "plasmarc").write_text(PLASMARC)
     (out / "widgets" / "panel-background.svg").write_text(panel_background())
     (out / "widgets" / "tasks.svg").write_text(tasks())
 

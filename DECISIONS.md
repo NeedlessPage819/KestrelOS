@@ -617,3 +617,16 @@ components: the app list (RootModel's "All Applications", which follows newly in
 and Flatpaks) and the full-screen blurred window (DashboardWindow). Both belong to Plasma's
 kicker components, so a Plasma update that changes them shows in the VM test
 ("Kestrel Launchpad loads without errors").
+
+**The bird opens the Kestrel menu**, like the Apple menu: About Kestrel OS, System Settings…,
+App Store…, Sleep, Restart…, Shut Down…, Lock Screen, Log Out. Restart, Shut Down and Log Out
+show Plasma's confirmation screen. (KDE's dashboard had these built in; the Launchpad, like the
+Mac's, does not.) The Launchpad opens from the dock icon and the Meta key.
+
+**Logout screen readable again:** Kestrel's Plasma theme (top bar and dock glass) lacked
+`"X-Plasma-API": "5.0"` in its metadata, so Plasma treated it as outdated, and the confirmation
+screen for Restart and Shut Down drew its names and buttons almost invisible. The theme
+generator (`image/artwork/plasma_theme.py`) now writes the key and Breeze's `plasmarc`.
+
+**Pages:** the page list now moves with the dots (it needs to be told where the current page
+sits on screen; without that only the page number changed).
