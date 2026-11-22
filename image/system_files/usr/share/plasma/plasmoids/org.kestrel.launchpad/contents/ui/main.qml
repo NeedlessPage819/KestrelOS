@@ -130,6 +130,8 @@ PlasmoidItem {
         backgroundColor: "transparent"      // the blur shows through; the tint is drawn below
         keyEventProxy: view.searchField
         onActiveChanged: if (!active && visible) root.close()
+        // The window catches Esc itself: first it clears the search, then it closes.
+        onKeyEscapePressed: view.searchField.text ? (view.searchField.text = "") : root.close()
 
         mainItem: MouseArea {
             id: view
