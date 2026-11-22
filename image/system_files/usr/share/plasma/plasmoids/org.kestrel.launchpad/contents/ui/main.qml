@@ -61,23 +61,38 @@ PlasmoidItem {
     }
 
     // ---- Apps ---------------------------------------------------------------------------
-    Kicker.AppsModel {
-        id: apps
+    // Plasma's launcher model; its first row is "All Applications", flat and sorted, exactly
+    // the list KDE's own dashboard shows. It keeps itself up to date as apps come and go.
+    Kicker.RootModel {
+        id: rootModel
         appletInterface: root
+        autoPopulate: false
         flat: true
         sorted: true
         showSeparators: false
-        showTopLevelItems: true
-        paginate: false
-        autoPopulate: false        // filled below, once "flat" is set (else it lists categories)
+        showTopLevelItems: false
+        showAllApps: true
+        showAllAppsCategorized: false
+        showRecentApps: false
+        showRecentDocs: false
+        showRecentFolders: false
+        showPowerSession: false
+        showFavoritesPlaceholder: false
         appNameFormat: 0           // just the name, "Firefox", not "Firefox (Web Browser)"
-        onCountChanged: root.refresh()
-        Component.onCompleted: { refresh(); root.refresh() }
+        onRefreshed: root.apps = modelForRow(0)
+        Component.onCompleted: refresh()
+    }
+    property var apps: null
+    onAppsChanged: refresh()
+    Connections {
+        target: root.apps
+        function onCountChanged() { root.refresh() }
     }
 
     // Plain list of {name, icon, row}; the grid pages and the search work on this.
     property var allApps: []
     function refresh() {
+        if (!apps) return
         const list = [], seen = {}
         for (let i = 0; i < apps.count; ++i) {
             const idx = apps.index(i, 0)
