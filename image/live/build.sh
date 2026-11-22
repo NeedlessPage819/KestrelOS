@@ -14,6 +14,8 @@ systemctl enable kestrel-live-gpu.service
 # Logs on the stick, for machines that stay black (DECISIONS.md D30).
 chmod 755 /usr/libexec/kestrel/live-log
 systemctl enable kestrel-live-log.service
+# More room for changes in the live session (DECISIONS.md D31).
+systemctl enable kestrel-live-space.service
 
 # Nothing in the live session may change hardware setup or download things in the
 # background: no GPU setup (it would blacklist drivers and reboot), no Flatpak downloads,
