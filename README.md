@@ -46,7 +46,7 @@ The system language in the screenshots is German; every language Fedora supports
   apps), slim translucent top bar
 - Traffic-light window buttons top left, soft shadows, real rounded window corners (own window frame)
 - Kestrel's own icon set (close to WhiteSur, which stays selectable), Inter font
-- Spotlight-like search with **Meta+Space**, Launchpad button in the dock
+- Spotlight-like search with **Meta+Space**; a Mac-style **Launchpad** (all apps over the blurred desktop, with search and pages) from the bird or the dock
 - Touchpad swipe gestures, light and dark mode ("Kestrel" and "Kestrel Dark", also automatic)
 - Dock settings in System Settings (size, magnification, when it hides); a clock that is as big as the menus; sensible scaling on 4K TVs and monitors
 - A clean terminal design, light and dark with the system; Windows programs (.exe) open with Wine by double click

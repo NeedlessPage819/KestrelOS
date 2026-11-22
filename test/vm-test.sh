@@ -189,6 +189,7 @@ check "Session is Wayland" remote \
 check "Kestrel layout applied" remote 'grep -q org.kestrel.dock ~/.config/plasma-org.kde.plasma.desktop-appletsrc'
 # The dock is our own QML: a Plasma update that breaks it must fail the test, not the user.
 check "Kestrel Dock loads without errors" remote     '! journalctl --user -b --no-pager | grep -i "org.kestrel.dock" | grep -iE "error|unavailable|not (a type|installed)|failed"'
+check "Kestrel Launchpad loads without errors" remote '! journalctl --user -b --no-pager | grep -i "org.kestrel.launchpad" | grep -iE "error|unavailable|not (a type|installed)|failed"'
 # Our window decoration is compiled code; if KWin can't load it, it silently falls back to Breeze.
 check "Kestrel window decoration loaded" in_session \
     'dbus-send --session --print-reply --dest=org.kde.KWin /KWin org.kde.KWin.supportInformation | grep -qx "Plugin: org.kestrel.decoration"'

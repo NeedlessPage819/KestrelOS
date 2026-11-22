@@ -597,3 +597,23 @@ drm/amd tracker is drafted in out/. Once it is fixed upstream, the Kestrel worka
 **Live session space:** the live system keeps every change in RAM (`/run`), which was only 20%
 of RAM; Steam, the Flathub catalogue and Wine set-ups ran out of room. `kestrel-live-space`
 raises it to 60% (memory is only used for what is written).
+
+## D32 – Kestrel Launchpad
+
+KDE's Application Dashboard (dark overlay, categories on the left) gave way to Kestrel's own
+Launchpad, built like the one on the Mac:
+
+- all apps in one alphabetical grid (7 × 5 on a wide screen), no categories, names under the
+  icons, over the **blurred desktop**;
+- a **search field** at the top: typing filters at once (names and words that start with the
+  text first); Enter opens the first hit, which is highlighted;
+- **pages**: swipe, scroll, arrow keys or the dots at the bottom;
+- opens with a short fade-and-settle animation; Esc first clears the search, then closes; a
+  click on empty space closes too.
+
+The bird in the top bar and the Launchpad icon in the dock open it (it provides Plasma's
+"launcher menu", the same hook the dock uses). It is pure QML on Plasma's own launcher
+components: the app list (RootModel's "All Applications", which follows newly installed apps
+and Flatpaks) and the full-screen blurred window (DashboardWindow). Both belong to Plasma's
+kicker components, so a Plasma update that changes them shows in the VM test
+("Kestrel Launchpad loads without errors").
