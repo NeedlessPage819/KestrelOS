@@ -23,6 +23,18 @@ blacklist ucsi_acpi
 blacklist soc_button_array
 blacklist wireless_hotkey
 EOF
+        # The main fix. Every charger event makes the AMD driver take its power-management lock
+        # and then ask the firmware whether the charger is in (_PSR). On this model _PSR also
+        # sets new processor power limits (AMD's ALIB), which stalls, and each answer triggers
+        # the next charger event. The lock is never released and the display server waits on
+        # it forever: black screen. Without the charger driver nobody asks _PSR; charging state
+        # still shows, it comes from the battery. The driver is built into the kernel and is
+        # already attached at this point, so detach it before the AMD driver loads.
+        for dev in /sys/bus/*/drivers/ac/ACPI0003:*; do
+            [ -e "$dev" ] || continue
+            echo "${dev##*/}" >"${dev%/*}/unbind" &&
+                echo "kestrel-quirks: charger driver detached from ${dev##*/}" >/dev/kmsg
+        done
         # Diagnostics while this model is being fixed, live stick only (it records them on its
         # KESTRELLOG partition): full display-driver messages.
         grep -qw rd.live.image /proc/cmdline && echo "options drm debug=0x106" >>"$quirks"
