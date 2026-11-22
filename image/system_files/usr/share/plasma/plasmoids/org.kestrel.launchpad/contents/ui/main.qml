@@ -17,7 +17,7 @@ import org.kde.plasma.private.kicker as Kicker
 PlasmoidItem {
     id: root
 
-    preferredRepresentation: compactRepresentation
+    preferredRepresentation: fullRepresentation
     readonly property string buttonIcon: Plasmoid.configuration.icon || "kestrel-logo-symbolic"
     Plasmoid.icon: buttonIcon
     toolTipMainText: "Launchpad"
@@ -48,7 +48,7 @@ PlasmoidItem {
     }
 
     // ---- Button in the top bar (the bird) -----------------------------------------------
-    compactRepresentation: MouseArea {
+    fullRepresentation: MouseArea {
         id: button
         hoverEnabled: true
         Layout.minimumWidth: Kirigami.Units.iconSizes.small
@@ -127,7 +127,7 @@ PlasmoidItem {
     Kicker.DashboardWindow {
         id: dash
         visible: false
-        visualParent: root.compactRepresentationItem
+        visualParent: root.fullRepresentationItem
         backgroundColor: "transparent"      // the blur shows through; the tint is drawn below
         keyEventProxy: view.searchField
         onActiveChanged: if (!active && visible) root.close()
