@@ -571,3 +571,29 @@ Others report the same, and Microsoft does not support WebView2 on Wine. So for 
 helps apps that only need it to be present, or use it in the background; apps that show their
 main window through it stay blank. To check again on real graphics hardware and with newer Wine
 versions.
+
+## D31 – Acer Aspire Lite 15 (AL15-45P): black screen fixed; per-model fixes
+
+**The laptop Kestrel is built for** stayed on a black screen with every Linux (Kestrel, Fedora,
+openSUSE, Debian and Linux Mint all report the same). Found with logs the live stick writes to
+its own KESTRELLOG partition (D30) and the kernel's stack dumps:
+
+- The firmware sends charger events. On each one, the AMD graphics driver takes its
+  power-management lock and then asks the firmware whether the charger is in (`_PSR`).
+- On this model `_PSR` also sets the processor's power limits through AMD's `ALIB` routine,
+  which stalls, and every answer triggers the next charger event (5,000 in 10 minutes).
+- The lock is never released, and the display server (`kwin_wayland`) waits on it forever.
+
+**Fix:** `kestrel-quirks`, a small step in the initramfs that runs before any driver loads and
+applies fixes only to models it knows (by the firmware's product name). On the AL15-45P it
+detaches Linux's charger driver (built into the kernel) from the charger before the AMD driver
+loads. Nobody asks `_PSR` any more; battery level and charging state still show (they come
+from the battery). Nothing else is changed, so panel self refresh, adaptive backlight, USB-C
+and the airplane key keep working.
+
+**The real fix belongs in the AMD driver** (ask `_PSR` before taking the lock); a report for the
+drm/amd tracker is drafted in out/. Once it is fixed upstream, the Kestrel workaround goes.
+
+**Live session space:** the live system keeps every change in RAM (`/run`), which was only 20%
+of RAM; Steam, the Flathub catalogue and Wine set-ups ran out of room. `kestrel-live-space`
+raises it to 60% (memory is only used for what is written).
