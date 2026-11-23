@@ -17,8 +17,8 @@ checked on real hardware is in [TESTING.md](TESTING.md).
 | Live USB stick: try it, then install | works in the VM, also with Secure Boot |
 | Windows program through Wine | works, 64- and 32-bit, tested automatically |
 | Secure Boot | works, tested automatically (full test) |
-| Design (dock, top bar, windows, icons, lock screen) | round 4, still being refined |
-| Real hardware (laptop, Rocket League online) | still open, see [TESTING.md](TESTING.md) |
+| Design (dock, top bar, windows, icons, Launchpad, lock screen) | round 5, still being refined |
+| Real hardware | live USB runs on an Acer Aspire Lite 15 (AL15-45P, Ryzen 7 5825U), a Dell with GTX 1660 Ti and an Intel laptop; installing on real hardware and Rocket League online still open, see [TESTING.md](TESTING.md) |
 | Updates over the internet | still open (D11) |
 
 ## Screenshots
@@ -46,7 +46,8 @@ The system language in the screenshots is German; every language Fedora supports
   apps), slim translucent top bar
 - Traffic-light window buttons top left, soft shadows, real rounded window corners (own window frame)
 - Kestrel's own icon set (close to WhiteSur, which stays selectable), Inter font
-- Spotlight-like search with **Meta+Space**; a Mac-style **Launchpad** (all apps over the blurred desktop, with search and pages) from the dock
+- Spotlight-like search with **Meta+Space**; a Mac-style **Launchpad** from the dock: all apps over the
+  blurred desktop, with search and pages (mouse wheel, touchpad swipe, arrow keys)
 - The bird at the top left opens the **Kestrel menu** like the Apple menu: Sleep, Restart, Shut Down, Lock Screen, Log Out, System Settings
 - Touchpad swipe gestures, light and dark mode ("Kestrel" and "Kestrel Dark", also automatic)
 - Dock settings in System Settings (size, magnification, when it hides); a clock that is as big as the menus; sensible scaling on 4K TVs and monitors
@@ -54,11 +55,16 @@ The system language in the screenshots is German; every language Fedora supports
 - Mac-style lock screen: large clock, round user picture, lots of settings and widgets
   (now playing, battery, keyboard layout, your own message)
 - Kestrel boot screen, boot menu, login screen, setup wizard and installer
+- English by default; the installer and the first-start setup ask for language, keyboard and
+  time zone (Kestrel's own pages are translated into German too)
 
 **Gaming**
 - Steam, Wine, Proton, Heroic, Lutris, Bottles, ProtonUp-Qt
 - GameMode, MangoHud (FPS overlay), Gamescope
 - Rules for controllers (Xbox, PlayStation, Switch) are preinstalled
+- Windows programs run through Wine, also 32-bit ones (installers, older programs), without
+  extra downloads; `kestrel webview2` installs Microsoft WebView2 for programs that need it
+  (it installs and runs, but Wine cannot show its window contents yet, see D29)
 - Easy Anti-Cheat (e.g. Rocket League) should run through Proton. This is checked on real
   hardware. Secure Boot stays on; nothing interferes with anti-cheat checks.
 
@@ -66,6 +72,10 @@ The system language in the screenshots is German; every language Fedora supports
 - Intel and AMD graphics work right away. Nvidia drivers are included and only switch on
   when an Nvidia card is found.
 - Also runs in VMs (QEMU/KVM, VirtualBox, VMware).
+- Fixes for single laptop models are applied automatically at boot, only on that model. The
+  first: the Acer Aspire Lite 15 (AL15-45P), where every Linux stayed on a black screen (D31).
+- The live USB stick writes its own logs to a small "KESTRELLOG" partition, so a computer that
+  stays on a black screen can still be diagnosed from another one (D30).
 
 **Updates that don't break things**
 - Updates are prepared in the background and only become active at the next restart.
@@ -77,6 +87,7 @@ The system language in the screenshots is German; every language Fedora supports
 kestrel update     # update system and apps (takes effect after a restart)
 kestrel rollback   # go back to the previous system (takes effect after a restart)
 kestrel status     # which version is running, which one is prepared
+kestrel webview2   # install Microsoft WebView2 for Windows programs (Wine)
 ```
 
 ## Project layout
@@ -91,12 +102,15 @@ image/packages/         package lists (one line = one package)
 image/artwork/          wallpaper, dock design and other artwork as source code
 image/decoration/       the Kestrel window frame (C++, built against the image's KDE libraries)
 image/dock-settings/    System Settings > Dock (C++ and QML, built the same way)
-image/system_files/     files copied into the system 1:1 (incl. dock widget and lock screen)
+image/system_files/     files copied into the system 1:1 (incl. dock, Launchpad, clock, lock screen,
+                        per-model fixes in usr/lib/dracut/modules.d/90kestrel-quirks)
 image/live/             live layer for the USB stick (live start, installer, Kestrel branding)
 iso/live/               builds the live ISO and the Kestrel boot menu
 iso/release.toml        settings for the plain installer ISO
 test/vm-test.sh         automatic test: installs the ISO in a VM and checks everything
 test/live-test.sh       starts the live ISO in a VM and takes pictures
+test/live-usb-log.sh    boots the live ISO as a USB stick and checks that it writes its logs
+test/webview2test.c     small Windows program that checks WebView2 under Wine
 test/vm-live.sh         try design changes quickly, without rebuilding
 sandbox/setup.sh        sets up the build environment
 sandbox/watchdog.sh     watchdog for long builds (reports hangs)
@@ -166,6 +180,7 @@ test/vm-live.sh start         # start the installed test VM
 test/vm-live.sh deco          # compile and apply the window frame (image/decoration/)
 test/vm-live.sh plasma        # apply the dock and top bar design
 test/vm-live.sh dock          # apply the Kestrel Dock widget
+test/vm-live.sh launchpad     # apply the Kestrel Launchpad and open it
 test/vm-live.sh lock          # apply the lock screen and lock (unlock unlocks again)
 test/vm-live.sh lockopt K V   # change a lock screen setting
 test/vm-live.sh shot name     # screenshot to out/test/vm/name.png
