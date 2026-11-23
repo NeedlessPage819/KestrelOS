@@ -32,10 +32,11 @@ cat >> /usr/share/anaconda/interactive-defaults.ks <<'KS'
 ostreecontainer --url=/run/initramfs/live/container --transport=oci --no-signature-verification
 KS
 
-# "Install" launcher: Kestrel name and an icon that fits the dock, first in the live dock.
+# "Install" launcher: Kestrel name and Kestrel's installer icon (image/artwork/kestrel_icons.py),
+# first in the live dock.
 inst=/usr/share/applications/liveinst.desktop
 [[ -f $inst ]] || die "liveinst.desktop missing"
-sed -i -e 's/^Name=.*/Name=Install Kestrel OS/' -e '/^Name\[/d' -e 's/^Icon=.*/Icon=system-software-install/' "$inst"
+sed -i -e 's/^Name=.*/Name=Install Kestrel OS/' -e '/^Name\[/d' -e 's/^Icon=.*/Icon=kestrel-installer/' "$inst"
 sed -i '/^Name=/a Name[de]=Kestrel OS installieren' "$inst"
 for layout in /usr/share/plasma/look-and-feel/org.kestrel.desktop*/contents/layouts/org.kde.plasma.desktop-layout.js; do
     sed -i 's|    "applications:org.kde.dolphin.desktop",|    "applications:liveinst.desktop",\n    "applications:org.kde.dolphin.desktop",|' "$layout"

@@ -526,7 +526,8 @@ Tested on a PC with a 4K TV. What was wrong and what changed:
 **What:** Kestrel now has its own icon set and uses it by default. It stays close to WhiteSur's
 look (D17), but in Kestrel's colours and with the Kestrel bird where it fits:
 - app icons on rounded tiles with depth: Files, Terminal, Settings, Store, Launchpad, Text
-  Editor, Images, Calculator, Screenshot, Music, Videos, Archiver;
+  Editor, Images, Calculator, Screenshot, Music, Videos, Archiver, and "Install Kestrel OS" on
+  the live stick (its own icon name, so the generic "install software" icon stays WhiteSur's);
 - the trash (empty and full);
 - light Kestrel-blue folders with the kind of folder pressed into the front;
 - file pages, coloured by type for PDF, archives, audio, video and Windows programs.

@@ -141,6 +141,14 @@ APPS = {
                '<rect x="29" y="35" width="70" height="52" rx="9" fill="url(#film)"/>'
                + "".join(f'<rect x="{34 + 12 * i}" y="39" width="7" height="5" rx="1.5" fill="#c22f41" opacity=".55"/><rect x="{34 + 12 * i}" y="78" width="7" height="5" rx="1.5" fill="#c22f41" opacity=".55"/>' for i in range(6))
                + '<path d="M57 51 l16 10 l-16 10 Z" fill="#c22f41" stroke="#c22f41" stroke-width="3" stroke-linejoin="round"/>'),
+    # "Install Kestrel OS" on the live stick: an arrow going down into a drive with the bird on it.
+    "installer": ("blue",
+                  lin("drv", "#ffffff", "#dfe4ff"),
+                  '<path d="M64 25 v31" stroke="#fff" stroke-width="8" stroke-linecap="round"/>'
+                  '<path d="M48 44 l16 16 l16 -16" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>'
+                  '<rect x="28" y="68" width="72" height="26" rx="8" fill="url(#drv)"/>'
+                  '<circle cx="88" cy="81" r="3.5" fill="#2dc2b3"/>'
+                  + bird(40, 73, 1.45, "#5b6cf0", 'opacity=".8"')),
     "archiver": ("amber",
                  lin("box", "#fff7e6", "#ffe0a8"),
                  '<path d="M33 50 h62 v35 a7 7 0 0 1 -7 7 H40 a7 7 0 0 1 -7 -7 Z" fill="url(#box)"/>'
@@ -247,7 +255,7 @@ LABELS = {
     "app-files": "Files", "app-terminal": "Terminal", "app-settings": "Settings", "app-store": "Store",
     "app-launchpad": "Launchpad", "app-texteditor": "Text Editor", "app-images": "Images",
     "app-calculator": "Calculator", "app-screenshot": "Screenshot", "app-music": "Music",
-    "app-videos": "Videos", "app-archiver": "Archiver", "trash": "Trash", "trash-full": "Trash (full)",
+    "app-videos": "Videos", "app-archiver": "Archiver", "app-installer": "Install", "trash": "Trash", "trash-full": "Trash (full)",
     "folder-folder": "Folder", "folder-home": "Home", "folder-documents": "Documents",
     "folder-downloads": "Downloads", "folder-pictures": "Pictures", "folder-music": "Music",
     "folder-videos": "Videos", "folder-desktop": "Desktop", "file-text": "Text", "file-image": "Image",
@@ -344,6 +352,8 @@ INSTALL = {
         "app-music": ["org.kde.elisa", "elisa"],
         "app-videos": ["org.kde.haruna", "org.kde.dragonplayer", "multimedia-video-player"],
         "app-archiver": ["org.kde.ark", "ark", "utilities-file-archiver"],
+        # Own name, not "system-software-install": that one means "install software" in other apps.
+        "app-installer": ["kestrel-installer", "anaconda", "org.fedoraproject.AnacondaInstaller", "liveinst"],
     },
     "places": {
         "trash": ["user-trash"],
