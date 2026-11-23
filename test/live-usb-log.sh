@@ -30,7 +30,8 @@ trap 'kill $vm_pid 2>/dev/null || true' EXIT
 echo "booting the ISO as a USB stick; waiting 4 minutes for the live session to write its logs"
 sleep 240
 echo "system_powerdown" | timeout 10 socat - TCP:127.0.0.1:${MONITOR_PORT} >/dev/null || true
-for (( i = 0; i < 90; i++ )); do kill -0 $vm_pid 2>/dev/null || break; sleep 1; done
+for (( i = 0; i < 180; i++ )); do kill -0 $vm_pid 2>/dev/null || break; sleep 1; done
+kill -0 $vm_pid 2>/dev/null && echo "warning: the VM did not shut down cleanly within 3 minutes"
 kill $vm_pid 2>/dev/null || true
 wait $vm_pid 2>/dev/null || true
 trap - EXIT
@@ -40,6 +41,10 @@ qemu-img convert -O raw "$OUT/stick.qcow2" "$OUT/stick.raw"
 start=$(sfdisk -d "$OUT/stick.raw" | awk -F'[=,]' '/start=/{n++; if (n == 3) {gsub(/ /, "", $2); print $2}}')
 [[ -n $start ]] || { echo "FAIL: no third partition on the stick"; exit 1; }
 img="$OUT/stick.raw@@$((start * 512))"
+# The partition must survive the live session (and a hard power-off): check it first.
+dd if="$OUT/stick.raw" of="$OUT/log.img" bs=512 skip="$start" count=131072 status=none
+fsck.fat -n "$OUT/log.img" >"$OUT/fsck.txt" 2>&1 || { echo "FAIL: KESTRELLOG file system damaged:"; cat "$OUT/fsck.txt"; exit 1; }
+rm -f "$OUT/log.img"
 echo "KESTRELLOG contents:"
 mdir -/ -i "$img" ::
 folder=$(mdir -b -i "$img" :: | grep -v README | head -1)
