@@ -19,14 +19,19 @@ Item {
     readonly property int style: config.clockStyle
     readonly property var weights: [Font.Light, Font.Normal, Font.DemiBold, Font.Bold]
 
-    function timeFormat() {
-        let f;
-        switch (config.timeFormat) {
-        case 1: f = "H:mm"; break;   // 24 hours
-        case 2: f = "h:mm"; break;   // 12 hours, without AM/PM like the Mac
-        default: f = Qt.locale().timeFormat(Locale.ShortFormat).replace(/\s*(AP|ap|A|a)\s*/, "");
-        }
-        return config.showSeconds ? f.replace(/mm/, "mm:ss") : f;
+    // 12 hours when chosen, or (automatic) when the language uses them, as in English.
+    readonly property bool twelveHours: config.timeFormat === 2 ||
+        (config.timeFormat === 0 && /a/i.test(Qt.locale().timeFormat(Locale.ShortFormat).replace(/'[^']*'/g, "")))
+
+    // The time like the Mac's lock screen: "6:03" in 12-hour languages, without AM/PM. In Qt, "h"
+    // only counts to 12 when the format also has AM/PM, so the time is formatted with it and the
+    // AM/PM text removed afterwards (removing it from the format gave "18:03p").
+    function timeText(d) {
+        const secs = config.showSeconds ? ":ss" : "";
+        if (!twelveHours) return Qt.locale().toString(d, "H:mm" + secs);
+        let s = Qt.locale().toString(d, "h:mm" + secs + " AP");
+        for (const t of [Qt.locale().amText, Qt.locale().pmText, "AM", "PM"]) if (t) s = s.replace(t, "");
+        return s.trim();
     }
 
     function dateText() {
@@ -72,7 +77,7 @@ Item {
             renderType: Text.CurveRendering   // crisp large digits, no colour fringes
             Layout.alignment: Qt.AlignHCenter
             visible: clock.style !== 2
-            text: Qt.locale().toString(clock.now, clock.timeFormat())
+            text: clock.timeText(clock.now)
             color: "white"
             opacity: 0.94
             font.family: "Inter"
