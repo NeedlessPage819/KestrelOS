@@ -64,7 +64,7 @@ The system language in the screenshots is German; every language Fedora supports
 - Rules for controllers (Xbox, PlayStation, Switch) are preinstalled
 - Windows programs run through Wine, also 32-bit ones (installers, older programs), without
   extra downloads; `kestrel webview2` installs Microsoft WebView2 for programs that need it
-  (it installs and runs, but Wine cannot show its window contents yet, see D29)
+  (works on real hardware; apps with their own window frame may show a white border, D29)
 - Easy Anti-Cheat (e.g. Rocket League) should run through Proton. This is checked on real
   hardware. Secure Boot stays on; nothing interferes with anti-cheat checks.
 

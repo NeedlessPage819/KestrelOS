@@ -634,3 +634,10 @@ goes to the next page; the list no longer scrolls by itself (it only shifted a l
 dot already showed the next page), and a touchpad's momentum does not skip pages. The list also
 moves with the dots (it needs to be told where the current page
 sits on screen; without that only the page number changed).
+
+**Update (real hardware):** on the Acer AL15-45P (AMD graphics), `kestrel webview2` installed
+WebView2 in the live session and a real WebView2 app **worked and drew its contents**. The white
+window in the VM was down to the VM's missing graphics card. Remaining issue: a white border
+around that app's window. Apps that draw their own frame leave a margin for shadow and rounded
+corners that Windows makes transparent through its compositor (DWM / DirectComposition); Wine does
+not do that yet, so the margin shows white. Cosmetic only.
