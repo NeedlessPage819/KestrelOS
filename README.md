@@ -33,15 +33,14 @@ All screenshots are from the automatic and manual tests in a VM.
 | ![Restart](docs/screenshots/restart-confirm.png) Restart and Shut Down ask first | ![Live desktop](docs/screenshots/live-desktop.png) The live USB stick, with "Install Kestrel OS" in the dock |
 | ![Dock](docs/screenshots/dock-magnification.png) Dock with magnification and labels | ![Lock screen](docs/screenshots/lock-screen.png) Lock screen |
 | ![Lock screen, wrong password](docs/screenshots/lock-screen-password.png) Lock screen after a wrong password | ![Lock screen variant](docs/screenshots/lock-screen-variant.png) One of many lock screen styles: small thin clock, blurred wallpaper, a message |
-| ![Lock screen settings](docs/screenshots/lock-screen-settings.png) Lock screen settings | ![Setup wizard](docs/screenshots/setup-dark-mode.png) First-start setup with dark mode switched on |
-| ![Installer](docs/screenshots/installer.png) Installer from the live USB stick | ![Installer finished](docs/screenshots/installer-done.png) Installation finished |
+| ![Installer](docs/screenshots/installer.png) Installer from the live USB stick: language and keyboard on the first page | ![Installer finished](docs/screenshots/installer-done.png) Installation finished |
 | ![Boot menu](docs/screenshots/boot-menu.png) Boot menu of the live USB stick (same with Secure Boot) | ![Boot screen](docs/screenshots/boot-screen.png) Boot screen |
-| ![Setup welcome](docs/screenshots/setup-welcome.png) First-start setup | ![Setup finished](docs/screenshots/setup-finished.png) End of the setup |
-| ![Login screen](docs/screenshots/login-screen.png) Login screen | ![Start screen](docs/screenshots/start-screen.png) Start screen after logging in, fades into the desktop |
+| ![Setup welcome](docs/screenshots/setup-welcome.png) First start: the setup wizard | ![Setup language](docs/screenshots/setup-language.png) Setup: language, keyboard, time, Wi-Fi, account |
+| ![Setup finished](docs/screenshots/setup-finished.png) End of the setup | ![Login screen](docs/screenshots/login-screen.png) Login screen |
+| ![Start screen](docs/screenshots/start-screen.png) Start screen after logging in, fades into the desktop | |
 
-Kestrel starts in English; every language Fedora supports can be chosen while installing. The
-installer, setup, login and lock screen settings pictures are still from an older German test run
-and are being retaken in English.
+Kestrel starts in English; the installer suggests the language of your location, and every
+language Fedora supports can be chosen while installing.
 
 ## What's inside
 

@@ -47,7 +47,7 @@ def background(os_name):
   <text x="{W / 2}" y="400" text-anchor="middle" fill="#ffffff" font-family="Inter"
         font-weight="300" font-size="52" letter-spacing="1">{os_name}</text>
   <text x="{W / 2}" y="985" text-anchor="middle" fill="#6e6e73" font-family="Inter"
-        font-size="24">Pfeiltasten zum Auswählen, Enter zum Starten</text>
+        font-size="24">Arrow keys to choose, Enter to start</text>
 </svg>"""
 
 
