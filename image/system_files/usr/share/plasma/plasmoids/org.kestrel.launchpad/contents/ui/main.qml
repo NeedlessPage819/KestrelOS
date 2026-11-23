@@ -152,7 +152,7 @@ PlasmoidItem {
             readonly property real s: Math.max(0.6, Math.min(width / 1920, height / 1080))
             anchors.fill: parent
             onClicked: root.close()      // a click on empty space closes, like on the Mac
-            onWheel: wheel => pages.wheelStep(wheel.angleDelta.y || -wheel.angleDelta.x)
+            onWheel: wheel => pages.wheelStep(wheel)      // also outside the grid
 
             function reset() {
                 search.text = ""
@@ -245,11 +245,28 @@ PlasmoidItem {
                     clip: true          // the next page stays hidden until you switch
                     model: Math.max(1, Math.ceil(root.shownApps.length / content.perPage))
 
+                    // Scrolling turns pages, one page per gesture, like on the Mac: mouse wheel
+                    // down or a two-finger swipe goes to the next page. The list must not
+                    // scroll by itself (it only shifted a little and the page did not change),
+                    // so the wheel catcher below takes every wheel event. A gesture ends after
+                    // a short pause, so a touchpad's momentum does not skip several pages.
                     property real wheelAcc: 0
-                    function wheelStep(delta) {
-                        wheelAcc += delta
-                        if (wheelAcc <= -120) { incrementCurrentIndex(); wheelAcc = 0 }
-                        else if (wheelAcc >= 120) { decrementCurrentIndex(); wheelAcc = 0 }
+                    property bool wheelLocked: false
+                    function wheelStep(wheel) {
+                        const d = Math.abs(wheel.angleDelta.x) > Math.abs(wheel.angleDelta.y)
+                            ? wheel.angleDelta.x : wheel.angleDelta.y
+                        wheelPause.restart()
+                        if (wheelLocked) return
+                        wheelAcc += d
+                        if (Math.abs(wheelAcc) < 100) return
+                        if (wheelAcc < 0) incrementCurrentIndex(); else decrementCurrentIndex()
+                        wheelAcc = 0
+                        wheelLocked = true
+                    }
+                    Timer {
+                        id: wheelPause
+                        interval: 300
+                        onTriggered: { pages.wheelLocked = false; pages.wheelAcc = 0 }
                     }
 
                     delegate: Item {
@@ -307,6 +324,14 @@ PlasmoidItem {
                             }
                         }
                     }
+                }
+
+                // Wheel catcher over the pages (see wheelStep); clicks and drags pass through.
+                MouseArea {
+                    x: pages.x; y: pages.y
+                    width: pages.width; height: pages.height
+                    acceptedButtons: Qt.NoButton
+                    onWheel: wheel => { pages.wheelStep(wheel); wheel.accepted = true }
                 }
 
                 // Nothing found.
