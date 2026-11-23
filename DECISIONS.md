@@ -628,5 +628,8 @@ Mac's, does not.) The Launchpad opens from the dock icon and the Meta key.
 screen for Restart and Shut Down drew its names and buttons almost invisible. The theme
 generator (`image/artwork/plasma_theme.py`) now writes the key and Breeze's `plasmarc`.
 
-**Pages:** the page list now moves with the dots (it needs to be told where the current page
+**Pages:** scrolling turns exactly one page per gesture: mouse wheel down or a two-finger swipe
+goes to the next page; the list no longer scrolls by itself (it only shifted a little, while the
+dot already showed the next page), and a touchpad's momentum does not skip pages. The list also
+moves with the dots (it needs to be told where the current page
 sits on screen; without that only the page number changed).
