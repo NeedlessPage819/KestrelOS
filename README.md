@@ -28,7 +28,9 @@ All screenshots are from the automatic and manual tests in a VM.
 | | |
 |---|---|
 | ![Light mode](docs/screenshots/desktop-light.png) Light mode | ![Dark mode](docs/screenshots/desktop-dark.png) Dark mode ("Kestrel Dark") |
-| ![Window frame](docs/screenshots/window-light.png) Window frame with real rounded corners: the window content is cut round too | |
+| ![Window frame](docs/screenshots/window-light.png) Window frame with real rounded corners: the window content is cut round too | ![Kestrel menu](docs/screenshots/kestrel-menu.png) The Kestrel menu behind the bird, like the Apple menu |
+| ![Launchpad](docs/screenshots/launchpad.png) Launchpad: all apps over the blurred desktop | ![Launchpad search](docs/screenshots/launchpad-search.png) Typing in the Launchpad searches; Enter opens the first hit |
+| ![Restart](docs/screenshots/restart-confirm.png) Restart and Shut Down ask first | ![Live desktop](docs/screenshots/live-desktop.png) The live USB stick, with "Install Kestrel OS" in the dock |
 | ![Dock](docs/screenshots/dock-magnification.png) Dock with magnification and labels | ![Lock screen](docs/screenshots/lock-screen.png) Lock screen |
 | ![Lock screen, wrong password](docs/screenshots/lock-screen-password.png) Lock screen after a wrong password | ![Lock screen variant](docs/screenshots/lock-screen-variant.png) One of many lock screen styles: small thin clock, blurred wallpaper, a message |
 | ![Lock screen settings](docs/screenshots/lock-screen-settings.png) Lock screen settings | ![Setup wizard](docs/screenshots/setup-dark-mode.png) First-start setup with dark mode switched on |
@@ -37,7 +39,9 @@ All screenshots are from the automatic and manual tests in a VM.
 | ![Setup welcome](docs/screenshots/setup-welcome.png) First-start setup | ![Setup finished](docs/screenshots/setup-finished.png) End of the setup |
 | ![Login screen](docs/screenshots/login-screen.png) Login screen | ![Start screen](docs/screenshots/start-screen.png) Start screen after logging in, fades into the desktop |
 
-The system language in the screenshots is German; every language Fedora supports works.
+Kestrel starts in English; every language Fedora supports can be chosen while installing. The
+installer, setup, login and lock screen settings pictures are still from an older German test run
+and are being retaken in English.
 
 ## What's inside
 
