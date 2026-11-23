@@ -29,9 +29,9 @@ vm_pid=$!
 trap 'kill $vm_pid 2>/dev/null || true' EXIT
 echo "booting the ISO as a USB stick; waiting 4 minutes for the live session to write its logs"
 sleep 240
-echo "system_powerdown" | timeout 10 socat - TCP:127.0.0.1:${MONITOR_PORT} >/dev/null || true
-for (( i = 0; i < 180; i++ )); do kill -0 $vm_pid 2>/dev/null || break; sleep 1; done
-kill -0 $vm_pid 2>/dev/null && echo "warning: the VM did not shut down cleanly within 3 minutes"
+# Switch off hard, like holding the power button on a black screen (the live session would
+# only show its "Shut down?" screen on a soft power-button press).
+echo "quit" | timeout 10 socat - TCP:127.0.0.1:${MONITOR_PORT} >/dev/null || true
 kill $vm_pid 2>/dev/null || true
 wait $vm_pid 2>/dev/null || true
 trap - EXIT
@@ -43,6 +43,9 @@ start=$(sfdisk -d "$OUT/stick.raw" | awk -F'[=,]' '/start=/{n++; if (n == 3) {gs
 img="$OUT/stick.raw@@$((start * 512))"
 # The partition must survive the live session (and a hard power-off): check it first.
 dd if="$OUT/stick.raw" of="$OUT/log.img" bs=512 skip="$start" count=131072 status=none
+# After a hard power-off the "not cleanly unmounted" flag is set (FAT32 boot sector, byte 65);
+# that is expected. Clear it in the copy, then any remaining finding is real damage.
+printf '\000' | dd of="$OUT/log.img" bs=1 seek=65 conv=notrunc status=none
 fsck.fat -n "$OUT/log.img" >"$OUT/fsck.txt" 2>&1 || { echo "FAIL: KESTRELLOG file system damaged:"; cat "$OUT/fsck.txt"; exit 1; }
 rm -f "$OUT/log.img"
 echo "KESTRELLOG contents:"
