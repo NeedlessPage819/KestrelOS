@@ -201,8 +201,10 @@ def metadata():
     }, indent=4) + "\n"
 
 
-# Same as Breeze ("default"): panels and popups turn opaque when a window is maximised.
-PLASMARC = "[AdaptiveTransparency]\nenabled=true\n"
+# No adaptive transparency: with it Plasma turns panels opaque when a window is maximised, and for
+# the dock that drew Breeze's grey panel over the whole panel, including the invisible band the
+# icons magnify into (a large grey box around the dock, D33). Dock and top bar stay glass.
+PLASMARC = "[AdaptiveTransparency]\nenabled=false\n"
 
 
 def dock_geometry_js():
@@ -228,6 +230,10 @@ def main():
     (out / "metadata.json").write_text(metadata())
     (out / "plasmarc").write_text(PLASMARC)
     (out / "widgets" / "panel-background.svg").write_text(panel_background())
+    # Plasma also looks for an "opaque" panel (for example when the panel's opacity is set to
+    # opaque); without one it falls back to Breeze's grey. It is the same glass.
+    (out / "opaque" / "widgets").mkdir(parents=True, exist_ok=True)
+    (out / "opaque" / "widgets" / "panel-background.svg").write_text(panel_background())
     (out / "widgets" / "tasks.svg").write_text(tasks())
 
 
