@@ -657,5 +657,24 @@ dock look the same with or without a maximized window. Checked in the VM: maximi
 the old theme shows the grey box, with the new one only the dock glass.
 
 **Unchanged:** the dock stays "Only for full-screen apps" (always visible, covered only by
-full-screen apps; System Settings > Dock). A maximized window still ends above the dock panel,
-including the magnification band; Plasma reserves the panel's whole height.
+full-screen apps; System Settings > Dock). How much room maximized windows get: D34.
+
+## D34 – Maximized windows reach down to the dock
+
+**Problem:** maximized windows ended about 150 px above the bottom of the screen, far above the
+visible dock. Plasma reserves a panel's whole height for it, and the dock panel is taller than
+its glass: the empty band above the glass is where the icons magnify. On the Mac the window ends
+at the dock and the magnified icons grow over the window.
+
+**Fix:** the dock panel itself reserves no space (Plasma's "windows go below" mode: the panel
+still stays on top of normal windows, and full-screen windows cover it as before). The dock widget
+adds an invisible strip at the bottom edge of its screen (a layer-shell surface, input passes
+through it) that reserves exactly the height of the glass. So maximized windows end at the top
+of the glass, and the magnified icons and their name labels grow over the window.
+
+The behaviour is unchanged: always visible, only full-screen apps cover it. System Settings >
+Dock shows it as "Only for full-screen apps" (the panel in "windows go below" mode plus the
+dock's `reserveSpace` setting); "Never, windows may go underneath" is the same panel mode without
+the strip. Docks set up before this ("none") still work and switch over when the settings are saved.
+Checked in the VM: a maximized Dolphin reaches the glass, the magnified Firefox icon and its
+label draw over it, a full-screen Dolphin covers the dock.

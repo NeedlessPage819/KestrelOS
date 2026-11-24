@@ -24,6 +24,11 @@
       <min>1.2</min>
       <max>1.8</max>
     </entry>
+    <!-- Reserve the glass's height for maximized windows while the panel lets windows go
+         below it: "Only for full-screen apps" in the dock settings (DECISIONS.md D34). -->
+    <entry name="reserveSpace" type="Bool">
+      <default>true</default>
+    </entry>
     <entry name="showIndicators" type="Bool">
       <default>true</default>
     </entry>

@@ -28,7 +28,11 @@ dock.alignment = "center";
 dock.lengthMode = "fit";
 dock.floating = true;
 // Like the Mac: always visible, only full-screen apps cover it. System Settings > Dock (D27).
-dock.hiding = "none";
+// Plasma would reserve the panel's whole height for it, including the empty band the icons
+// magnify into, so maximized windows would end far above the dock. The panel reserves nothing
+// instead and the dock widget reserves exactly its glass (DECISIONS.md D34); the dock still
+// stays on top of normal windows. The dock settings show this as "Only for full-screen apps".
+dock.hiding = "windowsgobelow";
 
 var apps = dock.addWidget("org.kestrel.dock");
 // Only apps that are part of the image: Flatpaks arrive later and would show as blank icons.

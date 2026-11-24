@@ -26,7 +26,8 @@ class KestrelDockKcm : public KQuickConfigModule
     Q_PROPERTY(bool magnify READ magnify WRITE setMagnify NOTIFY changed)
     Q_PROPERTY(double zoom READ zoom WRITE setZoom NOTIFY changed)
     Q_PROPERTY(bool showIndicators READ showIndicators WRITE setShowIndicators NOTIFY changed)
-    // 0 only full-screen apps cover it, 1 dodge windows, 2 auto-hide, 3 windows may go below
+    // 0 only full-screen apps cover it (maximized windows end at the glass, D34),
+    // 1 dodge windows, 2 auto-hide, 3 windows may go below
     Q_PROPERTY(int hiding READ hiding WRITE setHiding NOTIFY changed)
     Q_PROPERTY(int iconMin MEMBER m_iconMin CONSTANT)
     Q_PROPERTY(int iconMax MEMBER m_iconMax CONSTANT)
@@ -66,6 +67,7 @@ public:
                     r.magnify = w.readConfig("magnify", true);
                     r.zoom = w.readConfig("zoom", 1.6);
                     r.showIndicators = w.readConfig("showIndicators", true);
+                    r.reserveSpace = w.readConfig("reserveSpace", true);
                     r.hiding = p.hiding;
                 });
             });
@@ -78,9 +80,13 @@ public:
         m_zoom = std::clamp(toDouble(r.value(QStringLiteral("zoom")), 1.6), 1.2, m_zoomMax);
         m_showIndicators = toBool(r.value(QStringLiteral("showIndicators")), true);
         const QString hiding = r.value(QStringLiteral("hiding")).toString();
+        // "Only for full-screen apps" is the panel's "windows go below" mode plus the dock's
+        // own reserved strip of exactly the glass height (DECISIONS.md D34); without the strip
+        // it is "windows may go underneath". "none" is how docks before D34 were set up.
+        const bool reserve = toBool(r.value(QStringLiteral("reserveSpace")), true);
         m_hiding = hiding == QLatin1String("dodgewindows") ? 1
             : hiding == QLatin1String("autohide")       ? 2
-            : hiding == QLatin1String("windowsgobelow") ? 3
+            : hiding == QLatin1String("windowsgobelow") ? (reserve ? 0 : 3)
                                                         : 0;
         Q_EMIT changed();
         setNeedsSave(false);
@@ -88,7 +94,7 @@ public:
 
     void save() override
     {
-        static const char *hidingNames[] = {"none", "dodgewindows", "autohide", "windowsgobelow"};
+        static const char *hidingNames[] = {"windowsgobelow", "dodgewindows", "autohide", "windowsgobelow"};
         const int height = m_overflow + m_pad + m_iconSize + m_bottom; // as plasma_theme.py dock_height()
         evaluate(QStringLiteral(R"JS(
             panels().forEach(function (p) {
@@ -101,6 +107,7 @@ public:
                     w.writeConfig("magnify", %2);
                     w.writeConfig("zoom", %3);
                     w.writeConfig("showIndicators", %4);
+                    w.writeConfig("reserveSpace", %7);
                 });
                 if (isDock) {
                     p.height = %5;
@@ -113,7 +120,8 @@ public:
                      .arg(m_zoom, 0, 'f', 2)
                      .arg(m_showIndicators ? QStringLiteral("true") : QStringLiteral("false"))
                      .arg(height)
-                     .arg(QLatin1String(hidingNames[m_hiding])));
+                     .arg(QLatin1String(hidingNames[m_hiding]))
+                     .arg(m_hiding == 0 ? QStringLiteral("true") : QStringLiteral("false")));
         setNeedsSave(false);
     }
 

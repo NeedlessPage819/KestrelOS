@@ -77,8 +77,8 @@ KCM.SimpleKCM {
             wrapMode: Text.Wrap
             font: Kirigami.Theme.smallFont
             opacity: 0.7
-            text: [page.tr("Das Dock bleibt sichtbar. Maximierte Fenster enden darüber, nur Spiele und Videos im Vollbild verdecken es.",
-                           "The dock stays visible. Maximized windows end above it; only full-screen games and videos cover it."),
+            text: [page.tr("Das Dock bleibt sichtbar. Maximierte Fenster reichen bis an das Dock, nur Spiele und Videos im Vollbild verdecken es.",
+                           "The dock stays visible. Maximized windows reach down to the dock; only full-screen games and videos cover it."),
                    page.tr("Das Dock verschwindet, sobald ein Fenster es berührt, und kommt zurück, wenn der Mauszeiger an den unteren Rand geht.",
                            "The dock disappears as soon as a window touches it and comes back when the pointer reaches the bottom edge."),
                    page.tr("Das Dock erscheint nur, wenn der Mauszeiger an den unteren Rand geht.",

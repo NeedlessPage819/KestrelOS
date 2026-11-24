@@ -15,6 +15,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasma5support as P5Support
 import org.kde.taskmanager as TaskManager
+import org.kde.layershell as LayerShell
 import "geometry.js" as G
 
 PlasmoidItem {
@@ -158,6 +159,44 @@ PlasmoidItem {
                 dock.sampleExtra()
                 if (runs >= 30) dock.extraFrozen = true
             }
+        }
+
+        // Space for maximized windows (DECISIONS.md D34). Plasma reserves a panel's whole
+        // height, which for the dock includes the empty band the icons magnify into: maximized
+        // windows ended far above the glass. So the dock panel itself reserves nothing (Plasma's
+        // "windows go below" mode; it still stays on top of normal windows, and full-screen apps
+        // cover it) and this invisible strip at the screen edge reserves exactly the glass, as
+        // on the Mac. Magnified icons then grow over the window. Only in that mode and with
+        // "Only for full-screen apps" chosen (reserveSpace); the other modes reserve nothing.
+        readonly property bool reserving: Plasmoid.configuration.reserveSpace
+            && !!dock.Window.window && dock.Window.window.visibilityMode === 3
+        property int reserve: 0
+        function measureReserve() {
+            const win = dock.Window.window
+            if (!win || height <= 0) return
+            const top = dock.mapToItem(null, 0, 0).y + mask.y
+            reserve = Math.max(0, Math.ceil(win.height - top))
+        }
+        onMaskChanged: Qt.callLater(measureReserve)
+        Window {
+            id: spaceStrip
+            LayerShell.Window.scope: "kestrel-dock-space"
+            LayerShell.Window.layer: LayerShell.Window.LayerBackground
+            LayerShell.Window.anchors: LayerShell.Window.AnchorBottom | LayerShell.Window.AnchorLeft | LayerShell.Window.AnchorRight
+            LayerShell.Window.exclusionZone: dock.reserve
+            LayerShell.Window.keyboardInteractivity: LayerShell.Window.KeyboardInteractivityNone
+            LayerShell.Window.activateOnShow: false
+            flags: Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus | Qt.WindowTransparentForInput
+            color: "transparent"
+            width: 1
+            height: 1
+            // The dock's screen (with a second monitor the strip must sit under the dock).
+            screen: {
+                const g = Plasmoid.containment.screenGeometry
+                return Qt.application.screens.find(s => s.virtualX === g.x && s.virtualY === g.y)
+                    ?? Qt.application.screens[0]
+            }
+            visible: dock.reserving && dock.reserve > 0
         }
 
         function restLeft(k) {
