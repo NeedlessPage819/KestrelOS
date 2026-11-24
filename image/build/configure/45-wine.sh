@@ -17,5 +17,7 @@ cat > "$cil" <<'EOF'
 EOF
 semodule -i "$cil" || die "could not install the Kestrel Wine SELinux module"
 rm -rf "${cil%/*}"
-dll=$(grep -m1 '/i386-windows/ntdll\.dll$' < <(rpm -ql wine-core.i686)) || die "32-bit Wine not installed"
+# The 32-bit part: in Fedora's wine-core.i686 up to Wine 11.0, inside the x86_64 package
+# (WoW64) since 11.21. Either way it must be there.
+dll=$(grep -m1 '/i386-windows/ntdll\.dll$' < <(rpm -ql wine-core)) || die "32-bit Wine not installed"
 [[ $(matchpathcon -n "$dll") == *:textrel_shlib_t:* ]] || die "Wine DLLs would not get the textrel_shlib_t label"
