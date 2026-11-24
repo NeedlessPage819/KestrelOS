@@ -672,9 +672,18 @@ adds an invisible strip at the bottom edge of its screen (a layer-shell surface,
 through it) that reserves exactly the height of the glass. So maximized windows end at the top
 of the glass, and the magnified icons and their name labels grow over the window.
 
-The behaviour is unchanged: always visible, only full-screen apps cover it. System Settings >
-Dock shows it as "Only for full-screen apps" (the panel in "windows go below" mode plus the
-dock's `reserveSpace` setting); "Never, windows may go underneath" is the same panel mode without
-the strip. Docks set up before this ("none") still work and switch over when the settings are saved.
-Checked in the VM: a maximized Dolphin reaches the glass, the magnified Firefox icon and its
-label draw over it, a full-screen Dolphin covers the dock.
+The strip also leaves a 10 px gap between the window and the glass; flush, the dock looked
+glued to the window's bottom edge.
+
+The behaviour is unchanged: always visible, only full-screen apps cover it ("Only for full-screen
+apps" in System Settings > Dock: the panel in "windows go below" mode plus the dock's strip).
+Docks set up before this ("none") still work and switch over when the dock settings are saved.
+
+**Option "Let the dock float over windows"** (System Settings > Dock, off by default; not how the
+Mac does it): no strip, maximized windows use the whole screen height and the dock sits on top of
+them. Full-screen apps still cover the dock. The Hide choices "When a window touches the dock" and
+"Always hide automatically" reserve no space anyway, so the option is greyed out with them. It
+replaces the former Hide choice "Never, windows may go underneath", which did the same.
+Checked in the VM: a maximized Dolphin ends 10 px above the glass, the magnified Firefox icon and
+its label draw over it, a full-screen Dolphin covers the dock, and with the option on the
+maximized Dolphin reaches the bottom of the screen under the dock.

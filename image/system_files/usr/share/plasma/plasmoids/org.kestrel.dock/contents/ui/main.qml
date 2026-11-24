@@ -166,16 +166,19 @@ PlasmoidItem {
         // windows ended far above the glass. So the dock panel itself reserves nothing (Plasma's
         // "windows go below" mode; it still stays on top of normal windows, and full-screen apps
         // cover it) and this invisible strip at the screen edge reserves exactly the glass, as
-        // on the Mac. Magnified icons then grow over the window. Only in that mode and with
-        // "Only for full-screen apps" chosen (reserveSpace); the other modes reserve nothing.
+        // on the Mac. Magnified icons then grow over the window. Only in that mode, and not
+        // with "Let the dock float over windows" (reserveSpace off); other modes reserve nothing.
         readonly property bool reserving: Plasmoid.configuration.reserveSpace
             && !!dock.Window.window && dock.Window.window.visibilityMode === 3
         property int reserve: 0
+        // Space between a maximized window and the glass: touching, the dock looked glued to
+        // the window's edge.
+        readonly property int windowGap: 10
         function measureReserve() {
             const win = dock.Window.window
             if (!win || height <= 0) return
             const top = dock.mapToItem(null, 0, 0).y + mask.y
-            reserve = Math.max(0, Math.ceil(win.height - top))
+            reserve = Math.max(0, Math.ceil(win.height - top) + windowGap)
         }
         onMaskChanged: Qt.callLater(measureReserve)
         Window {

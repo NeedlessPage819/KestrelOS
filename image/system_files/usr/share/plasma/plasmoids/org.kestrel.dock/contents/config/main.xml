@@ -25,7 +25,7 @@
       <max>1.8</max>
     </entry>
     <!-- Reserve the glass's height for maximized windows while the panel lets windows go
-         below it: "Only for full-screen apps" in the dock settings (DECISIONS.md D34). -->
+         below it (DECISIONS.md D34). Off = "Let the dock float over windows" in the dock settings. -->
     <entry name="reserveSpace" type="Bool">
       <default>true</default>
     </entry>

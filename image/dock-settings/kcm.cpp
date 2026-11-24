@@ -27,8 +27,10 @@ class KestrelDockKcm : public KQuickConfigModule
     Q_PROPERTY(double zoom READ zoom WRITE setZoom NOTIFY changed)
     Q_PROPERTY(bool showIndicators READ showIndicators WRITE setShowIndicators NOTIFY changed)
     // 0 only full-screen apps cover it (maximized windows end at the glass, D34),
-    // 1 dodge windows, 2 auto-hide, 3 windows may go below
+    // 1 dodge windows, 2 auto-hide
     Q_PROPERTY(int hiding READ hiding WRITE setHiding NOTIFY changed)
+    // Windows may use the whole screen and the dock floats over them (D34; not the default).
+    Q_PROPERTY(bool overWindows READ overWindows WRITE setOverWindows NOTIFY changed)
     Q_PROPERTY(int iconMin MEMBER m_iconMin CONSTANT)
     Q_PROPERTY(int iconMax MEMBER m_iconMax CONSTANT)
     Q_PROPERTY(double zoomMax MEMBER m_zoomMax CONSTANT)
@@ -47,12 +49,14 @@ public:
     double zoom() const { return m_zoom; }
     bool showIndicators() const { return m_showIndicators; }
     int hiding() const { return m_hiding; }
+    bool overWindows() const { return m_overWindows; }
 
     void setIconSize(int v) { set(m_iconSize, std::clamp(v, m_iconMin, m_iconMax)); }
     void setMagnify(bool v) { set(m_magnify, v); }
     void setZoom(double v) { set(m_zoom, std::clamp(v, 1.2, m_zoomMax)); }
     void setShowIndicators(bool v) { set(m_showIndicators, v); }
-    void setHiding(int v) { set(m_hiding, std::clamp(v, 0, 3)); }
+    void setHiding(int v) { set(m_hiding, std::clamp(v, 0, 2)); }
+    void setOverWindows(bool v) { set(m_overWindows, v); }
 
     void load() override
     {
@@ -81,20 +85,21 @@ public:
         m_showIndicators = toBool(r.value(QStringLiteral("showIndicators")), true);
         const QString hiding = r.value(QStringLiteral("hiding")).toString();
         // "Only for full-screen apps" is the panel's "windows go below" mode plus the dock's
-        // own reserved strip of exactly the glass height (DECISIONS.md D34); without the strip
-        // it is "windows may go underneath". "none" is how docks before D34 were set up.
+        // own reserved strip of the glass height (DECISIONS.md D34); without the strip windows
+        // use the whole screen and the dock floats over them. "none" is how docks before D34
+        // were set up.
         const bool reserve = toBool(r.value(QStringLiteral("reserveSpace")), true);
         m_hiding = hiding == QLatin1String("dodgewindows") ? 1
             : hiding == QLatin1String("autohide")       ? 2
-            : hiding == QLatin1String("windowsgobelow") ? (reserve ? 0 : 3)
                                                         : 0;
+        m_overWindows = hiding == QLatin1String("windowsgobelow") && !reserve;
         Q_EMIT changed();
         setNeedsSave(false);
     }
 
     void save() override
     {
-        static const char *hidingNames[] = {"windowsgobelow", "dodgewindows", "autohide", "windowsgobelow"};
+        static const char *hidingNames[] = {"windowsgobelow", "dodgewindows", "autohide"};
         const int height = m_overflow + m_pad + m_iconSize + m_bottom; // as plasma_theme.py dock_height()
         evaluate(QStringLiteral(R"JS(
             panels().forEach(function (p) {
@@ -121,7 +126,7 @@ public:
                      .arg(m_showIndicators ? QStringLiteral("true") : QStringLiteral("false"))
                      .arg(height)
                      .arg(QLatin1String(hidingNames[m_hiding]))
-                     .arg(m_hiding == 0 ? QStringLiteral("true") : QStringLiteral("false")));
+                     .arg(m_overWindows ? QStringLiteral("false") : QStringLiteral("true")));
         setNeedsSave(false);
     }
 
@@ -132,6 +137,7 @@ public:
         m_zoom = m_defaultZoom;
         m_showIndicators = true;
         m_hiding = 0;
+        m_overWindows = false;
         Q_EMIT changed();
         setNeedsSave(true);
     }
@@ -206,6 +212,7 @@ private:
     double m_zoom = 1.6;
     bool m_showIndicators = true;
     int m_hiding = 0;
+    bool m_overWindows = false;
     int m_overflow = 90, m_pad = 6, m_bottom = 10, m_iconMin = 32, m_iconMax = 72, m_defaultIcon = 48;
     double m_zoomMax = 1.8, m_defaultZoom = 1.6;
 };

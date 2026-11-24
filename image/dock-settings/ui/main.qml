@@ -67,8 +67,7 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: page.tr("Ausblenden:", "Hide:")
             model: [page.tr("Nur bei Vollbild-Apps", "Only for full-screen apps"),
                     page.tr("Wenn ein Fenster das Dock berührt", "When a window touches the dock"),
-                    page.tr("Immer automatisch ausblenden", "Always hide automatically"),
-                    page.tr("Nie, Fenster dürfen darunter liegen", "Never, windows may go underneath")]
+                    page.tr("Immer automatisch ausblenden", "Always hide automatically")]
             currentIndex: kcm.hiding
             onActivated: index => kcm.hiding = index
         }
@@ -82,9 +81,24 @@ KCM.SimpleKCM {
                    page.tr("Das Dock verschwindet, sobald ein Fenster es berührt, und kommt zurück, wenn der Mauszeiger an den unteren Rand geht.",
                            "The dock disappears as soon as a window touches it and comes back when the pointer reaches the bottom edge."),
                    page.tr("Das Dock erscheint nur, wenn der Mauszeiger an den unteren Rand geht.",
-                           "The dock appears only when the pointer reaches the bottom edge."),
-                   page.tr("Das Dock bleibt sichtbar und schwebt über den Fenstern. Maximierte Fenster nutzen die ganze Höhe.",
-                           "The dock stays visible and floats over windows. Maximized windows use the full height.")][kcm.hiding]
+                           "The dock appears only when the pointer reaches the bottom edge.")][kcm.hiding]
+        }
+        QQC2.CheckBox {
+            Kirigami.FormData.label: page.tr("Fenster:", "Windows:")
+            text: page.tr("Dock über Fenstern schweben lassen", "Let the dock float over windows")
+            // Only meaningful while the dock always shows; the other choices hide it anyway.
+            enabled: kcm.hiding === 0
+            checked: kcm.overWindows
+            onToggled: kcm.overWindows = checked
+        }
+        QQC2.Label {
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 22
+            wrapMode: Text.Wrap
+            font: Kirigami.Theme.smallFont
+            opacity: 0.7
+            visible: kcm.hiding === 0
+            text: page.tr("Maximierte Fenster nutzen die ganze Bildschirmhöhe, das Dock liegt über ihnen. Ohne Haken enden sie über dem Dock, wie auf dem Mac.",
+                          "Maximized windows use the full screen height and the dock sits on top of them. Unchecked, they end above the dock, like on the Mac.")
         }
         QQC2.CheckBox {
             Kirigami.FormData.label: page.tr("Anzeigen:", "Show:")
