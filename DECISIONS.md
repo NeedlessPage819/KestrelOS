@@ -641,3 +641,21 @@ window in the VM was down to the VM's missing graphics card. Remaining issue: a 
 around that app's window. Apps that draw their own frame leave a margin for shadow and rounded
 corners that Windows makes transparent through its compositor (DWM / DirectComposition); Wine does
 not do that yet, so the margin shows white. Cosmetic only.
+
+## D33 – No grey box around the dock with maximized windows
+
+**Problem (real hardware):** with a maximized window, a large grey box appeared around the dock and
+only went away once the window was minimized. Cause: Kestrel's Plasma theme switched on Plasma's
+"adaptive transparency" (copied from Breeze's `plasmarc` with the D32 logout fix). With it, panels
+turn opaque as soon as a window is maximized. Kestrel's theme has no opaque panel picture, so
+Plasma used Breeze's grey one, and the dock panel is much taller than its visible glass (the empty
+band above the icons is where they magnify), so the whole panel became a grey box.
+
+**Fix:** the theme switches adaptive transparency off, and its "opaque" panel picture is the same
+glass as the normal one (should an opaque panel be forced in the panel settings). Top bar and
+dock look the same with or without a maximized window. Checked in the VM: maximized Dolphin with
+the old theme shows the grey box, with the new one only the dock glass.
+
+**Unchanged:** the dock stays "Only for full-screen apps" (always visible, covered only by
+full-screen apps; System Settings > Dock). A maximized window still ends above the dock panel,
+including the magnification band; Plasma reserves the panel's whole height.
