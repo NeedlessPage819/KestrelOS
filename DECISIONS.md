@@ -684,6 +684,7 @@ Mac does it): no strip, maximized windows use the whole screen height and the do
 them. Full-screen apps still cover the dock. The Hide choices "When a window touches the dock" and
 "Always hide automatically" reserve no space anyway, so the option is greyed out with them. It
 replaces the former Hide choice "Never, windows may go underneath", which did the same.
+
 Checked in the VM: a maximized Dolphin ends 10 px above the glass, the magnified Firefox icon and
 its label draw over it, a full-screen Dolphin covers the dock, and with the option on the
 maximized Dolphin reaches the bottom of the screen under the dock.
