@@ -34,7 +34,7 @@ jobs:
           sudo docker system prune -af >/dev/null
           df -h /
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -62,14 +62,16 @@ jobs:
         run: |
           source config.env
           repo=${UPDATE_SOURCE%:*}
-          echo "$TOKEN" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          # One login file for podman and skopeo (their default places differ under sudo).
+          auth=/tmp/ghcr-auth.json
+          echo "$TOKEN" | sudo podman login --authfile "$auth" ghcr.io -u "${{ github.actor }}" --password-stdin
           local="localhost/${IMAGE_NAME}:${FEDORA_VERSION}"
           date=$(date -u +%Y%m%d)
           # zstd layers: smaller downloads, read by bootc.
-          sudo podman push --compression-format zstd --force-compression --digestfile /tmp/digest "$local" "docker://$repo:latest"
+          sudo podman push --authfile "$auth" --compression-format zstd --force-compression --digestfile /tmp/digest "$local" "docker://$repo:latest"
           # The same image under its Fedora version and date (the layers are already there).
           for tag in "$FEDORA_VERSION" "$FEDORA_VERSION-$date"; do
-              sudo skopeo copy --authfile /run/containers/0/auth.json "docker://$repo@$(cat /tmp/digest)" "docker://$repo:$tag"
+              sudo skopeo copy --authfile "$auth" "docker://$repo@$(cat /tmp/digest)" "docker://$repo:$tag"
           done
           echo "repo=$repo" >>"$GITHUB_OUTPUT"
           echo "digest=$(cat /tmp/digest)" >>"$GITHUB_OUTPUT"
