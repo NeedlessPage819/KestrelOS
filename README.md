@@ -19,7 +19,7 @@ checked on real hardware is in [TESTING.md](TESTING.md).
 | Secure Boot | works, tested automatically (full test) |
 | Design (dock, top bar, windows, icons, Launchpad, lock screen) | round 5, still being refined |
 | Real hardware | live USB runs on an Acer Aspire Lite 15 (AL15-45P, Ryzen 7 5825U), a Dell with GTX 1660 Ti and an Intel laptop; installing on real hardware and Rocket League online still open, see [TESTING.md](TESTING.md) |
-| Updates over the internet | built and tested in the VM; the first online image is published once the signing key is set up (D36) |
+| Updates over the internet | works: signed image on ghcr.io, an installed VM updated itself from it (D36) |
 
 ## Screenshots
 

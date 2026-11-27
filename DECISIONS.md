@@ -738,3 +738,13 @@ after it.
 - The installer points the new system at the online image (a step at the end of installing).
   Systems installed before this switch over with their first `kestrel update`.
 
+**How a release is made:** run the full local build and `test/vm-test.sh`; if every check
+passes, tag the commit `release-YYYYMMDD` (`-2`, `-3` for more on one day) and push the tag.
+GitHub builds, publishes and signs the image in about 15 minutes.
+
+**Checked (2026-11-27):** first release `release-20261127-2` published and signed. A Kestrel
+installed in the VM from the local ISO pointed at `ghcr.io/needlesspage819/kestrel:latest`,
+`bootc upgrade` downloaded only the changed layers (2.1 of 6 GB), accepted the signature, and
+after a restart the VM ran the published image with the desktop, controller support and no
+failed services.
+
