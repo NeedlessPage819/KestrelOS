@@ -14,8 +14,8 @@ done
 # A package may pull in a newer libzstd than the base image has, while the zstd program stays
 # old; zstd then refuses to run ("incorrect library version") and the initramfs can't be built
 # (seen 2026-11-27: libzstd 1.6.0, zstd 1.5.7). Keep the program at the library's version.
-if [[ $(rpm -q --qf '%{VERSION}' libzstd) != "$(rpm -q --qf '%{VERSION}' zstd)" ]]; then
+if [[ $(rpm -q --qf '%{VERSION}' libzstd.x86_64) != "$(rpm -q --qf '%{VERSION}' zstd.x86_64)" ]]; then
     dnf5 -y upgrade zstd
 fi
-[[ $(rpm -q --qf '%{VERSION}' libzstd) == "$(rpm -q --qf '%{VERSION}' zstd)" ]] || die "zstd and libzstd versions differ"
+[[ $(rpm -q --qf '%{VERSION}' libzstd.x86_64) == "$(rpm -q --qf '%{VERSION}' zstd.x86_64)" ]] || die "zstd and libzstd versions differ"
 zstd --version >/dev/null || die "zstd does not run"
