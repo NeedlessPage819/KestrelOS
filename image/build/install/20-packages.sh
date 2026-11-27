@@ -10,3 +10,12 @@ for list in /tmp/build/packages/*.list; do
         rpm -q "${pkgs[@]}" >/dev/null || die "packages from ${list##*/} missing after install"
     fi
 done
+
+# A package may pull in a newer libzstd than the base image has, while the zstd program stays
+# old; zstd then refuses to run ("incorrect library version") and the initramfs can't be built
+# (seen 2026-11-27: libzstd 1.6.0, zstd 1.5.7). Keep the program at the library's version.
+if [[ $(rpm -q --qf '%{VERSION}' libzstd) != "$(rpm -q --qf '%{VERSION}' zstd)" ]]; then
+    dnf5 -y upgrade zstd
+fi
+[[ $(rpm -q --qf '%{VERSION}' libzstd) == "$(rpm -q --qf '%{VERSION}' zstd)" ]] || die "zstd and libzstd versions differ"
+zstd --version >/dev/null || die "zstd does not run"
