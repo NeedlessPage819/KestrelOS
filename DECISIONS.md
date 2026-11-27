@@ -174,9 +174,9 @@ Updates also work with a mouse click in **Discover** (the KDE app store).
 **Why:** The real tools (`bootc`, `flatpak`) are confusing for beginners.
 One command with German messages is easier.
 
-**Open:** For installed computers to *find* updates, the finished system image has to be on the
-internet (for example for free on GitHub). That is publishing something to the outside, so I will
-ask first. Until then you update by reinstalling with a new ISO.
+**Update (D36):** updates now come over the internet: the signed Kestrel image on GitHub's
+container registry. Installed computers fetch it in the background; `kestrel update` and
+Discover do it right away.
 
 ---
 
@@ -688,3 +688,53 @@ replaces the former Hide choice "Never, windows may go underneath", which did th
 Checked in the VM: a maximized Dolphin ends 10 px above the glass, the magnified Firefox icon and
 its label draw over it, a full-screen Dolphin covers the dock, and with the option on the
 maximized Dolphin reaches the bottom of the screen under the dock.
+
+## D35 – Game controllers work on the desktop
+
+**What:** a game controller (Xbox, PlayStation, Switch, 8BitDo and others) also controls the
+desktop, like a mouse and keyboard:
+
+| Controller | Does |
+|---|---|
+| Left or right stick | moves the mouse pointer (the further you push, the faster) |
+| Right trigger (RT/R2) / left trigger (LT/L2) | left click / right click |
+| A / B | Enter / Esc (open, back, close) |
+| D-pad | arrow keys |
+| Start | opens the Launchpad (like the Super key) |
+| X | on-screen keyboard (typing, e.g. in the Launchpad search) |
+| Y | space |
+| LB / RB | Ctrl / Alt |
+
+This comes from KWin itself (its "game controller" plugin since Plasma 6.6, switched off by
+default in Plasma 6.8; Kestrel switches it on). Off switch: System Settings > Game Controller.
+The Launchpad can now be used with arrow keys and so with the D-pad: a highlight moves over
+the icons, at the edge on to the next page; Enter (A) opens, Esc (B) closes.
+
+**Paused during games:** in games this would get in the way. Steam reads the controller in a
+way KWin does not notice (KDE bug 515994), so a game would get every press twice: once as
+controller and once as keyboard (B = Esc opens Rocket League's pause menu). A small Kestrel
+service (`/usr/libexec/kestrel/gamepad-guard`) switches desktop control off while a game runs
+(Steam games, Wine/Proton games from Heroic, Lutris or Bottles, Gamescope, common emulators)
+and on again afterwards. Tested in the VM with a virtual Xbox controller (`test/tools/vpad.c`):
+the stick moves the pointer over the dock, Start opens the Launchpad, the D-pad selects, A
+opens the app, B closes; with a game process running the plugin is unloaded and loaded again
+after it.
+
+## D36 – Updates over the internet
+
+**What:** installed computers get new versions of Kestrel from the internet:
+- The system image is built by GitHub (`.github/workflows/image.yml`) and published on GitHub's
+  container registry as `ghcr.io/needlesspage819/kestrel:latest` (free for public projects).
+- Only tested versions: a version is published when I mark it as a release (git tag
+  `release-…`) after the VM test passed. Once a week the newest release is rebuilt with
+  Fedora's latest security fixes.
+- Every image is **signed**. Installed computers accept only images with Kestrel's signature
+  (`/etc/containers/policy.json`, key `/etc/pki/containers/kestrel.pub`), like Universal Blue
+  does for its images. Someone who got into the registry still could not push a system onto
+  your computer. The private key is a secret of the GitHub repository; it is never in git.
+- Installed computers download updates in the background (the base image's automatic updates,
+  policy "stage") and switch at the next restart. The previous version stays in the boot menu.
+  `kestrel update` updates at once; Discover now also shows system updates.
+- The installer points the new system at the online image (a step at the end of installing).
+  Systems installed before this switch over with their first `kestrel update`.
+

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Desktop control with a game controller, paused while a game runs (DECISIONS.md D35).
+#
+# KWin's game controller plugin turns a controller into pointer and keyboard on the desktop:
+# a stick moves the pointer, A is Enter, B Esc, the D-pad the arrow keys, Start opens the
+# Launchpad, X the on-screen keyboard, the triggers click. In games that is harmful: Steam reads
+# the controller in a way KWin does not notice (KDE bug 515994), so a game would get every
+# press twice, once as controller and once as keyboard (B = Esc opens the pause menu). So while
+# a game runs, this unloads the plugin, and loads it again when the game has ended.
+#
+# Only when controller control is switched on (System Settings > Game Controller, kwinrc
+# [Plugins] gamecontrollerEnabled); switched off, this does nothing.
+set -u
+
+# Process names of running games: Steam's game launcher (also for Proton games), Wine and
+# Proton (Heroic, Lutris, Bottles), gamescope, common emulators.
+games='reaper|wineserver|gamescope|gamescope-wl|retroarch|rpcs3|pcsx2-qt|dolphin-emu|duckstation-qt|PPSSPPQt|Ryujinx|cemu|azahar|shadps4'
+
+plugins() { dbus-send --session --print-reply --dest=org.kde.KWin /Plugins "$@" 2>/dev/null; }
+loaded() { plugins org.freedesktop.DBus.Properties.Get string:org.kde.KWin.Plugins string:LoadedPlugins | grep -q '"gamecontroller"'; }
+
+paused=0
+while sleep 3; do
+    if [[ $(kreadconfig6 --file kwinrc --group Plugins --key gamecontrollerEnabled --default true) != true ]]; then
+        paused=0
+        continue
+    fi
+    if pgrep -u "$UID" -x "$games" >/dev/null; then
+        if (( !paused )) && loaded; then
+            plugins org.kde.KWin.Plugins.UnloadPlugin string:gamecontroller >/dev/null &&
+                echo "game running: controller desktop control paused"
+            paused=1
+        fi
+    elif (( paused )); then
+        loaded || { plugins org.kde.KWin.Plugins.LoadPlugin string:gamecontroller >/dev/null &&
+            echo "no game running: controller desktop control on again"; }
+        paused=0
+    fi
+done

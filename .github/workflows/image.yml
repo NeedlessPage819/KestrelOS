@@ -1,0 +1,91 @@
+# Builds the Kestrel system image and publishes it, signed, for online updates (DECISIONS.md D36).
+#
+# Only tested versions are published: a release is a git tag "release-YYYYMMDD[-n]" set after the
+# VM test (test/vm-test.sh) passed. Once a week the newest release is rebuilt, so installed
+# computers get Fedora's security fixes. Installed computers accept only images signed with
+# the key whose public half is image/system_files/etc/pki/containers/kestrel.pub; the private
+# half is the repository secret SIGNING_SECRET.
+name: Kestrel image
+
+on:
+  push:
+    tags: ["release-*"]
+  schedule:
+    - cron: "17 3 * * 1"    # Mondays 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: kestrel-image
+  cancel-in-progress: false
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - name: Make room on the runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache \
+              /usr/local/share/boost /usr/local/.ghcup /usr/share/swift
+          sudo docker system prune -af >/dev/null
+          df -h /
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use the newest release (weekly and manual builds)
+        if: github.ref_type != 'tag'
+        run: |
+          tag=$(git tag -l 'release-*' --sort=-creatordate | head -1)
+          [ -n "$tag" ] || { echo "no release tag yet"; exit 1; }
+          git checkout -q "$tag"
+          echo "building $tag"
+
+      - name: Check the signing key is set up
+        env:
+          SIGNING_SECRET: ${{ secrets.SIGNING_SECRET }}
+        run: |
+          [ -n "$SIGNING_SECRET" ] || { echo "::error::repository secret SIGNING_SECRET missing (DECISIONS.md D36)"; exit 1; }
+
+      - name: Build the image
+        run: sudo ./build.sh image
+
+      - name: Publish
+        id: publish
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          source config.env
+          repo=${UPDATE_SOURCE%:*}
+          echo "$TOKEN" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          local="localhost/${IMAGE_NAME}:${FEDORA_VERSION}"
+          date=$(date -u +%Y%m%d)
+          # zstd layers: smaller downloads, read by bootc.
+          sudo podman push --compression-format zstd --force-compression --digestfile /tmp/digest "$local" "docker://$repo:latest"
+          # The same image under its Fedora version and date (the layers are already there).
+          for tag in "$FEDORA_VERSION" "$FEDORA_VERSION-$date"; do
+              sudo skopeo copy --authfile /run/containers/0/auth.json "docker://$repo@$(cat /tmp/digest)" "docker://$repo:$tag"
+          done
+          echo "repo=$repo" >>"$GITHUB_OUTPUT"
+          echo "digest=$(cat /tmp/digest)" >>"$GITHUB_OUTPUT"
+
+      - uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: v2.5.0
+
+      - name: Sign
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+          COSIGN_PASSWORD: ""
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$TOKEN" | cosign login ghcr.io -u "${{ github.actor }}" --password-stdin
+          cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${{ steps.publish.outputs.repo }}@${{ steps.publish.outputs.digest }}"
+          cosign verify --key image/system_files/etc/pki/containers/kestrel.pub \
+              "${{ steps.publish.outputs.repo }}@${{ steps.publish.outputs.digest }}" >/dev/null
+          echo "signed ${{ steps.publish.outputs.repo }}@${{ steps.publish.outputs.digest }}"

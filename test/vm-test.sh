@@ -205,6 +205,16 @@ check "Boot screen: Kestrel theme, graphical boot" remote     'grep -qw rhgb /pr
 check "No failed system units" remote '! systemctl --failed --no-legend --plain | grep -v kestrel-flatpak-setup | grep .'
 remote 'systemctl --failed --no-legend --plain' || true
 
+# Online updates (D36): the installer pointed the system at Kestrel's signed online image.
+check "Updates come from Kestrel's signed online image" remote \
+    'rpm-ostree status --booted --json | grep -q "\"ostree-image-signed:docker://$(cat /usr/share/kestrel/update-source)\""'
+check "Only images with Kestrel's signature are accepted" remote \
+    "python3 -c 'import json; r=open(\"/usr/share/kestrel/update-source\").read().strip().rsplit(\":\", 1)[0]; p=json.load(open(\"/etc/containers/policy.json\"))[\"transports\"][\"docker\"][r][0]; assert p[\"type\"] == \"sigstoreSigned\"'"
+# Controller on the desktop (D35): KWin's plugin is loaded and the game guard runs.
+check "Game controllers work on the desktop" in_session \
+    'dbus-send --session --print-reply --dest=org.kde.KWin /Plugins org.freedesktop.DBus.Properties.Get string:org.kde.KWin.Plugins string:LoadedPlugins | grep -q "\"gamecontroller\""'
+check "Controller guard for games runs" remote 'pgrep -u "$USER" -f /usr/libexec/kestrel/gamepad-guard >/dev/null'
+
 sshpass -p "$TEST_PASSWORD" scp -q -P "$SSH_PORT" \
     -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
     "$WORK/winhello.exe" "$WORK/winhello32.exe" "$TEST_USER@127.0.0.1:"

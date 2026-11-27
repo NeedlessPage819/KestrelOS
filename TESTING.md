@@ -13,6 +13,8 @@
 | Window frame | KWin reports the Kestrel window decoration as loaded |
 | Boot screen | Kestrel design active, graphical boot (`rhgb`), pictures `boot-1..3.png` |
 | Dark mode | "Kestrel Dark" can be switched on, screenshot `dark.png` |
+| Online updates | installed system points at the signed online image; signature policy in place |
+| Controller on the desktop | KWin's game controller plugin loaded, game guard running |
 
 ## Live USB stick in the VM (`test/live-test.sh`)
 
@@ -66,8 +68,11 @@ Please tick off each item and write down problems with a short description.
 - [ ] In the game (full screen or borderless window) the dock and top bar are not visible
 - [ ] The game runs at full screen resolution, not blurry and upscaled
 - [ ] A controller (Xbox/PlayStation) is detected in Steam and in Heroic
+- [ ] On the desktop: the stick moves the pointer, RT clicks, Start opens the Launchpad, D-pad + A start an app
+- [ ] **In Rocket League the controller works normally and B does not open the pause menu twice** (no double input, D35)
 - [ ] GameMode active (turn it on in Heroic; to check: `gamemoded -s` in the terminal while the game is running)
 
 ### Updates and rollback
-- [ ] Later, once updates are published: install an update, restart, choose the previous version
-      in the boot menu. The old system starts again.
+- [ ] After installing: `kestrel status` shows `ghcr.io/needlesspage819/kestrel:latest` as the source
+- [ ] `kestrel update` downloads an update (signature accepted), restart, the new version runs
+- [ ] Choose the previous version in the boot menu. The old system starts again.

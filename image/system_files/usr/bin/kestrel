@@ -20,7 +20,16 @@ as_root() {
 
 cmd_update() {
     echo "==> Downloading and preparing the system update…"
-    as_root bootc upgrade
+    # Installed before online updates existed (DECISIONS.md D36): the system still points at
+    # the installer's copy. Switch to Kestrel's signed image on the internet once.
+    local source
+    source=$(cat /usr/share/kestrel/update-source)
+    if ! rpm-ostree status --booted --json | grep -q "\"container-image-reference\" *: *\"ostree-image-signed:docker://$source\""; then
+        echo "    (first online update: switching to $source)"
+        as_root bootc switch --enforce-container-sigpolicy "$source"
+    else
+        as_root bootc upgrade
+    fi
     echo "==> Updating apps (Flatpak)…"
     flatpak update --system --noninteractive
     flatpak update --user --noninteractive 2>/dev/null || true

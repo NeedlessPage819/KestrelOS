@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Kestrel controller guard
+Comment=Pauses desktop control with a game controller while a game runs (DECISIONS.md D35)
+Exec=/usr/libexec/kestrel/gamepad-guard
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=2

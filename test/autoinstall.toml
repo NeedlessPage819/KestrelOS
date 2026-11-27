@@ -18,6 +18,12 @@ rootpw --lock
 poweroff
 
 %post --erroronfail
+# Online updates (DECISIONS.md D36): the new system gets its updates from Kestrel's signed
+# image on the internet, not from the installer's copy.
+bootc switch --mutate-in-place --transport registry --enforce-container-sigpolicy "$(cat /usr/share/kestrel/update-source)"
+%end
+
+%post --erroronfail
 systemctl enable sshd.service
 # Text-mode installs default to multi-user.target; the account exists, so skip Plasma Setup.
 systemctl set-default graphical.target

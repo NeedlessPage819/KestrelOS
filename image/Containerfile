@@ -78,6 +78,11 @@ COPY build/configure/ /rootfs/tmp/build/configure/
 FROM ${BASE_IMAGE}:${FEDORA_VERSION}
 ARG OS_NAME="Kestrel OS"
 ARG IMAGE_NAME=kestrel
+ARG UPDATE_SOURCE
+# Links the published image to its source repository on GitHub (DECISIONS.md D36).
+LABEL org.opencontainers.image.source="https://github.com/NeedlessPage819/KestrelOS"
+LABEL org.opencontainers.image.title="Kestrel OS"
+LABEL org.opencontainers.image.description="Fedora Kinoite based OS for gaming and everyday use, with a macOS-like desktop"
 
 # Phase 1, packages: only invalidated by package lists or install steps, so design and
 # configuration changes below rebuild in minutes instead of reinstalling everything.
@@ -90,5 +95,5 @@ RUN --mount=type=bind,from=akmods-nvidia,src=/rpms,dst=/tmp/akmods-nvidia \
 
 # Phase 2, configuration and artwork: one copy, one run.
 COPY --from=files /rootfs/ /
-RUN OS_NAME="${OS_NAME}" IMAGE_NAME="${IMAGE_NAME}" /tmp/build/build.sh configure && \
+RUN OS_NAME="${OS_NAME}" IMAGE_NAME="${IMAGE_NAME}" UPDATE_SOURCE="${UPDATE_SOURCE}" /tmp/build/build.sh configure && \
     bootc container lint

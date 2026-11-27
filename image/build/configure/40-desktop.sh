@@ -205,6 +205,10 @@ shipped=$(rpm -q --qf '%{VERSION}-%{RELEASE}' kdecoration)
 [[ $built == "$shipped" ]] || die "window decoration built against kdecoration $built, image has $shipped"
 [[ -f /usr/lib64/qt6/plugins/plasma/kcms/systemsettings/kcm_kestreldock.so ]] || die "System Settings > Dock missing"
 [[ -x /usr/libexec/kestrel/auto-scale ]] || die "auto-scale helper missing or not executable"
+[[ -x /usr/libexec/kestrel/gamepad-guard ]] || die "controller guard missing or not executable"
+# Desktop control with a controller (D35) needs KWin's plugin and the on-screen keyboard (X).
+[[ -f /usr/lib64/qt6/plugins/kwin/plugins/gamecontroller.so ]] || die "KWin game controller plugin missing"
+rpm -q plasma-keyboard >/dev/null || die "plasma-keyboard (on-screen keyboard) missing"
 # Konsole's toolbars are hidden by our copies of its menu files (D27); check they still match
 # the version Konsole ships, else ours would be ignored (harmless) or outdated.
 for rc in konsoleui sessionui; do

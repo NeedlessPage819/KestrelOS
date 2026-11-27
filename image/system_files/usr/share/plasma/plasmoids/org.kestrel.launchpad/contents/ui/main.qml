@@ -156,9 +156,45 @@ PlasmoidItem {
 
             function reset() {
                 search.text = ""
+                sel = -1
                 pages.positionViewAtIndex(0, ListView.Beginning)
                 pages.currentIndex = 0
             }
+
+            // Arrow-key selection (DECISIONS.md D35): index into root.shownApps, -1 = none.
+            // A game controller's D-pad sends arrow keys, A Enter and B Esc (KWin's controller
+            // support), so the same code makes the Launchpad usable from the sofa.
+            property int sel: -1
+            function move(key) {
+                const n = root.shownApps.length
+                if (n === 0) return false
+                const per = content.perPage, cols = content.columns
+                if (sel < 0) {
+                    if (key === Qt.Key_Up) return false
+                    sel = Math.min(n - 1, pages.currentIndex * per)
+                    return true
+                }
+                const page = Math.floor(sel / per), pos = sel % per
+                const col = pos % cols, row = Math.floor(pos / cols)
+                let next = sel
+                if (key === Qt.Key_Right) {
+                    if (col < cols - 1 && sel + 1 < n) next = sel + 1
+                    else if ((page + 1) * per < n)      // on to the next page, same row
+                        next = Math.min(n - 1, (page + 1) * per + row * cols)
+                } else if (key === Qt.Key_Left) {
+                    if (col > 0) next = sel - 1
+                    else if (page > 0) next = (page - 1) * per + row * cols + cols - 1
+                } else if (key === Qt.Key_Down) {
+                    if (row < content.rows - 1 && sel + cols < n) next = sel + cols
+                    else if (row < content.rows - 1 && page * per + (row + 1) * cols < n) next = n - 1
+                } else if (key === Qt.Key_Up) {
+                    if (row > 0) next = sel - cols
+                    else { sel = -1; return true }      // back up to the search field
+                }
+                sel = next
+                return true
+            }
+            onSelChanged: if (sel >= 0) pages.currentIndex = Math.floor(sel / content.perPage)
 
             // Tint over the blurred desktop.
             Rectangle {
@@ -202,17 +238,28 @@ PlasmoidItem {
                     }
                     onTextChanged: {
                         root.query = text
+                        view.sel = -1
                         pages.currentIndex = 0
                         pages.positionViewAtIndex(0, ListView.Beginning)
                     }
                     Keys.onEscapePressed: text ? (text = "") : root.close()
-                    Keys.onReturnPressed: if (root.shownApps.length) root.launch(root.shownApps[0])
-                    Keys.onEnterPressed: if (root.shownApps.length) root.launch(root.shownApps[0])
-                    Keys.onLeftPressed: event => { if (!text) pages.decrementCurrentIndex(); else event.accepted = false }
-                    Keys.onRightPressed: event => { if (!text) pages.incrementCurrentIndex(); else event.accepted = false }
+                    function openSelected() {
+                        const list = root.shownApps
+                        if (list.length) root.launch(list[view.sel >= 0 ? Math.min(view.sel, list.length - 1) : 0])
+                    }
+                    Keys.onReturnPressed: openSelected()
+                    Keys.onEnterPressed: openSelected()
+                    // Arrows move the selection over the icons. While typing, left and right
+                    // stay in the text until the selection is on the icons (arrow down).
                     Keys.onPressed: event => {
-                        if (event.key === Qt.Key_PageDown) pages.incrementCurrentIndex()
-                        else if (event.key === Qt.Key_PageUp) pages.decrementCurrentIndex()
+                        const k = event.key
+                        if (k === Qt.Key_PageDown) { view.sel = -1; pages.incrementCurrentIndex() }
+                        else if (k === Qt.Key_PageUp) { view.sel = -1; pages.decrementCurrentIndex() }
+                        else if (k === Qt.Key_Up || k === Qt.Key_Down ||
+                                 ((k === Qt.Key_Left || k === Qt.Key_Right) && (!text || view.sel >= 0)))
+                            event.accepted = view.move(k)
+                        else return
+                        if (k === Qt.Key_PageDown || k === Qt.Key_PageUp) event.accepted = true
                     }
                 }
 
@@ -244,6 +291,8 @@ PlasmoidItem {
                     boundsBehavior: Flickable.StopAtBounds
                     clip: true          // the next page stays hidden until you switch
                     model: Math.max(1, Math.ceil(root.shownApps.length / content.perPage))
+                    // Turning the page another way (wheel, dots) drops a selection left behind.
+                    onCurrentIndexChanged: if (view.sel >= 0 && Math.floor(view.sel / content.perPage) !== currentIndex) view.sel = -1
 
                     // Scrolling turns pages, one page per gesture, like on the Mac: mouse wheel
                     // down or a two-finger swipe goes to the next page. The list must not
@@ -286,8 +335,10 @@ PlasmoidItem {
                                     width: content.cellW
                                     height: content.cellH
                                     hoverEnabled: true
-                                    // While searching, the first result is what Enter opens.
-                                    readonly property bool first: root.query && page.index === 0 && index === 0
+                                    // What Enter opens: the selected icon, or while searching the first result.
+                                    readonly property bool first: view.sel >= 0
+                                        ? page.index * content.perPage + index === view.sel
+                                        : root.query && page.index === 0 && index === 0
                                     onClicked: root.launch(modelData)
 
                                     Rectangle {      // soft highlight for the Enter target

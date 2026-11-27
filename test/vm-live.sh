@@ -148,6 +148,9 @@ click)
     pointer_to "${2:?x}" "${3:?y}"; sleep 0.3; button true; sleep 0.1; button false ;;
 run)
     shift; in_session "$*" ;;
+root)
+    # root COMMAND: run a command as root (sudo with the test account's password).
+    shift; remote "echo '$TEST_PASSWORD' | sudo -S -p '' sh -c $(printf %q "$*")" ;;
 shot)
     monitor "sendkey shift"; sleep 2
     monitor "screendump $WORK/${2:?name}.png -f png"; sleep 2

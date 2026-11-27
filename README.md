@@ -19,7 +19,7 @@ checked on real hardware is in [TESTING.md](TESTING.md).
 | Secure Boot | works, tested automatically (full test) |
 | Design (dock, top bar, windows, icons, Launchpad, lock screen) | round 5, still being refined |
 | Real hardware | live USB runs on an Acer Aspire Lite 15 (AL15-45P, Ryzen 7 5825U), a Dell with GTX 1660 Ti and an Intel laptop; installing on real hardware and Rocket League online still open, see [TESTING.md](TESTING.md) |
-| Updates over the internet | still open (D11) |
+| Updates over the internet | built and tested in the VM; the first online image is published once the signing key is set up (D36) |
 
 ## Screenshots
 
@@ -65,6 +65,9 @@ language Fedora supports can be chosen while installing.
 - Steam, Wine, Proton, Heroic, Lutris, Bottles, ProtonUp-Qt
 - GameMode, MangoHud (FPS overlay), Gamescope
 - Rules for controllers (Xbox, PlayStation, Switch) are preinstalled
+- A controller also works on the desktop: a stick moves the pointer, the triggers click, A/B
+  are Enter/Esc, Start opens the Launchpad, X the on-screen keyboard. Paused automatically
+  while a game runs, so games don't get double input (D35)
 - Windows programs run through Wine, also 32-bit ones (installers, older programs), without
   extra downloads; `kestrel webview2` installs Microsoft WebView2 for programs that need it
   (works on real hardware; apps with their own window frame may show a white border, D29)
@@ -81,6 +84,8 @@ language Fedora supports can be chosen while installing.
   stays on a black screen can still be diagnosed from another one (D30).
 
 **Updates that don't break things**
+- New versions come over the internet, signed: your computer only accepts images signed by
+  Kestrel (D36). Also shown in Discover.
 - Updates are prepared in the background and only become active at the next restart.
 - The previous system is kept. If something goes wrong, one command brings it back.
 

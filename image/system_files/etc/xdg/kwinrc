@@ -7,6 +7,10 @@ fadeEnabled=false
 magiclampEnabled=true
 squashEnabled=false
 maximizeEnabled=true
+# Game controllers work on the desktop (DECISIONS.md D35): a stick moves the pointer, A is
+# Enter, B Esc, the D-pad the arrow keys, Start opens the Launchpad. Paused during games by
+# /usr/libexec/kestrel/gamepad-guard. Off switch: System Settings > Game Controller.
+gamecontrollerEnabled=true
 
 [org.kde.kdecoration2]
 library=org.kestrel.decoration

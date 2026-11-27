@@ -30,6 +30,12 @@ cat >> /usr/share/anaconda/interactive-defaults.ks <<'KS'
 
 # Kestrel OS (DECISIONS.md D22): install the image stored on the live ISO.
 ostreecontainer --url=/run/initramfs/live/container --transport=oci --no-signature-verification
+
+%post --erroronfail
+# Online updates (DECISIONS.md D36): the new system gets its updates from Kestrel's signed
+# image on the internet, not from the installer's copy.
+bootc switch --mutate-in-place --transport registry --enforce-container-sigpolicy "$(cat /usr/share/kestrel/update-source)"
+%end
 KS
 
 # "Install" launcher: Kestrel name and Kestrel's installer icon (image/artwork/kestrel_icons.py),

@@ -1,3 +1,6 @@
 # Look and feel (DECISIONS.md D4).
 rsms-inter-fonts
 jetbrains-mono-fonts
+
+# System updates in Discover, next to app updates (DECISIONS.md D36).
+plasma-discover-rpm-ostree
