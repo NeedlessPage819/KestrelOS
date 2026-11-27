@@ -10,6 +10,12 @@ done
 plymouth-set-default-theme kestrel
 
 # The boot screen lives in the initramfs, so rebuild it for the image's kernel.
+# A module folder without any file is a leftover, not a kernel (the Universal Blue base image of
+# 2026-11-27 had an empty 7.3.5 tree next to its 7.3.4 kernel). Remove such trees, so a second
+# real kernel still stops the build below.
+for dir in /usr/lib/modules/*/; do
+    [[ -n $(find "$dir" -type f -print -quit) ]] || { echo "removing empty module folder $dir"; rm -rf "$dir"; }
+done
 kver=$(ls /usr/lib/modules)
 [[ $(wc -w <<<"$kver") -eq 1 ]] || die "expected exactly one kernel, found: $kver"
 # /root links to /var/roothome, which only exists on an installed system; dracut follows it.
